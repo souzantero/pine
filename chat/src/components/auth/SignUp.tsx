@@ -12,31 +12,50 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
 
-export function SignIn() {
+export function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn } = useAuth();
+  const { signUp } = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!email.trim() || !password.trim()) return;
+    if (!email.trim() || !password.trim() || !confirmPassword.trim()) return;
+
+    if (password !== confirmPassword) {
+      toast.error("As senhas não coincidem", {
+        description: "Por favor, verifique se as senhas são idênticas.",
+      });
+      return;
+    }
+
+    if (password.length < 6) {
+      toast.error("Senha muito curta", {
+        description: "A senha deve ter pelo menos 6 caracteres.",
+      });
+      return;
+    }
 
     setIsLoading(true);
 
-    const { error } = await signIn(email, password);
+    const { error } = await signUp(email, password);
 
     if (error) {
-      toast.error("Falha na autenticação", {
+      toast.error("Falha no cadastro", {
         description: error.message,
       });
       setIsLoading(false);
       return;
     }
 
-    // Redirect to main page
-    router.push("/");
+    toast.success("Cadastro realizado!", {
+      description: "Verifique seu e-mail para confirmar sua conta.",
+    });
+
+    // Redirect to sign in page
+    router.push("/sign-in");
   };
 
   return (
@@ -48,9 +67,9 @@ export function SignIn() {
             <h1 className="text-3xl font-bold tracking-tight">Pinechat</h1>
           </div>
           <div className="text-center">
-            <CardTitle className="text-2xl">Bem-vindo de volta</CardTitle>
+            <CardTitle className="text-2xl">Criar conta</CardTitle>
             <CardDescription className="mt-2">
-              Entre na sua conta para continuar
+              Cadastre-se para começar a usar o Pinechat
             </CardDescription>
           </div>
         </CardHeader>
@@ -81,14 +100,30 @@ export function SignIn() {
                 className="w-full"
               />
             </div>
-            <Button type="submit" className="w-full" disabled={isLoading || !email.trim() || !password.trim()}>
-              {isLoading ? "Entrando..." : "Entrar"}
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirmar senha</Label>
+              <PasswordInput
+                id="confirmPassword"
+                placeholder="Digite sua senha novamente"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                disabled={isLoading}
+                className="w-full"
+              />
+            </div>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isLoading || !email.trim() || !password.trim() || !confirmPassword.trim()}
+            >
+              {isLoading ? "Cadastrando..." : "Criar conta"}
             </Button>
           </form>
           <div className="mt-4 text-center text-sm text-muted-foreground">
-            Não tem uma conta?{" "}
-            <Link href="/sign-up" className="text-primary hover:underline font-medium">
-              Cadastre-se
+            Já tem uma conta?{" "}
+            <Link href="/sign-in" className="text-primary hover:underline font-medium">
+              Entre
             </Link>
           </div>
         </CardContent>
