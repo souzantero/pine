@@ -77,7 +77,7 @@ function getDecisionStatus(
 }
 
 function getActionTitle(action?: ActionRequest) {
-  return action?.name ?? "Unknown interrupt";
+  return action?.name ?? "Interrupção desconhecida";
 }
 
 export function ThreadActionsView({
