@@ -2,21 +2,22 @@ import React, {
   createContext,
   useContext,
   ReactNode,
+  useState,
   useEffect,
 } from "react";
 import { useStream } from "@langchain/langgraph-sdk/react";
 import { type Message } from "@langchain/langgraph-sdk";
 import {
   uiMessageReducer,
+  isUIMessage,
+  isRemoveUIMessage,
   type UIMessage,
   type RemoveUIMessage,
 } from "@langchain/langgraph-sdk/react-ui";
 import { useQueryState } from "nuqs";
-import { LogoSVG } from "@/components/icons/logo";
 import { useThreads } from "./Thread";
 import { toast } from "sonner";
 import { useAuth } from "./Auth";
-import { useLangGraphConfig } from "@/hooks/useLangGraphConfig";
 
 export type StateType = { messages: Message[]; ui?: UIMessage[] };
 
@@ -26,6 +27,7 @@ const useTypedStream = useStream<
     UpdateType: {
       messages?: Message[] | Message | string;
       ui?: (UIMessage | RemoveUIMessage)[] | UIMessage | RemoveUIMessage;
+      context?: Record<string, unknown>;
     };
     CustomEventType: UIMessage | RemoveUIMessage;
   }
@@ -80,16 +82,19 @@ const StreamSession = ({
     apiUrl,
     assistantId,
     threadId: threadId ?? null,
+    fetchStateHistory: true,
     ...(bearerToken && {
       defaultHeaders: {
         Authorization: `Bearer ${bearerToken}`,
       },
     }),
     onCustomEvent: (event, options) => {
-      options.mutate((prev) => {
-        const ui = uiMessageReducer(prev.ui ?? [], event);
-        return { ...prev, ui };
-      });
+      if (isUIMessage(event) || isRemoveUIMessage(event)) {
+        options.mutate((prev) => {
+          const ui = uiMessageReducer(prev.ui ?? [], event);
+          return { ...prev, ui };
+        });
+      }
     },
     onThreadId: (id) => {
       setThreadId(id);
@@ -105,7 +110,7 @@ const StreamSession = ({
         toast.error("Falha ao conectar ao servidor LangGraph", {
           description: () => (
             <p>
-              Por favor, verifique se seu grafo está executando em <code>{apiUrl}</code>.
+              Por favor, certifique-se de que seu grafo está sendo executado em <code>{apiUrl}</code>.
             </p>
           ),
           duration: 10000,
@@ -126,54 +131,14 @@ const StreamSession = ({
 export const StreamProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  // Use shared hook for config
-  const { apiUrl, assistantId } = useLangGraphConfig();
+  // Get environment variables
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  const assistantId = process.env.NEXT_PUBLIC_ASSISTANT_ID;
 
-  // If we're missing any required values, show the configuration message
+  // Validate required environment variables
   if (!apiUrl || !assistantId) {
-    return (
-      <div className="flex items-center justify-center min-h-screen w-full p-4">
-        <div className="animate-in fade-in-0 zoom-in-95 flex flex-col border bg-background shadow-lg rounded-lg max-w-3xl">
-          <div className="flex flex-col gap-2 mt-14 p-6 border-b">
-            <div className="flex items-start flex-col gap-2">
-              <LogoSVG className="h-7" />
-              <h1 className="text-xl font-semibold tracking-tight">
-                Pinechat
-              </h1>
-            </div>
-            <p className="text-muted-foreground">
-              Bem-vindo ao Pinechat! Por favor, configure as variáveis de ambiente
-              necessárias para começar.
-            </p>
-          </div>
-          <div className="flex flex-col gap-6 p-6 bg-muted/50">
-            <div className="flex flex-col gap-2">
-              <p className="text-sm font-medium">Configuração Ausente</p>
-              <p className="text-muted-foreground text-sm">
-                Por favor, configure as seguintes variáveis de ambiente:
-              </p>
-              <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1 ml-2">
-                {!apiUrl && (
-                  <li>
-                    <code className="text-xs bg-muted px-1 py-0.5 rounded">
-                      NEXT_PUBLIC_API_URL
-                    </code>{" "}
-                    - A URL da sua implantação do LangGraph
-                  </li>
-                )}
-                {!assistantId && (
-                  <li>
-                    <code className="text-xs bg-muted px-1 py-0.5 rounded">
-                      NEXT_PUBLIC_ASSISTANT_ID
-                    </code>{" "}
-                    - O ID do assistente / grafo
-                  </li>
-                )}
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
+    throw new Error(
+      "Variáveis de ambiente obrigatórias ausentes: NEXT_PUBLIC_API_URL e NEXT_PUBLIC_ASSISTANT_ID devem estar configuradas"
     );
   }
 

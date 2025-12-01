@@ -1,12 +1,14 @@
 from langchain.agents import create_agent
 from langchain_community.tools import DuckDuckGoSearchRun
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import ChatOpenAI
 
-model = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
+model = ChatOpenAI(
+    model="gpt-5",
+    stream_usage=True,
     temperature=0.1,
-    max_tokens=None,
-    timeout=None,
+    max_tokens=5000,
+    timeout=60,
+    reasoning_effort="low",
     max_retries=3,
 )
 

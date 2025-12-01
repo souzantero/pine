@@ -4,7 +4,7 @@ import { Inter } from "next/font/google";
 import React from "react";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { AuthProvider } from "@/providers/Auth";
-import { Toaster } from "sonner";
+import { ToasterProvider } from "@/components/providers/toaster-provider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -14,10 +14,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "Pinechat",
-  description: "Pinechat by Pine Software",
-  icons: {
-    icon: '/favicon.svg',
-  },
+  description: "Interface de chat com agentes IA por LangChain",
 };
 
 export default function RootLayout({
@@ -26,12 +23,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <body className={inter.className}>
         <AuthProvider>
+          <ToasterProvider />
           <NuqsAdapter>{children}</NuqsAdapter>
         </AuthProvider>
-        <Toaster />
       </body>
     </html>
   );

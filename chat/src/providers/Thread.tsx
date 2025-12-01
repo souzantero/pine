@@ -11,7 +11,6 @@ import {
 } from "react";
 import { createClient } from "./client";
 import { useAuth } from "./Auth";
-import { useLangGraphConfig } from "@/hooks/useLangGraphConfig";
 
 interface ThreadContextType {
   getThreads: () => Promise<Thread[]>;
@@ -34,16 +33,20 @@ function getThreadSearchMetadata(
 }
 
 export function ThreadProvider({ children }: { children: ReactNode }) {
-  const { apiUrl, assistantId } = useLangGraphConfig();
+  // Get environment variables
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  const assistantId = process.env.NEXT_PUBLIC_ASSISTANT_ID;
+
   const [threads, setThreads] = useState<Thread[]>([]);
   const [threadsLoading, setThreadsLoading] = useState(false);
   const { session } = useAuth();
 
+  // Get the Supabase access token
+  const bearerToken = session?.access_token;
+
   const getThreads = useCallback(async (): Promise<Thread[]> => {
     if (!apiUrl || !assistantId) return [];
-
-    const bearerToken = session?.access_token;
-    const client = createClient(apiUrl, bearerToken);
+    const client = createClient(apiUrl, undefined, bearerToken);
 
     const threads = await client.threads.search({
       metadata: {
@@ -53,7 +56,7 @@ export function ThreadProvider({ children }: { children: ReactNode }) {
     });
 
     return threads;
-  }, [apiUrl, assistantId, session]);
+  }, [apiUrl, assistantId, bearerToken]);
 
   const value = {
     getThreads,
