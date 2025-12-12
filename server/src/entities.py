@@ -9,7 +9,7 @@ def get_now():
 
 
 class Thread(SQLModel, table=True):
-    __tablename__ = "thread"
+    __tablename__ = "threads"
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     created_at: datetime = Field(default_factory=get_now)

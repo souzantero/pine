@@ -16,5 +16,5 @@ class RunInput(BaseModel):
     messages: List[MessageInput]
 
 
-class RunBody(BaseModel):
+class RunPayload(BaseModel):
     input: RunInput

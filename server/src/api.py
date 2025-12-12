@@ -9,7 +9,7 @@ from src.agent import build_agent
 from src.entities import Thread
 from src.database import get_checkpoint_saver, get_session
 from src.helpers import get_config
-from src.models import RunBody
+from src.schemas import RunPayload
 
 app = FastAPI()
 
@@ -47,10 +47,10 @@ async def get_thread(thread_id: str, checkpointer: CheckpointSaverDependency):
     return state.values
 
 
-@app.post("/threads/{thread_id}/runs/wait")
-async def wait_run(
-    thread_id: str, body: RunBody, checkpointer: CheckpointSaverDependency
+@app.post("/threads/{thread_id}/runs/invoke")
+async def invoke_run(
+    thread_id: str, payload: RunPayload, checkpointer: CheckpointSaverDependency
 ):
     agent = build_agent(checkpointer)
-    messages = [m.to_agent() for m in body.input.messages]
-    agent.invoke({"messages": messages}, config=get_config(thread_id))
+    messages = [m.to_agent() for m in payload.input.messages]
+    return agent.invoke({"messages": messages}, config=get_config(thread_id))
