@@ -1,8 +1,8 @@
-ag-ui-langgraph==0.0.21
-copilotkit==0.1.72
+ag-ui-langgraph==0.0.22
+copilotkit==0.1.74
 ddgs==9.9.1
 dotenv==0.9.9
-fastapi==0.124.3
+fastapi==0.115.14
 langchain==1.0.5
 langchain-community==0.4.1
 langchain-openai==1.1.0

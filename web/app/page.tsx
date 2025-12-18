@@ -1,10 +1,9 @@
-import { CopilotSidebar } from "@copilotkit/react-ui"; 
+import { CopilotChat } from "@copilotkit/react-core/v2";
 
 export default function Page() {
   return (
     <main>
-      <h1>Pinechat</h1>
-      <CopilotSidebar />
+      <CopilotChat />
     </main>
   );
 }

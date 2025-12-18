@@ -32,7 +32,7 @@ async def lifespan(app: FastAPI):
             description="Pinechat agent",
             graph=agent_graph,
         ),
-        path="/",
+        path="/ag-ui",
     )
     try:
         yield
