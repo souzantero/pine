@@ -1,12 +1,19 @@
 "use client";
 
-import { createContext, useContext, useCallback, useSyncExternalStore, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useCallback,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 
 export interface User {
   id: string;
   email: string;
-  name?: string;
-  password: string; // Armazenado apenas para mock
+  name: string;
+  createdAt: string;
 }
 
 interface AuthContextType {
@@ -14,120 +21,102 @@ interface AuthContextType {
   isLoggedIn: boolean;
   isLoading: boolean;
   signIn: (email: string, password: string) => Promise<{ error?: string }>;
-  signUp: (email: string, password: string) => Promise<{ error?: string }>;
+  signUp: (
+    email: string,
+    password: string,
+    name?: string
+  ) => Promise<{ error?: string }>;
   signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-const USERS_KEY = "pinechat_users";
-const LOGGED_USER_KEY = "pinechat_logged_user";
-
-// Store para usuários registrados
-function getRegisteredUsers(): User[] {
-  if (typeof window === "undefined") return [];
-  const stored = localStorage.getItem(USERS_KEY);
-  return stored ? JSON.parse(stored) : [];
-}
-
-function saveRegisteredUsers(users: User[]) {
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
-}
-
-// Store para usuário logado
-let listeners: Array<() => void> = [];
-let cachedLoggedUser: User | null = null;
-let initialized = false;
-
-function getLoggedUser(): User | null {
-  if (typeof window === "undefined") return null;
-  if (!initialized) {
-    const stored = localStorage.getItem(LOGGED_USER_KEY);
-    cachedLoggedUser = stored ? JSON.parse(stored) : null;
-    initialized = true;
-  }
-  return cachedLoggedUser;
-}
-
-function subscribe(listener: () => void) {
-  listeners.push(listener);
-  return () => {
-    listeners = listeners.filter((l) => l !== listener);
-  };
-}
-
-function setLoggedUser(user: User | null) {
-  cachedLoggedUser = user;
-  if (user) {
-    localStorage.setItem(LOGGED_USER_KEY, JSON.stringify(user));
-  } else {
-    localStorage.removeItem(LOGGED_USER_KEY);
-  }
-  listeners.forEach((listener) => listener());
-}
-
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const user = useSyncExternalStore(subscribe, getLoggedUser, () => null);
-  const isLoggedIn = user !== null;
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const signIn = useCallback(async (email: string, password: string): Promise<{ error?: string }> => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    if (!email || !password) {
-      return { error: "Email e senha são obrigatórios" };
+  useEffect(() => {
+    async function loadSession() {
+      try {
+        const response = await fetch("/api/auth/me");
+        const data = await response.json();
+        setUser(data.user);
+      } catch (error) {
+        console.error("Failed to load session:", error);
+      } finally {
+        setIsLoading(false);
+      }
     }
-
-    const users = getRegisteredUsers();
-    const foundUser = users.find((u) => u.email.toLowerCase() === email.toLowerCase());
-
-    if (!foundUser) {
-      return { error: "Usuário não encontrado. Cadastre-se primeiro." };
-    }
-
-    if (foundUser.password !== password) {
-      return { error: "Senha incorreta" };
-    }
-
-    setLoggedUser(foundUser);
-    return {};
+    loadSession();
   }, []);
 
-  const signUp = useCallback(async (email: string, password: string): Promise<{ error?: string }> => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+  const signIn = useCallback(
+    async (email: string, password: string): Promise<{ error?: string }> => {
+      try {
+        const response = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
 
-    if (!email || !password) {
-      return { error: "Email e senha são obrigatórios" };
-    }
+        const data = await response.json();
 
-    if (password.length < 6) {
-      return { error: "A senha deve ter pelo menos 6 caracteres" };
-    }
+        if (!response.ok) {
+          return { error: data.error };
+        }
 
-    const users = getRegisteredUsers();
-    const existingUser = users.find((u) => u.email.toLowerCase() === email.toLowerCase());
+        setUser(data.user);
+        return {};
+      } catch (error) {
+        console.error("Sign in error:", error);
+        return { error: "Erro ao conectar com o servidor" };
+      }
+    },
+    []
+  );
 
-    if (existingUser) {
-      return { error: "Este email já está cadastrado" };
-    }
+  const signUp = useCallback(
+    async (
+      email: string,
+      password: string,
+      name?: string
+    ): Promise<{ error?: string }> => {
+      try {
+        const response = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password, name }),
+        });
 
-    const newUser: User = {
-      id: crypto.randomUUID(),
-      email,
-      name: email.split("@")[0],
-      password,
-    };
+        const data = await response.json();
 
-    saveRegisteredUsers([...users, newUser]);
-    setLoggedUser(newUser);
-    return {};
-  }, []);
+        if (!response.ok) {
+          return { error: data.error };
+        }
+
+        setUser(data.user);
+        return {};
+      } catch (error) {
+        console.error("Sign up error:", error);
+        return { error: "Erro ao conectar com o servidor" };
+      }
+    },
+    []
+  );
 
   const signOut = useCallback(async () => {
-    setLoggedUser(null);
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      setUser(null);
+    } catch (error) {
+      console.error("Sign out error:", error);
+    }
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, isLoggedIn, isLoading: false, signIn, signUp, signOut }}>
+    <AuthContext.Provider
+      value={{ user, isLoggedIn: user !== null, isLoading, signIn, signUp, signOut }}
+    >
       {children}
     </AuthContext.Provider>
   );
