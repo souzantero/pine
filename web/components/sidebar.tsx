@@ -5,6 +5,12 @@ import { MessageSquare, PanelLeftClose, PanelLeft, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 
 export interface Conversation {
   id: string;
@@ -21,12 +27,36 @@ interface SidebarProps {
   onNewChat: () => void;
 }
 
-export function Sidebar({ conversations, selectedId, onSelect, onNewChat }: SidebarProps) {
+interface MobileSidebarProps extends SidebarProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+// Conteúdo compartilhado da sidebar
+function SidebarContent({
+  conversations,
+  selectedId,
+  onSelect,
+  onNewChat,
+  onItemClick,
+  showMenuToggle = true,
+  isMobile = false,
+}: SidebarProps & { onItemClick?: () => void; showMenuToggle?: boolean; isMobile?: boolean }) {
   const [menuExpanded, setMenuExpanded] = useState(true);
   const [activeSection, setActiveSection] = useState<NavSection>("conversations");
 
+  const handleSelect = (id: string) => {
+    onSelect(id);
+    onItemClick?.();
+  };
+
+  const handleNewChat = () => {
+    onNewChat();
+    onItemClick?.();
+  };
+
   return (
-    <div className="flex">
+    <div className="flex h-full">
       {/* Menu principal */}
       <aside
         className={cn(
@@ -34,22 +64,24 @@ export function Sidebar({ conversations, selectedId, onSelect, onNewChat }: Side
           menuExpanded ? "w-40" : "w-14"
         )}
       >
-        <div className={cn("p-2", menuExpanded ? "flex justify-end" : "flex justify-center")}>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setMenuExpanded(!menuExpanded)}
-            title={menuExpanded ? "Encolher menu" : "Expandir menu"}
-          >
-            {menuExpanded ? (
-              <PanelLeftClose className="h-5 w-5" />
-            ) : (
-              <PanelLeft className="h-5 w-5" />
-            )}
-          </Button>
-        </div>
+        {showMenuToggle && (
+          <div className={cn("p-2", menuExpanded ? "flex justify-end" : "flex justify-center")}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setMenuExpanded(!menuExpanded)}
+              title={menuExpanded ? "Encolher menu" : "Expandir menu"}
+            >
+              {menuExpanded ? (
+                <PanelLeftClose className="h-5 w-5" />
+              ) : (
+                <PanelLeft className="h-5 w-5" />
+              )}
+            </Button>
+          </div>
+        )}
 
-        <nav className="flex-1 p-2">
+        <nav className={cn("flex-1 p-2", !showMenuToggle && "pt-4")}>
           <ul className="space-y-2">
             <li>
               <button
@@ -73,11 +105,11 @@ export function Sidebar({ conversations, selectedId, onSelect, onNewChat }: Side
 
       {/* Submenu - Lista de conversas */}
       <aside className="w-56 border-r bg-muted/40 flex flex-col">
-        <div className="p-2">
+        <div className={cn("p-2", isMobile && "pt-12")}>
           <Button
             variant="outline"
             size="default"
-            onClick={onNewChat}
+            onClick={handleNewChat}
             title="Nova conversa"
             className="w-full"
           >
@@ -97,7 +129,7 @@ export function Sidebar({ conversations, selectedId, onSelect, onNewChat }: Side
                 conversations.map((conv) => (
                   <li key={conv.id}>
                     <button
-                      onClick={() => onSelect(conv.id)}
+                      onClick={() => handleSelect(conv.id)}
                       className={cn(
                         "w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors text-left",
                         selectedId === conv.id
@@ -116,5 +148,33 @@ export function Sidebar({ conversations, selectedId, onSelect, onNewChat }: Side
         </ScrollArea>
       </aside>
     </div>
+  );
+}
+
+// Sidebar para desktop
+export function Sidebar(props: SidebarProps) {
+  return (
+    <div className="hidden md:flex h-full">
+      <SidebarContent {...props} />
+    </div>
+  );
+}
+
+// Sidebar para mobile (drawer)
+export function MobileSidebar({ open, onOpenChange, ...props }: MobileSidebarProps) {
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent side="left" className="p-0 w-auto">
+        <SheetHeader className="sr-only">
+          <SheetTitle>Menu de navegação</SheetTitle>
+        </SheetHeader>
+        <SidebarContent
+          {...props}
+          onItemClick={() => onOpenChange(false)}
+          showMenuToggle={false}
+          isMobile
+        />
+      </SheetContent>
+    </Sheet>
   );
 }

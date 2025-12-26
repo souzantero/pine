@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { Header } from "@/components/header";
-import { Sidebar, type Conversation } from "@/components/sidebar";
+import { Sidebar, MobileSidebar, type Conversation } from "@/components/sidebar";
 import { ChatArea, type Message } from "@/components/chat-area";
 
 interface ConversationWithMessages extends Conversation {
@@ -16,6 +16,7 @@ export default function Home() {
   const { isLoggedIn } = useAuth();
   const [conversations, setConversations] = useState<ConversationWithMessages[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -108,21 +109,32 @@ export default function Home() {
     }, 1000);
   };
 
-  // Não renderiza enquanto redireciona
   if (!isLoggedIn) {
     return null;
   }
 
+  const sidebarProps = {
+    conversations,
+    selectedId,
+    onSelect: setSelectedId,
+    onNewChat: handleNewChat,
+  };
+
   return (
     <div className="h-screen flex flex-col">
-      <Header />
+      <Header onMenuClick={() => setMobileMenuOpen(true)} />
+
+      {/* Mobile Sidebar */}
+      <MobileSidebar
+        {...sidebarProps}
+        open={mobileMenuOpen}
+        onOpenChange={setMobileMenuOpen}
+      />
+
       <div className="flex flex-1 overflow-hidden">
-        <Sidebar
-          conversations={conversations}
-          selectedId={selectedId}
-          onSelect={setSelectedId}
-          onNewChat={handleNewChat}
-        />
+        {/* Desktop Sidebar */}
+        <Sidebar {...sidebarProps} />
+
         <main className="flex-1 overflow-hidden">
           <ChatArea
             messages={selectedConversation?.messages ?? []}

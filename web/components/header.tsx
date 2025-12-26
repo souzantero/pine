@@ -19,10 +19,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
-import { LogOut } from "lucide-react";
+import { LogOut, Menu } from "lucide-react";
 
-export function Header() {
+interface HeaderProps {
+  onMenuClick?: () => void;
+}
+
+export function Header({ onMenuClick }: HeaderProps) {
   const router = useRouter();
   const { user, signOut } = useAuth();
   const [loggingOut, setLoggingOut] = useState(false);
@@ -42,14 +47,26 @@ export function Header() {
 
   return (
     <>
-      <header className="flex items-center justify-between px-6 py-4 border-b">
-        <h1 className="text-xl font-semibold">Pine Chat</h1>
+      <header className="flex items-center justify-between px-4 md:px-6 py-3 md:py-4 border-b">
+        <div className="flex items-center gap-3">
+          {onMenuClick && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden"
+              onClick={onMenuClick}
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+          )}
+          <h1 className="text-lg md:text-xl font-semibold">Pine Chat</h1>
+        </div>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="rounded-full focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-              <Avatar className="cursor-pointer">
-                <AvatarFallback>{getInitials()}</AvatarFallback>
+              <Avatar className="cursor-pointer h-8 w-8 md:h-10 md:w-10">
+                <AvatarFallback className="text-sm md:text-base">{getInitials()}</AvatarFallback>
               </Avatar>
             </button>
           </DropdownMenuTrigger>
@@ -72,7 +89,7 @@ export function Header() {
       </header>
 
       <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-[90vw] md:max-w-lg">
           <AlertDialogHeader>
             <AlertDialogTitle>Deseja sair?</AlertDialogTitle>
             <AlertDialogDescription>
