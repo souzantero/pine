@@ -21,13 +21,15 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
-import { LogOut, Menu } from "lucide-react";
+import { LogOut, Menu, Settings } from "lucide-react";
 
 interface HeaderProps {
   onMenuClick?: () => void;
+  onSettingsClick?: () => void;
+  showSettingsButton?: boolean;
 }
 
-export function Header({ onMenuClick }: HeaderProps) {
+export function Header({ onMenuClick, onSettingsClick, showSettingsButton }: HeaderProps) {
   const router = useRouter();
   const { user, signOut } = useAuth();
   const [loggingOut, setLoggingOut] = useState(false);
@@ -62,14 +64,27 @@ export function Header({ onMenuClick }: HeaderProps) {
           <h1 className="text-lg md:text-xl font-semibold">Pine Chat</h1>
         </div>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="rounded-full focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-              <Avatar className="cursor-pointer h-8 w-8 md:h-10 md:w-10">
-                <AvatarFallback className="text-sm md:text-base">{getInitials()}</AvatarFallback>
-              </Avatar>
-            </button>
-          </DropdownMenuTrigger>
+        <div className="flex items-center gap-2">
+          {showSettingsButton && onSettingsClick && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="lg:hidden"
+              onClick={onSettingsClick}
+              title="Configurações"
+            >
+              <Settings className="h-5 w-5" />
+            </Button>
+          )}
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="rounded-full focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
+                <Avatar className="cursor-pointer h-8 w-8 md:h-10 md:w-10">
+                  <AvatarFallback className="text-sm md:text-base">{getInitials()}</AvatarFallback>
+                </Avatar>
+              </button>
+            </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             {user && (
               <div className="px-2 py-1.5 text-sm text-muted-foreground">
@@ -85,7 +100,8 @@ export function Header({ onMenuClick }: HeaderProps) {
               {loggingOut ? "Saindo..." : "Sair"}
             </DropdownMenuItem>
           </DropdownMenuContent>
-        </DropdownMenu>
+          </DropdownMenu>
+        </div>
       </header>
 
       <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>

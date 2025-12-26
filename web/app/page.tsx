@@ -6,9 +6,12 @@ import { useAuth } from "@/lib/auth";
 import { Header } from "@/components/header";
 import { Sidebar, MobileSidebar, type Conversation } from "@/components/sidebar";
 import { ChatArea, type Message } from "@/components/chat-area";
+import { ChatSettings, MobileChatSettings, type AIModel } from "@/components/chat-settings";
 
 interface ConversationWithMessages extends Conversation {
   messages: Message[];
+  model: AIModel;
+  temperature: number;
 }
 
 export default function Home() {
@@ -17,6 +20,8 @@ export default function Home() {
   const [conversations, setConversations] = useState<ConversationWithMessages[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileSettingsOpen, setMobileSettingsOpen] = useState(false);
+  const [settingsExpanded, setSettingsExpanded] = useState(true);
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -32,9 +37,29 @@ export default function Home() {
       title: "Nova conversa",
       updatedAt: new Date(),
       messages: [],
+      model: "gpt-4",
+      temperature: 0.7,
     };
     setConversations((prev) => [newConversation, ...prev]);
     setSelectedId(newConversation.id);
+  };
+
+  const handleModelChange = (model: AIModel) => {
+    if (!selectedId) return;
+    setConversations((prev) =>
+      prev.map((conv) =>
+        conv.id === selectedId ? { ...conv, model } : conv
+      )
+    );
+  };
+
+  const handleTemperatureChange = (temperature: number) => {
+    if (!selectedId) return;
+    setConversations((prev) =>
+      prev.map((conv) =>
+        conv.id === selectedId ? { ...conv, temperature } : conv
+      )
+    );
   };
 
   const handleSendMessage = (content: string) => {
@@ -51,6 +76,8 @@ export default function Home() {
         title: content.slice(0, 30) + (content.length > 30 ? "..." : ""),
         updatedAt: new Date(),
         messages: [userMessage],
+        model: "gpt-4",
+        temperature: 0.7,
       };
       setConversations((prev) => [newConversation, ...prev]);
       setSelectedId(newId);
@@ -88,22 +115,25 @@ export default function Home() {
 
   const simulateResponse = (conversationId: string) => {
     setTimeout(() => {
+      const conv = conversations.find((c) => c.id === conversationId);
+      const modelName = conv?.model ?? "IA";
+
       const assistantMessage: Message = {
         id: crypto.randomUUID(),
         role: "assistant",
-        content: "Esta é uma resposta simulada. Em breve, será integrado com o agente de IA.",
+        content: `Resposta simulada usando ${modelName}. Em breve, será integrado com o agente de IA.`,
         createdAt: new Date(),
       };
 
       setConversations((prev) =>
-        prev.map((conv) => {
-          if (conv.id === conversationId) {
+        prev.map((c) => {
+          if (c.id === conversationId) {
             return {
-              ...conv,
-              messages: [...conv.messages, assistantMessage],
+              ...c,
+              messages: [...c.messages, assistantMessage],
             };
           }
-          return conv;
+          return c;
         })
       );
     }, 1000);
@@ -122,7 +152,11 @@ export default function Home() {
 
   return (
     <div className="h-screen flex flex-col">
-      <Header onMenuClick={() => setMobileMenuOpen(true)} />
+      <Header
+        onMenuClick={() => setMobileMenuOpen(true)}
+        onSettingsClick={() => setMobileSettingsOpen(true)}
+        showSettingsButton={!!selectedConversation}
+      />
 
       {/* Mobile Sidebar */}
       <MobileSidebar
@@ -139,9 +173,36 @@ export default function Home() {
           <ChatArea
             messages={selectedConversation?.messages ?? []}
             onSendMessage={handleSendMessage}
+            disabled={!selectedConversation}
           />
         </main>
+
+        {/* Settings Panel - Desktop only */}
+        {selectedConversation && (
+          <div className="hidden lg:flex h-full">
+            <ChatSettings
+              model={selectedConversation.model}
+              onModelChange={handleModelChange}
+              temperature={selectedConversation.temperature}
+              onTemperatureChange={handleTemperatureChange}
+              expanded={settingsExpanded}
+              onExpandedChange={setSettingsExpanded}
+            />
+          </div>
+        )}
       </div>
+
+      {/* Mobile Settings */}
+      {selectedConversation && (
+        <MobileChatSettings
+          model={selectedConversation.model}
+          onModelChange={handleModelChange}
+          temperature={selectedConversation.temperature}
+          onTemperatureChange={handleTemperatureChange}
+          open={mobileSettingsOpen}
+          onOpenChange={setMobileSettingsOpen}
+        />
+      )}
     </div>
   );
 }

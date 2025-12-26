@@ -18,9 +18,10 @@ interface ChatAreaProps {
   messages: Message[];
   onSendMessage: (content: string) => void;
   isLoading?: boolean;
+  disabled?: boolean;
 }
 
-export function ChatArea({ messages, onSendMessage, isLoading }: ChatAreaProps) {
+export function ChatArea({ messages, onSendMessage, isLoading, disabled }: ChatAreaProps) {
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -33,7 +34,7 @@ export function ChatArea({ messages, onSendMessage, isLoading }: ChatAreaProps) 
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || isLoading) return;
+    if (!input.trim() || isLoading || disabled) return;
     onSendMessage(input.trim());
     setInput("");
   };
@@ -51,7 +52,11 @@ export function ChatArea({ messages, onSendMessage, isLoading }: ChatAreaProps) 
         <div className="max-w-3xl mx-auto space-y-3 md:space-y-4">
           {messages.length === 0 ? (
             <div className="flex items-center justify-center h-full min-h-[200px] text-muted-foreground text-center px-4">
-              <p className="text-sm md:text-base">Envie uma mensagem para começar a conversa</p>
+              <p className="text-sm md:text-base">
+                {disabled
+                  ? "Selecione uma conversa existente ou clique em \"Nova conversa\" para começar"
+                  : "Envie uma mensagem para começar a conversa"}
+              </p>
             </div>
           ) : (
             messages.map((message) => (
@@ -93,12 +98,12 @@ export function ChatArea({ messages, onSendMessage, isLoading }: ChatAreaProps) 
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Digite sua mensagem..."
+              placeholder={disabled ? "Selecione ou crie uma conversa..." : "Digite sua mensagem..."}
               className="min-h-[44px] max-h-[120px] md:max-h-[200px] resize-none text-sm md:text-base"
               rows={1}
-              disabled={isLoading}
+              disabled={isLoading || disabled}
             />
-            <Button type="submit" size="icon" disabled={!input.trim() || isLoading}>
+            <Button type="submit" size="icon" disabled={!input.trim() || isLoading || disabled}>
               <Send className="h-4 w-4" />
             </Button>
           </div>
