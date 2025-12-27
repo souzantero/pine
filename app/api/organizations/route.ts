@@ -25,6 +25,7 @@ const SYSTEM_ROLES = {
       Permission.MEMBERS_READ,
       Permission.MEMBERS_INVITE,
       Permission.MEMBERS_MANAGE,
+      Permission.ROLES_READ,
       Permission.ROLES_MANAGE,
     ],
   },

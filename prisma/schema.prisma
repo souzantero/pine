@@ -34,6 +34,7 @@ enum Permission {
   MEMBERS_INVITE
   MEMBERS_MANAGE
   // Roles
+  ROLES_READ
   ROLES_MANAGE
   // Organizacao
   ORGANIZATION_MANAGE
@@ -49,7 +50,9 @@ model User {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
-  memberships OrganizationMember[]
+  memberships     OrganizationMember[]
+  invitesCreated  OrganizationInvite[] @relation("InvitesCreated")
+  invitesAccepted OrganizationInvite[] @relation("InvitesAccepted")
 
   @@map("users")
 }
@@ -63,6 +66,7 @@ model Organization {
 
   members OrganizationMember[]
   roles   Role[]
+  invites OrganizationInvite[]
 
   @@map("organizations")
 }
@@ -78,9 +82,10 @@ model Role {
   createdAt      DateTime  @default(now()) @map("created_at")
   updatedAt      DateTime  @updatedAt @map("updated_at")
 
-  organization Organization?      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organization Organization?        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   permissions  RolePermission[]
   members      OrganizationMember[]
+  invites      OrganizationInvite[]
 
   @@unique([organizationId, name])
   @@map("roles")
@@ -114,4 +119,24 @@ model OrganizationMember {
 
   @@unique([userId, organizationId])
   @@map("organization_members")
+}
+
+// Convites para organizacao
+model OrganizationInvite {
+  id             String    @id @default(uuid())
+  organizationId String    @map("organization_id")
+  roleId         String    @map("role_id")
+  token          String    @unique
+  createdById    String    @map("created_by_id")
+  expiresAt      DateTime  @map("expires_at")
+  usedAt         DateTime? @map("used_at")
+  usedById       String?   @map("used_by_id")
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  role         Role         @relation(fields: [roleId], references: [id])
+  createdBy    User         @relation("InvitesCreated", fields: [createdById], references: [id])
+  usedBy       User?        @relation("InvitesAccepted", fields: [usedById], references: [id])
+
+  @@map("organization_invites")
 }

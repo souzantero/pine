@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { MessageSquare, PanelLeftClose, PanelLeft, Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { MessageSquare, PanelLeftClose, PanelLeft, Plus, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -11,6 +12,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { useAuth } from "@/lib/auth";
 
 export interface Conversation {
   id: string;
@@ -18,7 +20,7 @@ export interface Conversation {
   updatedAt: Date;
 }
 
-type NavSection = "conversations";
+type NavSection = "conversations" | "members";
 
 interface SidebarProps {
   conversations: Conversation[];
@@ -42,8 +44,12 @@ function SidebarContent({
   showMenuToggle = true,
   isMobile = false,
 }: SidebarProps & { onItemClick?: () => void; showMenuToggle?: boolean; isMobile?: boolean }) {
+  const router = useRouter();
+  const { hasPermission } = useAuth();
   const [menuExpanded, setMenuExpanded] = useState(true);
   const [activeSection, setActiveSection] = useState<NavSection>("conversations");
+
+  const canViewMembers = hasPermission("MEMBERS_READ");
 
   const handleSelect = (id: string) => {
     onSelect(id);
@@ -52,6 +58,11 @@ function SidebarContent({
 
   const handleNewChat = () => {
     onNewChat();
+    onItemClick?.();
+  };
+
+  const handleMembersClick = () => {
+    router.push("/members");
     onItemClick?.();
   };
 
@@ -99,6 +110,22 @@ function SidebarContent({
                 {menuExpanded && <span className="text-sm font-medium">Conversas</span>}
               </button>
             </li>
+            {canViewMembers && (
+              <li>
+                <button
+                  onClick={handleMembersClick}
+                  title={!menuExpanded ? "Membros" : undefined}
+                  className={cn(
+                    "w-full flex items-center rounded-md transition-colors",
+                    menuExpanded ? "gap-3 px-3 py-2" : "justify-center p-2",
+                    "hover:bg-muted"
+                  )}
+                >
+                  <Users className="h-5 w-5 shrink-0" />
+                  {menuExpanded && <span className="text-sm font-medium">Membros</span>}
+                </button>
+              </li>
+            )}
           </ul>
         </nav>
       </aside>

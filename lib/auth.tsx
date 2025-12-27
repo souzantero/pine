@@ -27,6 +27,7 @@ export type Permission =
   | "MEMBERS_READ"
   | "MEMBERS_INVITE"
   | "MEMBERS_MANAGE"
+  | "ROLES_READ"
   | "ROLES_MANAGE"
   | "ORGANIZATION_MANAGE"
   | "PLATFORM_MANAGE";

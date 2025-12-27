@@ -11,7 +11,7 @@ const PUBLIC_API_ROUTES = ["/api/auth/login", "/api/auth/register"];
 const AUTH_ONLY_API_ROUTES = ["/api/organizations"];
 
 // Rotas que precisam apenas de autenticacao (sem org)
-const AUTH_ONLY_ROUTES = ["/onboarding"];
+const AUTH_ONLY_ROUTES = ["/onboarding", "/invite"];
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -59,8 +59,8 @@ export function proxy(request: NextRequest) {
 
   // Rotas que precisam apenas de auth (sem verificar org)
   if (AUTH_ONLY_ROUTES.some((route) => pathname.startsWith(route))) {
-    // Se ja tem org, redirecionar para home
-    if (currentOrg?.value) {
+    // Onboarding: se ja tem org, redirecionar para home
+    if (pathname.startsWith("/onboarding") && currentOrg?.value) {
       return NextResponse.redirect(new URL("/", request.url));
     }
     return NextResponse.next();

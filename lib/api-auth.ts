@@ -138,6 +138,7 @@ export async function validateSession(): Promise<AuthResult> {
 
 /**
  * Valida a sessão e garante que o usuário tem pelo menos uma organização
+ * Usa o cookie current_org para determinar a organização ativa
  */
 export async function validateSessionWithOrg(): Promise<AuthWithOrgResult> {
   const result = await validateSession();
@@ -146,16 +147,32 @@ export async function validateSessionWithOrg(): Promise<AuthWithOrgResult> {
     return result;
   }
 
-  if (!result.session.currentMembership) {
+  if (result.session.memberships.length === 0) {
     return {
       success: false,
       error: { error: "Usuário não pertence a nenhuma organização", status: 403 },
     };
   }
 
+  // Buscar org ativa do cookie
+  const cookieStore = await cookies();
+  const currentOrgId = cookieStore.get("current_org")?.value;
+
+  // Encontrar membership da org ativa ou usar a primeira
+  let currentMembership = result.session.memberships.find(
+    (m) => m.organizationId === currentOrgId
+  );
+
+  if (!currentMembership) {
+    currentMembership = result.session.memberships[0];
+  }
+
   return {
     success: true,
-    session: result.session as AuthSession & { currentMembership: AuthMembership },
+    session: {
+      ...result.session,
+      currentMembership,
+    },
   };
 }
 
