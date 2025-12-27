@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { MessageSquare, PanelLeftClose, PanelLeft, Plus, Users } from "lucide-react";
+import { MessageSquare, PanelLeftClose, PanelLeft, Plus, Users, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -50,6 +50,7 @@ function SidebarContent({
   const [activeSection, setActiveSection] = useState<NavSection>("conversations");
 
   const canViewMembers = hasPermission("MEMBERS_READ");
+  const canManageOrg = hasPermission("ORGANIZATION_MANAGE");
 
   const handleSelect = (id: string) => {
     onSelect(id);
@@ -66,13 +67,18 @@ function SidebarContent({
     onItemClick?.();
   };
 
+  const handleSettingsClick = () => {
+    router.push("/settings");
+    onItemClick?.();
+  };
+
   return (
     <div className="flex h-full">
       {/* Menu principal */}
       <aside
         className={cn(
           "border-r bg-muted/30 flex flex-col transition-all duration-300",
-          menuExpanded ? "w-40" : "w-14"
+          menuExpanded ? "w-48" : "w-14"
         )}
       >
         {showMenuToggle && (
@@ -123,6 +129,22 @@ function SidebarContent({
                 >
                   <Users className="h-5 w-5 shrink-0" />
                   {menuExpanded && <span className="text-sm font-medium">Membros</span>}
+                </button>
+              </li>
+            )}
+            {canManageOrg && (
+              <li>
+                <button
+                  onClick={handleSettingsClick}
+                  title={!menuExpanded ? "Configurações" : undefined}
+                  className={cn(
+                    "w-full flex items-center rounded-md transition-colors",
+                    menuExpanded ? "gap-3 px-3 py-2" : "justify-center p-2",
+                    "hover:bg-muted"
+                  )}
+                >
+                  <Settings className="h-5 w-5 shrink-0" />
+                  {menuExpanded && <span className="text-sm font-medium">Configurações</span>}
                 </button>
               </li>
             )}
