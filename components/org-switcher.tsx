@@ -32,12 +32,9 @@ export function OrgSwitcher() {
   // Se só tem uma org, mostrar apenas o nome sem dropdown
   if (memberships.length === 1) {
     return (
-      <div className="flex items-center gap-2 px-2 py-1 text-sm text-muted-foreground">
-        <Building2 className="h-4 w-4" />
-        <span className="hidden sm:inline truncate max-w-[150px]">
-          {currentMembership.organization.name}
-        </span>
-      </div>
+      <h1 className="text-lg md:text-xl font-semibold truncate max-w-[200px] md:max-w-[300px]">
+        {currentMembership.organization.name}
+      </h1>
     );
   }
 
@@ -46,15 +43,13 @@ export function OrgSwitcher() {
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          size="sm"
-          className="gap-2 px-2"
+          className="gap-2 px-2 h-auto py-1"
           disabled={switching}
         >
-          <Building2 className="h-4 w-4" />
-          <span className="hidden sm:inline truncate max-w-[150px]">
+          <span className="text-lg md:text-xl font-semibold truncate max-w-[150px] md:max-w-[250px]">
             {currentMembership.organization.name}
           </span>
-          <ChevronsUpDown className="h-3 w-3 opacity-50" />
+          <ChevronsUpDown className="h-4 w-4 opacity-50 shrink-0" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-[200px]">

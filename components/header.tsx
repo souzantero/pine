@@ -62,10 +62,7 @@ export function Header({ onMenuClick, onSettingsClick, showSettingsButton }: Hea
               <Menu className="h-5 w-5" />
             </Button>
           )}
-          <h1 className="text-lg md:text-xl font-semibold">Pine Chat</h1>
-          <div className="hidden md:block border-l pl-3 ml-1">
-            <OrgSwitcher />
-          </div>
+          <OrgSwitcher />
         </div>
 
         <div className="flex items-center gap-2">
