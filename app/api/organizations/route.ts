@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { cookies } from "next/headers";
 import { Permission, RoleScope } from "@/lib/generated/prisma/client";
+import { validateSession, authError } from "@/lib/api-auth";
 
 // Permissões padrão para cada role de sistema
 const SYSTEM_ROLES = {
@@ -38,13 +38,12 @@ const SYSTEM_ROLES = {
 // POST - Criar nova organização
 export async function POST(request: NextRequest) {
   try {
-    const cookieStore = await cookies();
-    const session = cookieStore.get("session");
-
-    if (!session?.value) {
-      return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
+    const auth = await validateSession();
+    if (!auth.success) {
+      return authError(auth.error);
     }
 
+    const { user } = auth.session;
     const { name, slug } = await request.json();
 
     if (!name?.trim()) {
@@ -127,7 +126,7 @@ export async function POST(request: NextRequest) {
       // 4. Criar membership do usuário como Owner
       const membership = await tx.organizationMember.create({
         data: {
-          userId: session.value,
+          userId: user.id,
           organizationId: organization.id,
           roleId: roles.Owner.id,
           isOwner: true,
@@ -176,63 +175,11 @@ export async function POST(request: NextRequest) {
 
 // GET - Listar organizações do usuário
 export async function GET() {
-  try {
-    const cookieStore = await cookies();
-    const session = cookieStore.get("session");
-
-    if (!session?.value) {
-      return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
-    }
-
-    const memberships = await prisma.organizationMember.findMany({
-      where: { userId: session.value },
-      include: {
-        organization: {
-          select: {
-            id: true,
-            name: true,
-            slug: true,
-            createdAt: true,
-          },
-        },
-        role: {
-          select: {
-            id: true,
-            name: true,
-            description: true,
-            scope: true,
-            isSystemRole: true,
-            permissions: {
-              select: {
-                permission: true,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    const formattedMemberships = memberships.map((m) => ({
-      id: m.id,
-      isOwner: m.isOwner,
-      createdAt: m.createdAt,
-      organization: m.organization,
-      role: {
-        id: m.role.id,
-        name: m.role.name,
-        description: m.role.description,
-        scope: m.role.scope,
-        isSystemRole: m.role.isSystemRole,
-        permissions: m.role.permissions.map((p) => p.permission),
-      },
-    }));
-
-    return NextResponse.json({ memberships: formattedMemberships });
-  } catch (error) {
-    console.error("List organizations error:", error);
-    return NextResponse.json(
-      { error: "Erro interno do servidor" },
-      { status: 500 }
-    );
+  const auth = await validateSession();
+  if (!auth.success) {
+    return authError(auth.error);
   }
+
+  // Retorna as memberships já carregadas pelo validateSession
+  return NextResponse.json({ memberships: auth.session.memberships });
 }
