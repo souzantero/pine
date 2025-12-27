@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { Header } from "@/components/header";
-import { Sidebar, MobileSidebar, type Thread } from "@/components/sidebar";
+import { Sidebar, MobileSidebar, MobileThreadsDrawer, type Thread } from "@/components/sidebar";
 import { ChatArea, type Message } from "@/components/chat-area";
 import { ChatSettings, MobileChatSettings, type AIModel } from "@/components/chat-settings";
 
@@ -35,6 +35,7 @@ export default function Home() {
   const [threads, setThreads] = useState<ThreadWithMessages[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileThreadsOpen, setMobileThreadsOpen] = useState(false);
   const [mobileSettingsOpen, setMobileSettingsOpen] = useState(false);
   const [settingsExpanded, setSettingsExpanded] = useState(true);
   const [isLoadingThreads, setIsLoadingThreads] = useState(true);
@@ -239,11 +240,21 @@ export default function Home() {
         showSettingsButton={!!selectedThread}
       />
 
-      {/* Mobile Sidebar */}
+      {/* Mobile Menu */}
       <MobileSidebar
-        {...sidebarProps}
         open={mobileMenuOpen}
         onOpenChange={setMobileMenuOpen}
+        onThreadsClick={() => setMobileThreadsOpen(true)}
+      />
+
+      {/* Mobile Threads Drawer */}
+      <MobileThreadsDrawer
+        threads={threads}
+        selectedId={selectedId}
+        onSelect={setSelectedId}
+        onNewChat={handleNewChat}
+        open={mobileThreadsOpen}
+        onOpenChange={setMobileThreadsOpen}
       />
 
       <div className="flex flex-1 overflow-hidden">
