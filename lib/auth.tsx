@@ -30,7 +30,10 @@ export type Permission =
   | "ROLES_READ"
   | "ROLES_MANAGE"
   | "ORGANIZATION_MANAGE"
-  | "PLATFORM_MANAGE";
+  | "PLATFORM_MANAGE"
+  | "PROMPTS_READ"
+  | "PROMPTS_WRITE"
+  | "PROMPTS_DELETE";
 
 export type RoleScope = "PLATFORM" | "ORGANIZATION";
 

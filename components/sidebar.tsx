@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { MessageSquare, PanelLeftClose, PanelLeft, Plus, Users, Settings, Building2, ChevronDown } from "lucide-react";
+import { useRouter, usePathname } from "next/navigation";
+import { MessageSquare, PanelLeftClose, PanelLeft, Plus, Users, Settings, Building2, ChevronDown, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -30,7 +30,7 @@ export interface Thread {
   updatedAt: Date;
 }
 
-type NavSection = "threads" | "members";
+type NavSection = "threads" | "prompts" | "settings";
 
 interface SidebarProps {
   threads: Thread[];
@@ -65,13 +65,17 @@ function SidebarContent({
   isMobile = false,
 }: SidebarProps & { onItemClick?: () => void; showMenuToggle?: boolean; isMobile?: boolean }) {
   const router = useRouter();
+  const pathname = usePathname();
   const { hasPermission } = useAuth();
   const [menuExpanded, setMenuExpanded] = useState(true);
-  const [activeSection, setActiveSection] = useState<NavSection>("threads");
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   const canViewMembers = hasPermission("MEMBERS_READ");
   const canManageOrg = hasPermission("ORGANIZATION_MANAGE");
+  const canViewPrompts = hasPermission("PROMPTS_READ");
+
+  // Determinar qual seção está ativa baseado na rota
+  const activeSection: NavSection = pathname === "/prompts" ? "prompts" : "threads";
 
   const handleSelect = (id: string) => {
     onSelect(id);
@@ -90,6 +94,16 @@ function SidebarContent({
 
   const handleOrganizationClick = () => {
     router.push("/settings");
+    onItemClick?.();
+  };
+
+  const handlePromptsClick = () => {
+    router.push("/prompts");
+    onItemClick?.();
+  };
+
+  const handleConversasClick = () => {
+    router.push("/");
     onItemClick?.();
   };
 
@@ -125,7 +139,7 @@ function SidebarContent({
           <ul className="space-y-2">
             <li>
               <button
-                onClick={() => setActiveSection("threads")}
+                onClick={handleConversasClick}
                 title={!menuExpanded ? "Conversas" : undefined}
                 className={cn(
                   "w-full flex items-center rounded-md transition-colors",
@@ -139,6 +153,24 @@ function SidebarContent({
                 {menuExpanded && <span className="text-sm font-medium">Conversas</span>}
               </button>
             </li>
+            {canViewPrompts && (
+              <li>
+                <button
+                  onClick={handlePromptsClick}
+                  title={!menuExpanded ? "Prompts" : undefined}
+                  className={cn(
+                    "w-full flex items-center rounded-md transition-colors",
+                    menuExpanded ? "gap-3 px-3 py-2" : "justify-center p-2",
+                    activeSection === "prompts"
+                      ? "bg-primary text-primary-foreground"
+                      : "hover:bg-muted"
+                  )}
+                >
+                  <FileText className="h-5 w-5 shrink-0" />
+                  {menuExpanded && <span className="text-sm font-medium">Prompts</span>}
+                </button>
+              </li>
+            )}
             {canAccessSettings && (
               <li>
                 {menuExpanded ? (
@@ -243,50 +275,52 @@ function SidebarContent({
         </nav>
       </aside>
 
-      {/* Submenu - Lista de threads */}
-      <aside className="w-56 border-r bg-muted/40 flex flex-col">
-        <div className={cn("p-2", isMobile && "pt-12")}>
-          <Button
-            variant="outline"
-            size="default"
-            onClick={handleNewChat}
-            title="Nova conversa"
-            className="w-full"
-          >
-            <Plus className="h-4 w-4" />
-            <span className="ml-2">Nova conversa</span>
-          </Button>
-        </div>
+      {/* Submenu - Lista de threads (só aparece quando Conversas está ativo) */}
+      {activeSection === "threads" && (
+        <aside className="w-56 border-r bg-muted/40 flex flex-col">
+          <div className={cn("p-2", isMobile && "pt-12")}>
+            <Button
+              variant="outline"
+              size="default"
+              onClick={handleNewChat}
+              title="Nova conversa"
+              className="w-full"
+            >
+              <Plus className="h-4 w-4" />
+              <span className="ml-2">Nova conversa</span>
+            </Button>
+          </div>
 
-        <ScrollArea className="flex-1">
-          <nav className="p-2">
-            <ul className="space-y-1">
-              {threads.length === 0 ? (
-                <li className="px-3 py-2 text-sm text-muted-foreground">
-                  Nenhuma conversa
-                </li>
-              ) : (
-                threads.map((thread) => (
-                  <li key={thread.id}>
-                    <button
-                      onClick={() => handleSelect(thread.id)}
-                      className={cn(
-                        "w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors text-left",
-                        selectedId === thread.id
-                          ? "bg-primary text-primary-foreground"
-                          : "hover:bg-muted"
-                      )}
-                    >
-                      <MessageSquare className="h-4 w-4 shrink-0" />
-                      <span className="truncate">{thread.title}</span>
-                    </button>
+          <ScrollArea className="flex-1">
+            <nav className="p-2">
+              <ul className="space-y-1">
+                {threads.length === 0 ? (
+                  <li className="px-3 py-2 text-sm text-muted-foreground">
+                    Nenhuma conversa
                   </li>
-                ))
-              )}
-            </ul>
-          </nav>
-        </ScrollArea>
-      </aside>
+                ) : (
+                  threads.map((thread) => (
+                    <li key={thread.id}>
+                      <button
+                        onClick={() => handleSelect(thread.id)}
+                        className={cn(
+                          "w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors text-left",
+                          selectedId === thread.id
+                            ? "bg-primary text-primary-foreground"
+                            : "hover:bg-muted"
+                        )}
+                      >
+                        <MessageSquare className="h-4 w-4 shrink-0" />
+                        <span className="truncate">{thread.title}</span>
+                      </button>
+                    </li>
+                  ))
+                )}
+              </ul>
+            </nav>
+          </ScrollArea>
+        </aside>
+      )}
     </div>
   );
 }
@@ -309,12 +343,17 @@ function MobileMenuContent({
   onThreadsClick: () => void;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
   const { hasPermission } = useAuth();
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   const canViewMembers = hasPermission("MEMBERS_READ");
   const canManageOrg = hasPermission("ORGANIZATION_MANAGE");
+  const canViewPrompts = hasPermission("PROMPTS_READ");
   const canAccessSettings = canViewMembers || canManageOrg;
+
+  // Determinar qual seção está ativa baseado na rota
+  const activeSection: NavSection = pathname === "/prompts" ? "prompts" : "threads";
 
   const handleMembersClick = () => {
     router.push("/members");
@@ -323,6 +362,11 @@ function MobileMenuContent({
 
   const handleOrganizationClick = () => {
     router.push("/settings");
+    onItemClick?.();
+  };
+
+  const handlePromptsClick = () => {
+    router.push("/prompts");
     onItemClick?.();
   };
 
@@ -338,12 +382,33 @@ function MobileMenuContent({
           <li>
             <button
               onClick={handleThreadsClick}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-md transition-colors hover:bg-muted"
+              className={cn(
+                "w-full flex items-center gap-3 px-3 py-2 rounded-md transition-colors",
+                activeSection === "threads"
+                  ? "bg-primary text-primary-foreground"
+                  : "hover:bg-muted"
+              )}
             >
               <MessageSquare className="h-5 w-5 shrink-0" />
               <span className="text-sm font-medium">Conversas</span>
             </button>
           </li>
+          {canViewPrompts && (
+            <li>
+              <button
+                onClick={handlePromptsClick}
+                className={cn(
+                  "w-full flex items-center gap-3 px-3 py-2 rounded-md transition-colors",
+                  activeSection === "prompts"
+                    ? "bg-primary text-primary-foreground"
+                    : "hover:bg-muted"
+                )}
+              >
+                <FileText className="h-5 w-5 shrink-0" />
+                <span className="text-sm font-medium">Prompts</span>
+              </button>
+            </li>
+          )}
           {canAccessSettings && (
             <li>
               <Collapsible open={settingsOpen} onOpenChange={setSettingsOpen}>

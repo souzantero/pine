@@ -40,6 +40,17 @@ enum Permission {
   ORGANIZATION_MANAGE
   // Plataforma (para roles de plataforma no futuro)
   PLATFORM_MANAGE
+  // Prompts
+  PROMPTS_READ
+  PROMPTS_WRITE
+  PROMPTS_DELETE
+}
+
+// Role do prompt (para IA)
+enum PromptRole {
+  SYSTEM
+  USER
+  ASSISTANT
 }
 
 model User {
@@ -68,6 +79,7 @@ model Organization {
   roles   Role[]
   invites OrganizationInvite[]
   threads Thread[]
+  prompts Prompt[]
 
   @@map("organizations")
 }
@@ -118,6 +130,7 @@ model OrganizationMember {
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   role         Role         @relation(fields: [roleId], references: [id])
   threads      Thread[]
+  prompts      Prompt[]
 
   @@unique([userId, organizationId])
   @@map("organization_members")
@@ -136,6 +149,23 @@ model Thread {
   createdBy    OrganizationMember @relation(fields: [createdById], references: [id], onDelete: Cascade)
 
   @@map("threads")
+}
+
+// Prompts salvos
+model Prompt {
+  id             String     @id @default(uuid())
+  organizationId String     @map("organization_id")
+  createdById    String     @map("created_by_id")
+  name           String
+  content        String     @db.Text
+  role           PromptRole @default(SYSTEM)
+  createdAt      DateTime   @default(now()) @map("created_at")
+  updatedAt      DateTime   @updatedAt @map("updated_at")
+
+  organization Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdBy    OrganizationMember @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@map("prompts")
 }
 
 // Convites para organizacao
