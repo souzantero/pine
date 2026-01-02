@@ -19,60 +19,58 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 
-export type AIModel = "gpt-4" | "gpt-3.5" | "claude-3" | "claude-2" | "gemini-pro" | "gemini-flash";
-
 export interface SystemPrompt {
   id: string;
   name: string;
   content: string;
 }
 
-interface ModelOption {
-  value: AIModel;
-  label: string;
-  provider: string;
+export interface ModelOption {
+  id: string;
+  name: string;
+  description?: string;
 }
 
-const models: ModelOption[] = [
-  { value: "gpt-4", label: "GPT-4", provider: "OpenAI" },
-  { value: "gpt-3.5", label: "GPT-3.5 Turbo", provider: "OpenAI" },
-  { value: "claude-3", label: "Claude 3 Opus", provider: "Anthropic" },
-  { value: "claude-2", label: "Claude 2", provider: "Anthropic" },
-  { value: "gemini-pro", label: "Gemini Pro", provider: "Google" },
-  { value: "gemini-flash", label: "Gemini Flash", provider: "Google" },
-];
-
 interface SettingsContentProps {
-  model: AIModel;
-  onModelChange: (model: AIModel) => void;
+  model: string;
+  onModelChange: (model: string) => void;
   temperature: number;
   onTemperatureChange: (temperature: number) => void;
+  availableModels: ModelOption[];
   systemPrompts: SystemPrompt[];
   selectedPromptId: string | null;
   onPromptChange: (promptId: string | null) => void;
 }
 
 // Conteúdo compartilhado das configurações
-function SettingsContent({ model, onModelChange, temperature, onTemperatureChange, systemPrompts, selectedPromptId, onPromptChange }: SettingsContentProps) {
+function SettingsContent({ model, onModelChange, temperature, onTemperatureChange, availableModels, systemPrompts, selectedPromptId, onPromptChange }: SettingsContentProps) {
   return (
     <div className="p-4 space-y-4">
       <div className="space-y-2">
         <label className="text-sm font-medium">Modelo</label>
-        <Select value={model} onValueChange={(value) => onModelChange(value as AIModel)}>
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Selecione um modelo" />
-          </SelectTrigger>
-          <SelectContent>
-            {models.map((m) => (
-              <SelectItem key={m.value} value={m.value}>
-                <div className="flex flex-col">
-                  <span>{m.label}</span>
-                  <span className="text-xs text-muted-foreground">{m.provider}</span>
-                </div>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {availableModels.length > 0 ? (
+          <Select value={model} onValueChange={onModelChange}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Selecione um modelo" />
+            </SelectTrigger>
+            <SelectContent>
+              {availableModels.map((m) => (
+                <SelectItem key={m.id} value={m.id}>
+                  <div className="flex flex-col">
+                    <span>{m.name}</span>
+                    {m.description && (
+                      <span className="text-xs text-muted-foreground">{m.description}</span>
+                    )}
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        ) : (
+          <p className="text-sm text-muted-foreground py-2">
+            Configure um provedor de IA nas configurações da organização
+          </p>
+        )}
       </div>
 
       <Separator />
@@ -129,7 +127,7 @@ interface ChatSettingsProps extends SettingsContentProps {
 }
 
 // Desktop Settings Panel
-export function ChatSettings({ model, onModelChange, temperature, onTemperatureChange, systemPrompts, selectedPromptId, onPromptChange, expanded, onExpandedChange }: ChatSettingsProps) {
+export function ChatSettings({ model, onModelChange, temperature, onTemperatureChange, availableModels, systemPrompts, selectedPromptId, onPromptChange, expanded, onExpandedChange }: ChatSettingsProps) {
   return (
     <aside
       className={cn(
@@ -165,6 +163,7 @@ export function ChatSettings({ model, onModelChange, temperature, onTemperatureC
             onModelChange={onModelChange}
             temperature={temperature}
             onTemperatureChange={onTemperatureChange}
+            availableModels={availableModels}
             systemPrompts={systemPrompts}
             selectedPromptId={selectedPromptId}
             onPromptChange={onPromptChange}
@@ -194,7 +193,7 @@ interface MobileChatSettingsProps extends SettingsContentProps {
 }
 
 // Mobile Settings (Sheet/Drawer)
-export function MobileChatSettings({ model, onModelChange, temperature, onTemperatureChange, systemPrompts, selectedPromptId, onPromptChange, open, onOpenChange }: MobileChatSettingsProps) {
+export function MobileChatSettings({ model, onModelChange, temperature, onTemperatureChange, availableModels, systemPrompts, selectedPromptId, onPromptChange, open, onOpenChange }: MobileChatSettingsProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-72">
@@ -209,6 +208,7 @@ export function MobileChatSettings({ model, onModelChange, temperature, onTemper
           onModelChange={onModelChange}
           temperature={temperature}
           onTemperatureChange={onTemperatureChange}
+          availableModels={availableModels}
           systemPrompts={systemPrompts}
           selectedPromptId={selectedPromptId}
           onPromptChange={onPromptChange}

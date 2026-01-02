@@ -6,11 +6,11 @@ import { useAuth } from "@/lib/auth";
 import { Header } from "@/components/header";
 import { Sidebar, MobileSidebar, MobileThreadsDrawer, type Thread } from "@/components/sidebar";
 import { ChatArea, type Message } from "@/components/chat-area";
-import { ChatSettings, MobileChatSettings, type AIModel, type SystemPrompt } from "@/components/chat-settings";
+import { ChatSettings, MobileChatSettings, type SystemPrompt, type ModelOption } from "@/components/chat-settings";
 
 interface ThreadWithMessages extends Thread {
   messages: Message[];
-  model: AIModel;
+  model: string;
   temperature: number;
   systemPromptId: string | null;
 }
@@ -41,6 +41,7 @@ export default function Home() {
   const [settingsExpanded, setSettingsExpanded] = useState(true);
   const [isLoadingThreads, setIsLoadingThreads] = useState(true);
   const [systemPrompts, setSystemPrompts] = useState<SystemPrompt[]>([]);
+  const [availableModels, setAvailableModels] = useState<ModelOption[]>([]);
 
   // Carregar threads da API
   const loadThreads = useCallback(async () => {
@@ -54,7 +55,7 @@ export default function Home() {
         title: t.title || "Nova conversa",
         updatedAt: new Date(t.updatedAt),
         messages: [], // Mensagens serao carregadas quando implementarmos a API
-        model: "gpt-4" as AIModel,
+        model: "",
         temperature: 0.7,
         systemPromptId: null,
       }));
@@ -89,6 +90,19 @@ export default function Home() {
     }
   }, []);
 
+  // Carregar modelos disponiveis da API
+  const loadModels = useCallback(async () => {
+    try {
+      const response = await fetch("/api/models");
+      if (!response.ok) return;
+
+      const data = await response.json();
+      setAvailableModels(data.models || []);
+    } catch (error) {
+      console.error("Erro ao carregar modelos:", error);
+    }
+  }, []);
+
   useEffect(() => {
     if (!isLoading) {
       if (!isLoggedIn) {
@@ -98,9 +112,10 @@ export default function Home() {
       } else {
         loadThreads();
         loadPrompts();
+        loadModels();
       }
     }
-  }, [isLoading, isLoggedIn, hasOrganization, router, loadThreads, loadPrompts]);
+  }, [isLoading, isLoggedIn, hasOrganization, router, loadThreads, loadPrompts, loadModels]);
 
   const selectedThread = threads.find((t) => t.id === selectedId);
 
@@ -123,7 +138,7 @@ export default function Home() {
         title: data.thread.title || "Nova conversa",
         updatedAt: new Date(data.thread.updatedAt),
         messages: [],
-        model: "gpt-4",
+        model: "",
         temperature: 0.7,
         systemPromptId: null,
       };
@@ -135,7 +150,7 @@ export default function Home() {
     }
   };
 
-  const handleModelChange = (model: AIModel) => {
+  const handleModelChange = (model: string) => {
     if (!selectedId) return;
     setThreads((prev) =>
       prev.map((thread) =>
@@ -191,7 +206,7 @@ export default function Home() {
           title: data.thread.title || title,
           updatedAt: new Date(data.thread.updatedAt),
           messages: [userMessage],
-          model: "gpt-4",
+          model: "",
           temperature: 0.7,
           systemPromptId: null,
         };
@@ -314,6 +329,7 @@ export default function Home() {
               onModelChange={handleModelChange}
               temperature={selectedThread.temperature}
               onTemperatureChange={handleTemperatureChange}
+              availableModels={availableModels}
               systemPrompts={systemPrompts}
               selectedPromptId={selectedThread.systemPromptId}
               onPromptChange={handlePromptChange}
@@ -331,6 +347,7 @@ export default function Home() {
           onModelChange={handleModelChange}
           temperature={selectedThread.temperature}
           onTemperatureChange={handleTemperatureChange}
+          availableModels={availableModels}
           systemPrompts={systemPrompts}
           selectedPromptId={selectedThread.systemPromptId}
           onPromptChange={handlePromptChange}
