@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { ModelProvider } from "@/lib/generated/prisma/client";
 import { validateSession, authError } from "@/lib/api-auth";
@@ -33,8 +33,8 @@ const MODELS_BY_PROVIDER: Record<ModelProvider, { id: string; name: string; desc
   ],
 };
 
-// GET - Retornar modelos disponiveis baseado no provedor padrao
-export async function GET() {
+// GET - Retornar modelos disponiveis baseado no provedor
+export async function GET(request: NextRequest) {
   const auth = await validateSession();
   if (!auth.success) {
     return authError(auth.error);
@@ -42,7 +42,17 @@ export async function GET() {
 
   const { currentMembership } = auth.session;
 
-  // Buscar o provedor padrao da organizacao
+  if (!currentMembership) {
+    return NextResponse.json(
+      { error: "Sessão inválida" },
+      { status: 401 }
+    );
+  }
+
+  const { searchParams } = new URL(request.url);
+  const requestedProvider = searchParams.get("provider") as ModelProvider | null;
+
+  // Buscar o provedor padrao e provedores ativos da organizacao
   const organization = await prisma.organization.findUnique({
     where: { id: currentMembership.organizationId },
     select: {
@@ -50,6 +60,7 @@ export async function GET() {
       modelProviders: {
         where: { isActive: true },
         select: { provider: true },
+        orderBy: { provider: "asc" },
       },
     },
   });
@@ -61,20 +72,26 @@ export async function GET() {
     );
   }
 
-  // Se nao tiver provedor padrao, retornar lista vazia
-  if (!organization.defaultModelProvider) {
-    return NextResponse.json({
-      provider: null,
-      models: [],
-      configuredProviders: organization.modelProviders.map((p) => p.provider),
-    });
+  const configuredProviders = organization.modelProviders.map((p) => p.provider);
+
+  // Determinar qual provedor usar: o solicitado (se ativo) ou o padrao
+  let activeProvider: ModelProvider | null = null;
+
+  if (requestedProvider && configuredProviders.includes(requestedProvider)) {
+    activeProvider = requestedProvider;
+  } else if (organization.defaultModelProvider && configuredProviders.includes(organization.defaultModelProvider)) {
+    activeProvider = organization.defaultModelProvider;
+  } else if (configuredProviders.length > 0) {
+    // Se nao tem padrao mas tem provedores configurados, usa o primeiro
+    activeProvider = configuredProviders[0];
   }
 
-  const models = MODELS_BY_PROVIDER[organization.defaultModelProvider] || [];
+  const models = activeProvider ? MODELS_BY_PROVIDER[activeProvider] || [] : [];
 
   return NextResponse.json({
-    provider: organization.defaultModelProvider,
+    defaultProvider: organization.defaultModelProvider,
+    selectedProvider: activeProvider,
     models,
-    configuredProviders: organization.modelProviders.map((p) => p.provider),
+    configuredProviders,
   });
 }

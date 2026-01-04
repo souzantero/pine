@@ -42,6 +42,8 @@ export default function Home() {
   const [isLoadingThreads, setIsLoadingThreads] = useState(true);
   const [systemPrompts, setSystemPrompts] = useState<SystemPrompt[]>([]);
   const [availableModels, setAvailableModels] = useState<ModelOption[]>([]);
+  const [selectedProvider, setSelectedProvider] = useState<string | null>(null);
+  const [configuredProviders, setConfiguredProviders] = useState<string[]>([]);
 
   // Carregar threads da API
   const loadThreads = useCallback(async () => {
@@ -91,13 +93,16 @@ export default function Home() {
   }, []);
 
   // Carregar modelos disponiveis da API
-  const loadModels = useCallback(async () => {
+  const loadModels = useCallback(async (provider?: string) => {
     try {
-      const response = await fetch("/api/models");
+      const url = provider ? `/api/models?provider=${provider}` : "/api/models";
+      const response = await fetch(url);
       if (!response.ok) return;
 
       const data = await response.json();
       setAvailableModels(data.models || []);
+      setSelectedProvider(data.selectedProvider || null);
+      setConfiguredProviders(data.configuredProviders || []);
     } catch (error) {
       console.error("Erro ao carregar modelos:", error);
     }
@@ -175,6 +180,19 @@ export default function Home() {
         thread.id === selectedId ? { ...thread, systemPromptId: promptId } : thread
       )
     );
+  };
+
+  const handleProviderChange = (provider: string) => {
+    // Recarregar modelos para o novo provedor
+    loadModels(provider);
+    // Limpar modelo selecionado na thread atual quando muda o provedor
+    if (selectedId) {
+      setThreads((prev) =>
+        prev.map((thread) =>
+          thread.id === selectedId ? { ...thread, model: "" } : thread
+        )
+      );
+    }
   };
 
   const handleSendMessage = async (content: string) => {
@@ -333,6 +351,9 @@ export default function Home() {
               systemPrompts={systemPrompts}
               selectedPromptId={selectedThread.systemPromptId}
               onPromptChange={handlePromptChange}
+              selectedProvider={selectedProvider}
+              configuredProviders={configuredProviders}
+              onProviderChange={handleProviderChange}
               expanded={settingsExpanded}
               onExpandedChange={setSettingsExpanded}
             />
@@ -351,6 +372,9 @@ export default function Home() {
           systemPrompts={systemPrompts}
           selectedPromptId={selectedThread.systemPromptId}
           onPromptChange={handlePromptChange}
+          selectedProvider={selectedProvider}
+          configuredProviders={configuredProviders}
+          onProviderChange={handleProviderChange}
           open={mobileSettingsOpen}
           onOpenChange={setMobileSettingsOpen}
         />

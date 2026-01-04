@@ -31,6 +31,19 @@ export interface ModelOption {
   description?: string;
 }
 
+export interface ProviderOption {
+  value: string;
+  label: string;
+}
+
+// Mapeamento de nomes de provedores para labels amigaveis
+const PROVIDER_LABELS: Record<string, string> = {
+  OPENAI: "OpenAI",
+  OPENROUTER: "OpenRouter",
+  ANTHROPIC: "Anthropic",
+  GOOGLE: "Google AI",
+};
+
 interface SettingsContentProps {
   model: string;
   onModelChange: (model: string) => void;
@@ -40,12 +53,37 @@ interface SettingsContentProps {
   systemPrompts: SystemPrompt[];
   selectedPromptId: string | null;
   onPromptChange: (promptId: string | null) => void;
+  selectedProvider: string | null;
+  configuredProviders: string[];
+  onProviderChange: (provider: string) => void;
 }
 
 // Conteúdo compartilhado das configurações
-function SettingsContent({ model, onModelChange, temperature, onTemperatureChange, availableModels, systemPrompts, selectedPromptId, onPromptChange }: SettingsContentProps) {
+function SettingsContent({ model, onModelChange, temperature, onTemperatureChange, availableModels, systemPrompts, selectedPromptId, onPromptChange, selectedProvider, configuredProviders, onProviderChange }: SettingsContentProps) {
   return (
     <div className="p-4 space-y-4">
+      {/* Seletor de Provedor */}
+      {configuredProviders.length > 0 && (
+        <>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Provedor</label>
+            <Select value={selectedProvider ?? ""} onValueChange={onProviderChange}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Selecione um provedor" />
+              </SelectTrigger>
+              <SelectContent>
+                {configuredProviders.map((provider) => (
+                  <SelectItem key={provider} value={provider}>
+                    {PROVIDER_LABELS[provider] || provider}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <Separator />
+        </>
+      )}
+
       <div className="space-y-2">
         <label className="text-sm font-medium">Modelo</label>
         {availableModels.length > 0 ? (
@@ -75,26 +113,6 @@ function SettingsContent({ model, onModelChange, temperature, onTemperatureChang
 
       <Separator />
 
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <label className="text-sm font-medium">Temperatura</label>
-          <span className="text-sm text-muted-foreground">{temperature.toFixed(1)}</span>
-        </div>
-        <Slider
-          value={[temperature]}
-          onValueChange={(value) => onTemperatureChange(value[0])}
-          min={0}
-          max={2}
-          step={0.1}
-          className="w-full"
-        />
-        <p className="text-xs text-muted-foreground">
-          Valores baixos = respostas mais focadas. Valores altos = mais criatividade.
-        </p>
-      </div>
-
-      <Separator />
-
       <div className="space-y-2">
         <label className="text-sm font-medium">System Prompt</label>
         <Select
@@ -117,6 +135,26 @@ function SettingsContent({ model, onModelChange, temperature, onTemperatureChang
           Define o comportamento e contexto inicial do assistente.
         </p>
       </div>
+
+      <Separator />
+
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <label className="text-sm font-medium">Temperatura</label>
+          <span className="text-sm text-muted-foreground">{temperature.toFixed(1)}</span>
+        </div>
+        <Slider
+          value={[temperature]}
+          onValueChange={(value) => onTemperatureChange(value[0])}
+          min={0}
+          max={2}
+          step={0.1}
+          className="w-full"
+        />
+        <p className="text-xs text-muted-foreground">
+          Valores baixos = respostas mais focadas. Valores altos = mais criatividade.
+        </p>
+      </div>
     </div>
   );
 }
@@ -127,7 +165,7 @@ interface ChatSettingsProps extends SettingsContentProps {
 }
 
 // Desktop Settings Panel
-export function ChatSettings({ model, onModelChange, temperature, onTemperatureChange, availableModels, systemPrompts, selectedPromptId, onPromptChange, expanded, onExpandedChange }: ChatSettingsProps) {
+export function ChatSettings({ model, onModelChange, temperature, onTemperatureChange, availableModels, systemPrompts, selectedPromptId, onPromptChange, selectedProvider, configuredProviders, onProviderChange, expanded, onExpandedChange }: ChatSettingsProps) {
   return (
     <aside
       className={cn(
@@ -167,6 +205,9 @@ export function ChatSettings({ model, onModelChange, temperature, onTemperatureC
             systemPrompts={systemPrompts}
             selectedPromptId={selectedPromptId}
             onPromptChange={onPromptChange}
+            selectedProvider={selectedProvider}
+            configuredProviders={configuredProviders}
+            onProviderChange={onProviderChange}
           />
         </div>
       )}
@@ -193,7 +234,7 @@ interface MobileChatSettingsProps extends SettingsContentProps {
 }
 
 // Mobile Settings (Sheet/Drawer)
-export function MobileChatSettings({ model, onModelChange, temperature, onTemperatureChange, availableModels, systemPrompts, selectedPromptId, onPromptChange, open, onOpenChange }: MobileChatSettingsProps) {
+export function MobileChatSettings({ model, onModelChange, temperature, onTemperatureChange, availableModels, systemPrompts, selectedPromptId, onPromptChange, selectedProvider, configuredProviders, onProviderChange, open, onOpenChange }: MobileChatSettingsProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-72">
@@ -212,6 +253,9 @@ export function MobileChatSettings({ model, onModelChange, temperature, onTemper
           systemPrompts={systemPrompts}
           selectedPromptId={selectedPromptId}
           onPromptChange={onPromptChange}
+          selectedProvider={selectedProvider}
+          configuredProviders={configuredProviders}
+          onProviderChange={onProviderChange}
         />
       </SheetContent>
     </Sheet>
