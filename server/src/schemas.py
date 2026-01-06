@@ -146,3 +146,35 @@ class MemberDetailResponse(BaseModel):
 
 class UpdateMemberRoleRequest(BaseModel):
     role_id: uuid.UUID
+
+
+# =============================================================================
+# Invite Schemas
+# =============================================================================
+
+
+class CreateInviteRequest(BaseModel):
+    role_id: uuid.UUID
+    expires_in_days: int = 7
+
+
+class InviteResponse(BaseModel):
+    id: uuid.UUID
+    token: str
+    organization: OrganizationResponse
+    role: RoleResponse
+    expires_at: datetime
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class InviteInfoResponse(BaseModel):
+    """Informacoes publicas do convite (para pagina de aceite)."""
+    organization_name: str
+    organization_slug: str
+    role_name: str
+    expires_at: datetime
+    is_expired: bool
+    is_used: bool
