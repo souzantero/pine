@@ -11,7 +11,7 @@ from src.agent import build_agent
 from src.database import get_checkpoint_saver, get_session
 from src.entities import Thread
 from src.helpers import agent_messages_to_list, chunk_to_text, get_config
-from src.routers import auth, invites, members, organizations
+from src.routers import auth, invites, members, organizations, roles
 from src.schemas import RunPayload
 
 app = FastAPI(title="PineChat API", version="1.0.0")
@@ -21,6 +21,7 @@ app.include_router(auth.router)
 app.include_router(organizations.router)
 app.include_router(members.router)
 app.include_router(invites.router)
+app.include_router(roles.router)
 
 SessionDependency = Annotated[Session, Depends(get_session)]
 CheckpointSaverDependency = Annotated[AsyncPostgresSaver, Depends(get_checkpoint_saver)]

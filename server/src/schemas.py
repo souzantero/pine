@@ -178,3 +178,32 @@ class InviteInfoResponse(BaseModel):
     expires_at: datetime
     is_expired: bool
     is_used: bool
+
+
+# =============================================================================
+# Role Schemas
+# =============================================================================
+
+
+class CreateRoleRequest(BaseModel):
+    name: str
+    description: str | None = None
+    permissions: List[str]
+
+
+class UpdateRoleRequest(BaseModel):
+    name: str | None = None
+    description: str | None = None
+    permissions: List[str] | None = None
+
+
+class RoleDetailResponse(BaseModel):
+    id: uuid.UUID
+    name: str
+    description: str | None
+    is_system_role: bool
+    permissions: List[str]
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
