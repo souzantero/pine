@@ -4,9 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-PineChat is a Next.js 16.1 + React 19 full-stack chat application with AI agent integration and multi-tenant organization management. Written in TypeScript with Prisma ORM and PostgreSQL.
+PineChat is a chat application with AI agent integration and multi-tenant organization management. The project uses a decoupled architecture:
+
+- **Frontend**: Next.js 16.1 + React 19 (TypeScript)
+- **Backend**: Python FastAPI with SQLAlchemy ORM and PostgreSQL
 
 ## Commands
+
+### Frontend (root directory)
 
 ```bash
 npm run dev      # Start development server (http://localhost:3000)
@@ -15,53 +20,82 @@ npm run start    # Start production server
 npm run lint     # Run ESLint
 ```
 
-Database commands:
-```bash
-npx prisma generate   # Generate Prisma client after schema changes
-npx prisma migrate dev  # Run migrations in development
-npx prisma studio     # Open Prisma database GUI
-```
+### Backend (server directory)
 
-Docker for local PostgreSQL:
 ```bash
-docker-compose up -d  # Start PostgreSQL container
+cd server
+source .venv/bin/activate    # Activate virtual environment
+
+# Run server
+uvicorn src.api:app --reload --port 8888
+
+# Database migrations
+alembic upgrade head         # Run migrations
+alembic revision --autogenerate -m "description"  # Create migration
+
+# Docker for local PostgreSQL
+docker-compose up -d
 ```
 
 ## Architecture
+
+### System Design
+
+```
+┌─────────────────┐         ┌─────────────────┐
+│    Frontend     │  HTTP   │     Backend     │
+│   Next.js App   │ ──────► │  FastAPI + DB   │
+│  localhost:3000 │  JWT    │  localhost:8888 │
+└─────────────────┘         └─────────────────┘
+```
+
+- Frontend is a React SPA that communicates with the Python backend via REST API
+- Authentication uses JWT tokens stored in localStorage
+- Current organization is managed client-side in localStorage
 
 ### Multi-Tenant RBAC System
 
 The app implements role-based access control with organization scoping:
 
 - **Users** can belong to multiple **Organizations** with different **Roles**
-- **Roles** contain **RolePermissions** (fixed enum: THREADS_*, AGENTS_*, MEMBERS_*, ROLES_*, ORGANIZATION_MANAGE, PLATFORM_MANAGE)
+- **Roles** contain **Permissions** (THREADS_*, AGENTS_*, MEMBERS_*, ROLES_*, ORGANIZATION_MANAGE, PLATFORM_MANAGE, PROMPTS_*)
 - Platform roles (null organizationId) vs Organization-scoped roles
 
 ### Authentication Flow
 
-1. Cookie-based sessions: `session` (user auth) and `current_org` (active organization)
-2. `AuthProvider` (lib/auth.tsx) - Client-side React Context for user/organization state
-3. `validateSession()`, `validatePermission()` (lib/api-auth.ts) - Server-side validation
-4. Middleware (middleware.ts + lib/proxy.ts) handles route protection and redirects
+1. User logs in via `/auth/login` endpoint, receives JWT token
+2. Token is stored in localStorage (`pinechat_token`)
+3. `AuthProvider` (lib/auth.tsx) manages user state and calls `/auth/me` to validate session
+4. Current organization ID is stored in localStorage (`pinechat_current_org`)
+5. All API calls include `Authorization: Bearer <token>` header
 
 ### Key Files
 
+**Frontend:**
+- `lib/api.ts` - HTTP client for backend communication, token management
 - `lib/auth.tsx` - AuthContext with `useAuth()` hook providing user, memberships, currentOrg, hasPermission()
-- `lib/api-auth.ts` - Server-side auth validation for API routes
-- `lib/db.ts` - Prisma client singleton
-- `db/schema.prisma` - Database schema
+
+**Backend:**
+- `server/src/api.py` - FastAPI app with CORS configuration
+- `server/src/routers/` - API route handlers (auth, threads, prompts, members, etc.)
+- `server/src/schemas.py` - Pydantic models with camelCase serialization
+- `server/src/models.py` - SQLAlchemy ORM models
+- `server/db/` - Alembic migrations
 
 ### API Structure
 
-All API routes are in `/app/api/`:
-- `/auth/*` - Login, register, logout, current user
-- `/organizations/*` - Create org, get/set current org, settings
-- `/members/*` - List, invite, remove members
-- `/invites/*` - Create and accept invites
-- `/roles/*` - List roles
-- `/threads/*` - Create and list conversation threads
+All API routes are served by the Python backend at `localhost:8888`:
 
-API routes use `validateSession()` or `validatePermission()` from lib/api-auth.ts.
+- `/auth/*` - Login, register, current user (me)
+- `/organizations/{org_id}` - Organization CRUD
+- `/organizations/{org_id}/threads` - Conversation threads
+- `/organizations/{org_id}/prompts` - System prompts
+- `/organizations/{org_id}/members` - Member management
+- `/organizations/{org_id}/invites` - Organization invites
+- `/organizations/{org_id}/roles` - Role management
+- `/organizations/{org_id}/models` - Available AI models
+- `/organizations/{org_id}/model-providers` - LLM provider configuration
+- `/invites/{token}` - Public invite info and accept
 
 ### UI Components
 
@@ -72,13 +106,27 @@ API routes use `validateSession()` or `validatePermission()` from lib/api-auth.t
 ### Page Flow
 
 1. `/login`, `/signup` - Public auth pages
-2. `/onboarding` - Organization creation/selection (requires auth, no org)
+2. `/onboarding` - Organization creation (requires auth, no org)
 3. `/invite/[token]` - Accept organization invites
 4. `/` - Main chat interface (requires auth + active org)
-5. `/members`, `/settings` - Organization management
+5. `/members`, `/settings`, `/prompts` - Organization management
 
 ## Code Conventions
 
 - Comments are in Portuguese (pt-BR)
 - Path alias: `@/*` maps to project root
-- Server Components by default; use "use client" directive for client components
+- All frontend components use "use client" directive (SPA pattern)
+- Backend uses camelCase for JSON responses (Pydantic alias_generator)
+
+## Environment Variables
+
+**Frontend (.env.local):**
+```
+NEXT_PUBLIC_API_URL=http://localhost:8888
+```
+
+**Backend (server/.env):**
+```
+DATABASE_URL=postgresql://...
+JWT_SECRET=...
+```
