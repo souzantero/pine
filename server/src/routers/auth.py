@@ -5,14 +5,14 @@ from sqlmodel import Session, select
 
 from src.auth import CurrentUser, create_access_token, hash_password, verify_password
 from src.database import get_session
-from src.entities import OrganizationMember, User
+from src.entities import OrganizationMember, RolePermission, User
 from src.schemas import (
     LoginRequest,
     MembershipResponse,
+    MembershipRoleResponse,
     MeResponse,
     OrganizationResponse,
     RegisterRequest,
-    RoleResponse,
     TokenResponse,
     UserResponse,
 )
@@ -84,6 +84,11 @@ def get_me(current_user: CurrentUser, session: SessionDep):
         # Carrega relacionamentos
         session.refresh(membership, ["organization", "role"])
 
+        # Busca permissoes da role
+        perm_statement = select(RolePermission).where(RolePermission.role_id == membership.role.id)
+        role_permissions = session.exec(perm_statement).all()
+        permissions = [rp.permission.value for rp in role_permissions]
+
         membership_responses.append(
             MembershipResponse(
                 id=membership.id,
@@ -94,10 +99,13 @@ def get_me(current_user: CurrentUser, session: SessionDep):
                     slug=membership.organization.slug,
                     created_at=membership.organization.created_at,
                 ),
-                role=RoleResponse(
+                role=MembershipRoleResponse(
                     id=membership.role.id,
                     name=membership.role.name,
                     description=membership.role.description,
+                    scope=membership.role.scope.value,
+                    is_system_role=membership.role.is_system_role,
+                    permissions=permissions,
                 ),
                 is_owner=membership.is_owner,
             )

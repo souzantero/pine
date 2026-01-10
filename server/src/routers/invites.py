@@ -1,7 +1,7 @@
 import secrets
 import uuid
 from datetime import UTC, datetime, timedelta
-from typing import Annotated
+from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session, select
@@ -11,7 +11,12 @@ from src.database import get_session
 from src.entities import Organization, OrganizationInvite, OrganizationMember, Permission, Role
 from src.schemas import (
     CreateInviteRequest,
+    InviteCreatedByResponse,
+    InviteInfoCreatedBy,
+    InviteInfoOrganization,
     InviteInfoResponse,
+    InviteInfoRole,
+    InviteListItemResponse,
     InviteResponse,
     OrganizationResponse,
     RoleResponse,
@@ -25,6 +30,76 @@ SessionDep = Annotated[Session, Depends(get_session)]
 def generate_invite_token() -> str:
     """Gera um token unico para o convite."""
     return secrets.token_urlsafe(32)
+
+
+def get_invite_link(token: str) -> str:
+    """Gera o link completo do convite."""
+    # TODO: usar variavel de ambiente para URL base
+    return f"http://localhost:3000/invite/{token}"
+
+
+@router.get(
+    "/organizations/{organization_id}/invites",
+    response_model=List[InviteListItemResponse],
+)
+def list_invites(
+    organization_id: uuid.UUID,
+    current_user: CurrentUser,
+    session: SessionDep,
+):
+    """Lista convites pendentes da organizacao (requer MEMBERS_INVITE)."""
+    # Verifica permissao
+    if not check_permission(session, current_user.id, organization_id, Permission.MEMBERS_INVITE):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permissao MEMBERS_INVITE necessaria",
+        )
+
+    # Busca convites pendentes (nao usados e nao expirados)
+    now = datetime.now(UTC)
+    statement = (
+        select(OrganizationInvite)
+        .where(
+            OrganizationInvite.organization_id == organization_id,
+            OrganizationInvite.used_at == None,  # noqa: E711
+        )
+        .order_by(OrganizationInvite.created_at.desc())
+    )
+    invites = session.exec(statement).all()
+
+    result = []
+    for invite in invites:
+        # Verifica se expirou
+        expires_at = invite.expires_at
+        if expires_at.tzinfo is None:
+            expires_at = expires_at.replace(tzinfo=UTC)
+        if expires_at < now:
+            continue  # Pula convites expirados
+
+        # Carrega relacionamentos
+        session.refresh(invite, ["role", "created_by"])
+
+        result.append(
+            InviteListItemResponse(
+                id=invite.id,
+                token=invite.token,
+                invite_link=get_invite_link(invite.token),
+                role=RoleResponse(
+                    id=invite.role.id,
+                    name=invite.role.name,
+                    description=invite.role.description,
+                ),
+                created_by=InviteCreatedByResponse(
+                    id=invite.created_by.id,
+                    name=invite.created_by.name,
+                    email=invite.created_by.email,
+                ),
+                expires_at=invite.expires_at,
+                created_at=invite.created_at,
+            )
+        )
+
+    return result
 
 
 @router.post(
@@ -77,6 +152,7 @@ def create_invite(
     return InviteResponse(
         id=invite.id,
         token=invite.token,
+        invite_link=get_invite_link(invite.token),
         organization=OrganizationResponse(
             id=organization.id,
             name=organization.name,
@@ -107,7 +183,7 @@ def get_invite_info(token: str, session: SessionDep):
         )
 
     # Carrega relacionamentos
-    session.refresh(invite, ["organization", "role"])
+    session.refresh(invite, ["organization", "role", "created_by"])
 
     now = datetime.now(UTC)
     # Compara como naive datetime se expires_at nao tem timezone
@@ -118,9 +194,16 @@ def get_invite_info(token: str, session: SessionDep):
     is_used = invite.used_at is not None
 
     return InviteInfoResponse(
-        organization_name=invite.organization.name,
-        organization_slug=invite.organization.slug,
-        role_name=invite.role.name,
+        organization=InviteInfoOrganization(
+            name=invite.organization.name,
+            slug=invite.organization.slug,
+        ),
+        role=InviteInfoRole(
+            name=invite.role.name,
+        ),
+        created_by=InviteInfoCreatedBy(
+            name=invite.created_by.name,
+        ),
         expires_at=invite.expires_at,
         is_expired=is_expired,
         is_used=is_used,

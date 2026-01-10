@@ -84,11 +84,21 @@ class RoleResponse(CamelCaseModel):
     description: str | None
 
 
+class MembershipRoleResponse(CamelCaseModel):
+    """Role com permissoes para uso no membership."""
+    id: uuid.UUID
+    name: str
+    description: str | None
+    scope: str
+    is_system_role: bool
+    permissions: List[str]
+
+
 class MembershipResponse(CamelCaseModel):
     id: uuid.UUID
     organization_id: uuid.UUID
     organization: OrganizationResponse
-    role: RoleResponse
+    role: MembershipRoleResponse
     is_owner: bool
 
 
@@ -158,20 +168,55 @@ class CreateInviteRequest(CamelCaseModel):
 class InviteResponse(CamelCaseModel):
     id: uuid.UUID
     token: str
+    invite_link: str
     organization: OrganizationResponse
     role: RoleResponse
     expires_at: datetime
     created_at: datetime
 
 
+class InviteInfoOrganization(CamelCaseModel):
+    """Organizacao do convite (info publica)."""
+    name: str
+    slug: str
+
+
+class InviteInfoRole(CamelCaseModel):
+    """Role do convite (info publica)."""
+    name: str
+
+
+class InviteInfoCreatedBy(CamelCaseModel):
+    """Usuario que criou o convite (info publica)."""
+    name: str
+
+
 class InviteInfoResponse(CamelCaseModel):
     """Informacoes publicas do convite (para pagina de aceite)."""
-    organization_name: str
-    organization_slug: str
-    role_name: str
+    organization: InviteInfoOrganization
+    role: InviteInfoRole
+    created_by: InviteInfoCreatedBy
     expires_at: datetime
     is_expired: bool
     is_used: bool
+
+
+class InviteCreatedByResponse(CamelCaseModel):
+    """Informacoes do usuario que criou o convite."""
+    id: uuid.UUID
+    name: str
+    email: str
+
+
+class InviteListItemResponse(CamelCaseModel):
+    """Item da listagem de convites pendentes."""
+    id: uuid.UUID
+    token: str
+    invite_link: str
+    role: RoleResponse
+    created_by: InviteCreatedByResponse
+    expires_at: datetime
+    created_at: datetime
 
 
 # =============================================================================
