@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useSession } from "@/lib/session";
 import { api } from "@/lib/api";
 import { getDefaultAgentId, getDefaultConfig } from "@/lib/agents";
-import { getAgentConfig, setAgentConfig } from "@/lib/storage";
+import { getThreadConfig, setThreadConfig } from "@/lib/storage";
 import type { Thread, ThreadWithMessages, Message, ApiThread } from "@/lib/types";
 import type { AgentConfig } from "@/lib/agents";
 
@@ -24,9 +24,9 @@ interface UseThreadsReturn {
   refresh: () => Promise<void>;
 }
 
-// Obter config do agente: primeiro tenta do storage, senao usa default
-function getStoredOrDefaultConfig(agentId: string): AgentConfig {
-  const storedConfig = getAgentConfig<AgentConfig>(agentId);
+// Obter config: primeiro tenta do storage da thread, senao usa default do codigo
+function getStoredOrDefaultConfig(threadId: string, agentId: string): AgentConfig {
+  const storedConfig = getThreadConfig<AgentConfig>(threadId, agentId);
   if (storedConfig) {
     return storedConfig;
   }
@@ -42,7 +42,7 @@ function mapApiThreadToThread(t: ApiThread): ThreadWithMessages {
     updatedAt: new Date(t.updatedAt),
     messages: [],
     agentId: defaultAgentId,
-    agentConfig: getStoredOrDefaultConfig(defaultAgentId),
+    agentConfig: getStoredOrDefaultConfig(t.id, defaultAgentId),
   };
 }
 
@@ -155,8 +155,8 @@ export function useThreads(): UseThreadsReturn {
         prev.map((thread) => {
           if (thread.id === threadId) {
             const newConfig = { ...thread.agentConfig, [key]: value } as AgentConfig;
-            // Salva a config no storage para persistir entre sessoes
-            setAgentConfig(thread.agentId, newConfig);
+            // Salva a config no storage da thread
+            setThreadConfig(threadId, thread.agentId, newConfig);
             return { ...thread, agentConfig: newConfig };
           }
           return thread;
@@ -172,8 +172,8 @@ export function useThreads(): UseThreadsReturn {
         prev.map((thread) => {
           if (thread.id === threadId) {
             const newConfig = { ...thread.agentConfig, ...updates } as AgentConfig;
-            // Salva a config no storage para persistir entre sessoes
-            setAgentConfig(thread.agentId, newConfig);
+            // Salva a config no storage da thread
+            setThreadConfig(threadId, thread.agentId, newConfig);
             return { ...thread, agentConfig: newConfig };
           }
           return thread;
@@ -190,7 +190,7 @@ export function useThreads(): UseThreadsReturn {
           ? {
               ...thread,
               agentId,
-              agentConfig: getStoredOrDefaultConfig(agentId),
+              agentConfig: getStoredOrDefaultConfig(threadId, agentId),
             }
           : thread
       )

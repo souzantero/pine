@@ -1,9 +1,9 @@
 // Gestão de dados no localStorage
-// Centraliza o acesso ao storage para token JWT, organização atual e configurações de agentes
+// Centraliza o acesso ao storage para token JWT, organização atual e configurações de threads
 
 const TOKEN_KEY = "pinechat_token";
 const CURRENT_ORG_KEY = "pinechat_current_org";
-const AGENT_CONFIG_PREFIX = "pinechat_agent_config_";
+const THREAD_CONFIG_PREFIX = "pinechat_thread_";
 
 // Token JWT
 export function getToken(): string | null {
@@ -37,10 +37,11 @@ export function clearCurrentOrgId(): void {
   localStorage.removeItem(CURRENT_ORG_KEY);
 }
 
-// Configurações de agentes por tipo
-export function getAgentConfig<T>(agentId: string): T | null {
+// Configurações específicas por thread + agente
+// Chave: pinechat_thread_{threadId}_{agentId}
+export function getThreadConfig<T>(threadId: string, agentId: string): T | null {
   if (typeof window === "undefined") return null;
-  const key = AGENT_CONFIG_PREFIX + agentId;
+  const key = THREAD_CONFIG_PREFIX + threadId + "_" + agentId;
   const stored = localStorage.getItem(key);
   if (!stored) return null;
   try {
@@ -50,14 +51,14 @@ export function getAgentConfig<T>(agentId: string): T | null {
   }
 }
 
-export function setAgentConfig<T>(agentId: string, config: T): void {
+export function setThreadConfig<T>(threadId: string, agentId: string, config: T): void {
   if (typeof window === "undefined") return;
-  const key = AGENT_CONFIG_PREFIX + agentId;
+  const key = THREAD_CONFIG_PREFIX + threadId + "_" + agentId;
   localStorage.setItem(key, JSON.stringify(config));
 }
 
-export function clearAgentConfig(agentId: string): void {
+export function clearThreadConfig(threadId: string, agentId: string): void {
   if (typeof window === "undefined") return;
-  const key = AGENT_CONFIG_PREFIX + agentId;
+  const key = THREAD_CONFIG_PREFIX + threadId + "_" + agentId;
   localStorage.removeItem(key);
 }
