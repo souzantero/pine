@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { useSession } from "@/lib/session";
-import { OrgSwitcher } from "@/components/org-switcher";
+import { OrgSwitcher } from "./org-switcher";
 import { LogOut, Menu, Settings } from "lucide-react";
 
 interface HeaderProps {

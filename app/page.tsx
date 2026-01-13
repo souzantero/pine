@@ -4,10 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/session";
 import { useThreads, usePrompts, useModels } from "@/lib/hooks";
-import { Header } from "@/components/header";
-import { Sidebar, MobileSidebar, MobileThreadsDrawer } from "@/components/sidebar";
-import { ChatArea } from "@/components/chat-area";
-import { ChatSettings, MobileChatSettings } from "@/components/chat-settings";
+import { Header, Sidebar, MobileSidebar, MobileThreadsDrawer } from "@/components/layout";
+import { ChatArea, ChatSettings, MobileChatSettings } from "@/components/chat";
 import { getDefaultAgentId } from "@/lib/agents";
 import type { Message } from "@/lib/types";
 

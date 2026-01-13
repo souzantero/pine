@@ -5,8 +5,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/session";
 import { usePrompts, useSidebarThreads } from "@/lib/hooks";
 import { api } from "@/lib/api";
-import { Header } from "@/components/header";
-import { Sidebar, MobileSidebar, MobileThreadsDrawer } from "@/components/sidebar";
+import { Header, Sidebar, MobileSidebar, MobileThreadsDrawer } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {

@@ -6,7 +6,7 @@ import { useSession } from "@/lib/session";
 import { useOrganization, useModelProviders } from "@/lib/hooks";
 import { MODEL_PROVIDERS } from "@/lib/types";
 import type { ModelProviderType } from "@/lib/types";
-import { Header } from "@/components/header";
+import { Header } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

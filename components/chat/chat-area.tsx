@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { AgentSelector } from "@/components/agent-selector";
+import { AgentSelector } from "./agent-selector";
 
 export interface Message {
   id: string;
