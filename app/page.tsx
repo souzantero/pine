@@ -62,15 +62,19 @@ export default function Home() {
 
     const agentConfig = selectedThread.agentConfig as BasicAgentConfig;
     if (agentConfig.provider) {
-      // Provider ja configurado (do storage), carregar modelos compativeis
-      loadModelsForProvider(agentConfig.provider);
+      // Provider ja configurado, carregar modelos apenas se ainda nao carregados
+      if (modelsProvider !== agentConfig.provider) {
+        loadModelsForProvider(agentConfig.provider);
+      }
     } else {
       // Sem provider, auto-selecionar primeiro disponivel
       const defaultProvider = configuredProviders[0];
       updateAgentConfigMultiple(selectedThread.id, { provider: defaultProvider });
-      loadModelsForProvider(defaultProvider);
+      if (modelsProvider !== defaultProvider) {
+        loadModelsForProvider(defaultProvider);
+      }
     }
-  }, [selectedThread?.id, configuredProviders, updateAgentConfigMultiple, loadModelsForProvider]);
+  }, [selectedThread?.id, configuredProviders, modelsProvider, updateAgentConfigMultiple, loadModelsForProvider]);
 
   // Auto-selecionar primeiro modelo quando modelos sao carregados e nao ha modelo configurado
   useEffect(() => {
