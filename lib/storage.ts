@@ -4,6 +4,7 @@
 const TOKEN_KEY = "pinechat_token";
 const CURRENT_ORG_KEY = "pinechat_current_org";
 const THREAD_CONFIG_PREFIX = "pinechat_thread_";
+const MENU_EXPANDED_KEY = "pinechat_menu_expanded";
 
 // Token JWT
 export function getToken(): string | null {
@@ -61,4 +62,16 @@ export function clearThreadConfig(threadId: string, agentId: string): void {
   if (typeof window === "undefined") return;
   const key = THREAD_CONFIG_PREFIX + threadId + "_" + agentId;
   localStorage.removeItem(key);
+}
+
+// Estado do menu da sidebar (expandido/colapsado)
+export function getMenuExpanded(): boolean {
+  if (typeof window === "undefined") return true;
+  const stored = localStorage.getItem(MENU_EXPANDED_KEY);
+  return stored !== null ? stored === "true" : true;
+}
+
+export function setMenuExpanded(expanded: boolean): void {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(MENU_EXPANDED_KEY, String(expanded));
 }

@@ -27,6 +27,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { getMenuExpanded, setMenuExpanded } from "@/lib/storage";
 import type { SidebarProps, NavSection } from "./types";
 
 // Conteúdo compartilhado da sidebar
@@ -42,8 +43,14 @@ function SidebarContent({
   const router = useRouter();
   const pathname = usePathname();
   const { hasPermission } = useSession();
-  const [menuExpanded, setMenuExpanded] = useState(true);
+  const [menuExpanded, setMenuExpandedState] = useState(getMenuExpanded);
   const [settingsOpen, setSettingsOpen] = useState(false);
+
+  // Wrapper para persistir estado no storage
+  const handleMenuExpandedChange = (expanded: boolean) => {
+    setMenuExpandedState(expanded);
+    setMenuExpanded(expanded);
+  };
 
   const canViewMembers = hasPermission("MEMBERS_READ");
   const canManageOrg = hasPermission("ORGANIZATION_MANAGE");
@@ -98,7 +105,7 @@ function SidebarContent({
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setMenuExpanded(!menuExpanded)}
+              onClick={() => handleMenuExpandedChange(!menuExpanded)}
               title={menuExpanded ? "Encolher menu" : "Expandir menu"}
             >
               {menuExpanded ? (
