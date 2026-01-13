@@ -10,13 +10,67 @@ from sqlmodel import col, select
 from src.agent import build_agent
 from src.auth import CurrentUser, check_permission, get_user_membership
 from src.database import DatabaseSession, get_checkpoint_saver
-from src.entities import Permission, Thread
+from src.entities import ModelProvider, OrganizationModelProvider, Permission, Prompt, Thread
 from src.helpers import agent_messages_to_list, chunk_to_text, get_config
-from src.schemas import CreateThreadRequest, RunPayload, ThreadResponse, UpdateThreadRequest
+from src.schemas import CreateThreadRequest, RunRequest, ThreadResponse, UpdateThreadRequest
 
 router = APIRouter(prefix="/organizations/{organization_id}/threads", tags=["threads"])
 
-CheckpointSaverDep = Annotated[AsyncPostgresSaver, Depends(get_checkpoint_saver)]
+CheckpointSaver = Annotated[AsyncPostgresSaver, Depends(get_checkpoint_saver)]
+
+
+def get_provider_api_key(
+    db: DatabaseSession,
+    organization_id: uuid.UUID,
+    provider_str: str,
+) -> tuple[ModelProvider, str]:
+    """Busca a API key do provedor configurado na organizacao."""
+    try:
+        provider = ModelProvider(provider_str)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Provedor invalido: {provider_str}",
+        )
+
+    # Apenas OpenAI e OpenRouter suportados
+    if provider not in [ModelProvider.OPENAI, ModelProvider.OPENROUTER]:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Provedor {provider_str} nao suportado. Use OPENAI ou OPENROUTER.",
+        )
+
+    # Busca a configuracao do provedor
+    statement = select(OrganizationModelProvider).where(
+        OrganizationModelProvider.organization_id == organization_id,
+        OrganizationModelProvider.provider == provider,
+        OrganizationModelProvider.is_active == True,
+    )
+    org_provider = db.exec(statement).first()
+
+    if not org_provider:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Provedor {provider_str} nao configurado para esta organizacao",
+        )
+
+    return provider, org_provider.api_key
+
+
+def resolve_system_prompt(
+    db: DatabaseSession,
+    organization_id: uuid.UUID,
+    prompt_id: uuid.UUID | None,
+) -> str | None:
+    """Busca o conteudo do system prompt pelo ID."""
+    if not prompt_id:
+        return None
+
+    prompt = db.get(Prompt, prompt_id)
+    if not prompt or prompt.organization_id != organization_id:
+        return None
+
+    return prompt.content
 
 
 @router.get("", response_model=List[ThreadResponse])
@@ -200,22 +254,62 @@ def delete_thread(
 
 @router.get("/{thread_id}/state/messages")
 async def get_thread_messages(
-    organization_id: uuid.UUID, thread_id: str, checkpointer: CheckpointSaverDep
+    organization_id: uuid.UUID,
+    thread_id: str,
+    current_user: CurrentUser,
+    db: DatabaseSession,
+    checkpointer: CheckpointSaver,
 ):
-    agent = build_agent(checkpointer)
-    state_snapshot = await agent.aget_state(config=get_config(thread_id))
-    state_messages = state_snapshot.values.get("messages", [])
+    """Retorna mensagens de uma thread (requer THREADS_READ)."""
+    # Verifica permissao
+    if not check_permission(db, current_user.id, organization_id, Permission.THREADS_READ):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permissao THREADS_READ necessaria",
+        )
+
+    # Busca o checkpoint diretamente sem precisar criar um agente
+    config = get_config(thread_id)
+    checkpoint_tuple = await checkpointer.aget_tuple(config)
+
+    if not checkpoint_tuple or not checkpoint_tuple.checkpoint:
+        return {"messages": []}
+
+    state_messages = checkpoint_tuple.checkpoint.get("channel_values", {}).get("messages", [])
     return {"messages": agent_messages_to_list(state_messages)}
 
 
-@router.post("/{thread_id}/runs/invoke")
+@router.post("/{thread_id}/agents/{agent_id}/runs/invoke")
 async def invoke_run(
     organization_id: uuid.UUID,
     thread_id: str,
-    payload: RunPayload,
-    checkpointer: CheckpointSaverDep,
+    agent_id: str,
+    payload: RunRequest,
+    current_user: CurrentUser,
+    db: DatabaseSession,
+    checkpointer: CheckpointSaver,
 ):
-    agent = build_agent(checkpointer)
+    """Executa o agente e retorna todas as mensagens (requer THREADS_WRITE)."""
+    # Verifica permissao
+    if not check_permission(db, current_user.id, organization_id, Permission.THREADS_WRITE):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permissao THREADS_WRITE necessaria",
+        )
+
+    # Obtem api_key do provedor
+    provider, api_key = get_provider_api_key(db, organization_id, payload.config.provider)
+
+    # Resolve system prompt
+    system_prompt = resolve_system_prompt(db, organization_id, payload.config.system_prompt_id)
+
+    agent = build_agent(
+        provider=provider,
+        api_key=api_key,
+        config=payload.config,
+        checkpointer=checkpointer,
+        system_prompt=system_prompt,
+    )
     messages = [m.to_agent() for m in payload.input.messages]
     state_values = await agent.ainvoke(
         {"messages": messages}, config=get_config(thread_id)
@@ -224,19 +318,42 @@ async def invoke_run(
     return {"messages": agent_messages_to_list(state_messages)}
 
 
-@router.post("/{thread_id}/runs/stream")
+@router.post("/{thread_id}/agents/{agent_id}/runs/stream")
 async def stream_run(
     organization_id: uuid.UUID,
     thread_id: str,
-    payload: RunPayload,
-    checkpointer: CheckpointSaverDep,
+    agent_id: str,
+    payload: RunRequest,
+    current_user: CurrentUser,
+    db: DatabaseSession,
+    checkpointer: CheckpointSaver,
 ):
-    agent = build_agent(checkpointer)
-    config = get_config(thread_id)
+    """Executa o agente com streaming SSE (requer THREADS_WRITE)."""
+    # Verifica permissao
+    if not check_permission(db, current_user.id, organization_id, Permission.THREADS_WRITE):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permissao THREADS_WRITE necessaria",
+        )
+
+    # Obtem api_key do provedor
+    provider, api_key = get_provider_api_key(db, organization_id, payload.config.provider)
+
+    # Resolve system prompt
+    system_prompt = resolve_system_prompt(db, organization_id, payload.config.system_prompt_id)
+
+    agent = build_agent(
+        provider=provider,
+        api_key=api_key,
+        config=payload.config,
+        checkpointer=checkpointer,
+        system_prompt=system_prompt,
+    )
+    thread_config = get_config(thread_id)
     messages = [m.to_agent() for m in payload.input.messages]
 
     def sse_response_payload(data: Dict[str, Any]) -> str:
-        """Formato básico text/event-stream."""
+        """Formato basico text/event-stream."""
         return f"data: {json.dumps(data, ensure_ascii=False)}\n\n"
 
     async def event_iterator():
@@ -245,7 +362,7 @@ async def stream_run(
             # Primeiro: faz streaming dos chunks para o frontend
             async for event in agent.astream_events(
                 {"messages": messages},
-                config=config,
+                config=thread_config,
             ):
                 event_name = event.get("event")
                 if event_name == "on_chat_model_stream":
@@ -253,17 +370,17 @@ async def stream_run(
                     text = chunk_to_text(chunk) if chunk is not None else ""
                     if not text:
                         continue
-                    # Cada pedaço do modelo vira um evento chunk no SSE
+                    # Cada pedaco do modelo vira um evento chunk no SSE
                     yield sse_response_payload({"event": "chunk", "text": text})
 
-            # IMPORTANTE: O loop acima só termina quando astream_events() completar TOTALMENTE,
-            # incluindo a persistência no checkpointer. Não damos break antecipado.
+            # IMPORTANTE: O loop acima so termina quando astream_events() completar TOTALMENTE,
+            # incluindo a persistencia no checkpointer. Nao damos break antecipado.
 
-            # Agora sim, busca as mensagens já salvas no checkpointer
-            state_snapshot = await agent.aget_state(config=config)
+            # Agora sim, busca as mensagens ja salvas no checkpointer
+            state_snapshot = await agent.aget_state(config=thread_config)
             state_messages = state_snapshot.values.get("messages", [])
 
-            # Evento final entrega o histórico completo já salvo no Postgres/checkpointer
+            # Evento final entrega o historico completo ja salvo no Postgres/checkpointer
             yield sse_response_payload(
                 {
                     "event": "final",

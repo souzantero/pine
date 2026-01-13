@@ -138,3 +138,35 @@ export interface ApiModelsResponse {
   selectedProvider: string | null;
   configuredProviders: string[];
 }
+
+// ============================================
+// Agent Run (Invoke/Stream)
+// ============================================
+
+export interface AgentRunConfig {
+  provider: string;
+  model: string;
+  temperature: number;
+  systemPromptId: string | null;
+}
+
+export interface InvokePayload {
+  input: {
+    messages: { content: string }[];
+  };
+  config: AgentRunConfig;
+}
+
+export interface AgentMessage {
+  id: string;
+  type: "human" | "ai" | "tool";
+  content: string;
+  responseMetadata?: Record<string, unknown>;
+  toolCalls?: unknown[];
+  additionalKwargs?: Record<string, unknown>;
+  createdAt?: string;
+}
+
+export interface InvokeResponse {
+  messages: AgentMessage[];
+}

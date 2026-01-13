@@ -2,6 +2,7 @@
 // Gerencia autenticação JWT automaticamente
 
 import { getToken } from "./storage";
+import type { InvokePayload, InvokeResponse } from "./types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8888";
 
@@ -84,3 +85,14 @@ export const api = {
   delete: <T>(endpoint: string, options?: RequestInit) =>
     request<T>(endpoint, { ...options, method: "DELETE" }),
 };
+
+// Funcao para invocar o agente
+export async function invokeAgent(
+  organizationId: string,
+  threadId: string,
+  agentId: string,
+  payload: InvokePayload
+): Promise<{ data?: InvokeResponse; error?: string }> {
+  const endpoint = `/organizations/${organizationId}/threads/${threadId}/agents/${agentId}/runs/invoke`;
+  return api.post<InvokeResponse>(endpoint, payload);
+}

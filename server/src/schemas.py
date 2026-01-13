@@ -39,8 +39,18 @@ class RunInput(CamelCaseModel):
     messages: List[MessageInput]
 
 
-class RunPayload(CamelCaseModel):
+class RunConfig(CamelCaseModel):
+    """Configuracao de execucao do agente."""
+
+    provider: str  # OPENAI, OPENROUTER
+    model: str
+    temperature: float = 0.7
+    system_prompt_id: uuid.UUID | None = None
+
+
+class RunRequest(CamelCaseModel):
     input: RunInput
+    config: RunConfig
 
 
 # =============================================================================

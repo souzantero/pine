@@ -7,11 +7,13 @@ import { useThreads, usePrompts, useModels } from "@/lib/hooks";
 import { Header, Sidebar, MobileSidebar, MobileThreadsDrawer } from "@/components/layout";
 import { ChatArea, ChatSettings, MobileChatSettings } from "@/components/chat";
 import { getDefaultAgentId } from "@/lib/agents";
+import { invokeAgent } from "@/lib/api";
+import type { BasicAgentConfig } from "@/lib/agents";
 import type { Message } from "@/lib/types";
 
 export default function Home() {
   const router = useRouter();
-  const { isLoggedIn, isLoading: authLoading, hasOrganization } = useSession();
+  const { isLoggedIn, isLoading: authLoading, hasOrganization, currentMembership } = useSession();
 
   // Hooks
   const {
@@ -40,6 +42,7 @@ export default function Home() {
   const [mobileThreadsOpen, setMobileThreadsOpen] = useState(false);
   const [mobileSettingsOpen, setMobileSettingsOpen] = useState(false);
   const [settingsExpanded, setSettingsExpanded] = useState(true);
+  const [isInvoking, setIsInvoking] = useState(false);
 
   // Redirect se não autenticado
   useEffect(() => {
@@ -51,6 +54,18 @@ export default function Home() {
       }
     }
   }, [authLoading, isLoggedIn, hasOrganization, router]);
+
+  // Auto-selecionar primeiro provider disponível se não tiver um selecionado
+  useEffect(() => {
+    if (!selectedThread || configuredProviders.length === 0) return;
+
+    const agentConfig = selectedThread.agentConfig as BasicAgentConfig;
+    if (!agentConfig.provider) {
+      const defaultProvider = configuredProviders[0];
+      updateAgentConfig(selectedThread.id, "provider", defaultProvider);
+      loadModelsForProvider(defaultProvider);
+    }
+  }, [selectedThread, configuredProviders, updateAgentConfig, loadModelsForProvider]);
 
   const handleNewChat = useCallback(async () => {
     await createThread();
@@ -76,7 +91,7 @@ export default function Home() {
     (provider: string) => {
       // Recarregar modelos para o novo provedor
       loadModelsForProvider(provider);
-      // Limpar modelo selecionado na thread atual quando muda o provedor
+      // Limpar modelo selecionado quando muda o provedor
       if (selectedId) {
         updateAgentConfig(selectedId, "model", "");
       }
@@ -84,29 +99,89 @@ export default function Home() {
     [loadModelsForProvider, selectedId, updateAgentConfig]
   );
 
-  const simulateResponse = useCallback(
-    (threadId: string) => {
-      setTimeout(() => {
-        const thread = threads.find((t) => t.id === threadId);
-        const modelName = (thread?.agentConfig as Record<string, unknown>)?.model as string ?? "IA";
+  const invokeAgentForThread = useCallback(
+    async (threadId: string, messageContent: string) => {
+      const thread = threads.find((t) => t.id === threadId);
+      if (!thread || !currentMembership) return;
 
+      const agentConfig = thread.agentConfig as BasicAgentConfig;
+
+      // Verifica se tem provedor e modelo configurados
+      if (!agentConfig.provider || !agentConfig.model) {
         const assistantMessage: Message = {
           id: crypto.randomUUID(),
           role: "assistant",
-          content: `Resposta simulada usando ${modelName || "agente"}. Em breve, será integrado com o agente de IA.`,
+          content: "Por favor, configure um provedor e modelo nas configuracoes para continuar.",
           createdAt: new Date(),
         };
-
         addMessage(threadId, assistantMessage);
-      }, 1000);
+        return;
+      }
+
+      setIsInvoking(true);
+
+      try {
+        const response = await invokeAgent(
+          currentMembership.organizationId,
+          threadId,
+          thread.agentId,
+          {
+            input: {
+              messages: [{ content: messageContent }],
+            },
+            config: {
+              provider: agentConfig.provider,
+              model: agentConfig.model,
+              temperature: agentConfig.temperature,
+              systemPromptId: agentConfig.systemPromptId,
+            },
+          }
+        );
+
+        if (response.error) {
+          const errorMessage: Message = {
+            id: crypto.randomUUID(),
+            role: "assistant",
+            content: `Erro ao processar mensagem: ${response.error}`,
+            createdAt: new Date(),
+          };
+          addMessage(threadId, errorMessage);
+          return;
+        }
+
+        // Pega a ultima mensagem do tipo "ai" da resposta
+        const aiMessages = response.data?.messages.filter((m) => m.type === "ai") ?? [];
+        const lastAiMessage = aiMessages[aiMessages.length - 1];
+
+        if (lastAiMessage) {
+          const assistantMessage: Message = {
+            id: lastAiMessage.id || crypto.randomUUID(),
+            role: "assistant",
+            content: lastAiMessage.content,
+            createdAt: new Date(),
+          };
+          addMessage(threadId, assistantMessage);
+        }
+      } catch (error) {
+        console.error("Erro ao invocar agente:", error);
+        const errorMessage: Message = {
+          id: crypto.randomUUID(),
+          role: "assistant",
+          content: "Erro ao conectar com o servidor. Tente novamente.",
+          createdAt: new Date(),
+        };
+        addMessage(threadId, errorMessage);
+      } finally {
+        setIsInvoking(false);
+      }
     },
-    [threads, addMessage]
+    [threads, currentMembership, addMessage]
   );
 
   const handleSendMessage = useCallback(
     async (content: string) => {
       if (!selectedId) {
-        // Criar nova thread quando não houver thread selecionada
+        // Criar nova thread quando nao houver thread selecionada
         const title = content.slice(0, 30) + (content.length > 30 ? "..." : "");
         const newThread = await createThread(title);
 
@@ -118,7 +193,7 @@ export default function Home() {
             createdAt: new Date(),
           };
           addMessage(newThread.id, userMessage);
-          simulateResponse(newThread.id);
+          invokeAgentForThread(newThread.id, content);
         }
         return;
       }
@@ -131,9 +206,9 @@ export default function Home() {
       };
 
       addMessage(selectedId, userMessage);
-      simulateResponse(selectedId);
+      invokeAgentForThread(selectedId, content);
     },
-    [selectedId, createThread, addMessage, simulateResponse]
+    [selectedId, createThread, addMessage, invokeAgentForThread]
   );
 
   const isLoading = authLoading || threadsLoading;
@@ -182,6 +257,7 @@ export default function Home() {
           <ChatArea
             messages={selectedThread?.messages ?? []}
             onSendMessage={handleSendMessage}
+            isLoading={isInvoking}
             disabled={!selectedThread}
             selectedAgentId={selectedThread?.agentId ?? getDefaultAgentId()}
             onAgentChange={handleAgentChange}
