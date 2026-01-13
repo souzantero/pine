@@ -2,7 +2,7 @@
 // Gerencia autenticação JWT automaticamente
 
 import { getToken } from "./storage";
-import type { InvokePayload, InvokeResponse } from "./types";
+import type { InvokePayload, InvokeResponse, AgentMessage } from "./types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8888";
 
@@ -95,4 +95,13 @@ export async function invokeAgent(
 ): Promise<{ data?: InvokeResponse; error?: string }> {
   const endpoint = `/organizations/${organizationId}/threads/${threadId}/agents/${agentId}/runs/invoke`;
   return api.post<InvokeResponse>(endpoint, payload);
+}
+
+// Funcao para buscar mensagens de uma thread
+export async function getThreadMessages(
+  organizationId: string,
+  threadId: string
+): Promise<{ data?: { messages: AgentMessage[] }; error?: string }> {
+  const endpoint = `/organizations/${organizationId}/threads/${threadId}/state/messages`;
+  return api.get<{ messages: AgentMessage[] }>(endpoint);
 }

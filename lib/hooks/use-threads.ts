@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useSession } from "@/lib/session";
-import { api } from "@/lib/api";
+import { api, getThreadMessages } from "@/lib/api";
 import { getDefaultAgentId, getDefaultConfig } from "@/lib/agents";
 import { getThreadConfig, setThreadConfig } from "@/lib/storage";
-import type { Thread, ThreadWithMessages, Message, ApiThread } from "@/lib/types";
+import type { Thread, ThreadWithMessages, Message, ApiThread, AgentMessage } from "@/lib/types";
 import type { AgentConfig } from "@/lib/agents";
 
 interface UseThreadsReturn {
@@ -33,6 +33,16 @@ function getStoredOrDefaultConfig(threadId: string, agentId: string): AgentConfi
   return getDefaultConfig(agentId);
 }
 
+// Converter mensagem do agente para mensagem do frontend
+function mapAgentMessageToMessage(m: AgentMessage): Message {
+  return {
+    id: m.id,
+    role: m.type === "human" ? "user" : "assistant",
+    content: m.content,
+    createdAt: m.createdAt ? new Date(m.createdAt) : new Date(),
+  };
+}
+
 // Converter resposta da API para tipo do frontend
 function mapApiThreadToThread(t: ApiThread): ThreadWithMessages {
   const defaultAgentId = getDefaultAgentId();
@@ -54,6 +64,7 @@ export function useThreads(): UseThreadsReturn {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const loadedThreadsRef = useRef<Set<string>>(new Set());
 
   const loadThreads = useCallback(async () => {
     if (!orgId) {
@@ -86,6 +97,31 @@ export function useThreads(): UseThreadsReturn {
   }, [loadThreads]);
 
   const selectedThread = threads.find((t) => t.id === selectedId) ?? null;
+
+  // Carregar mensagens ao selecionar uma thread
+  useEffect(() => {
+    if (!selectedId || !orgId) return;
+    if (loadedThreadsRef.current.has(selectedId)) return;
+
+    const loadMessages = async () => {
+      const response = await getThreadMessages(orgId, selectedId);
+      if (response.error || !response.data) return;
+
+      // Filtra apenas mensagens human e ai (ignora tool)
+      const messages = response.data.messages
+        .filter((m) => m.type === "human" || m.type === "ai")
+        .map(mapAgentMessageToMessage);
+
+      setThreads((prev) =>
+        prev.map((thread) =>
+          thread.id === selectedId ? { ...thread, messages } : thread
+        )
+      );
+      loadedThreadsRef.current.add(selectedId);
+    };
+
+    loadMessages();
+  }, [selectedId, orgId]);
 
   const selectThread = useCallback((id: string | null) => {
     setSelectedId(id);

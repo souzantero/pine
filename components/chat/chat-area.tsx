@@ -5,7 +5,6 @@ import { Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { AgentSelector } from "./agent-selector";
 
 export interface Message {
@@ -50,8 +49,8 @@ export function ChatArea({ messages, onSendMessage, isLoading, disabled, selecte
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <ScrollArea className="flex-1 p-2 md:p-4" ref={scrollRef}>
+    <div className="flex flex-col h-full overflow-hidden">
+      <div className="flex-1 overflow-y-auto p-2 md:p-4" ref={scrollRef}>
         <div className="max-w-3xl mx-auto space-y-3 md:space-y-4">
           {messages.length === 0 ? (
             <div className="flex items-center justify-center h-full min-h-[200px] text-muted-foreground text-center px-4">
@@ -91,7 +90,7 @@ export function ChatArea({ messages, onSendMessage, isLoading, disabled, selecte
             </div>
           )}
         </div>
-      </ScrollArea>
+      </div>
 
       <div className="border-t p-2 md:p-4">
         <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
