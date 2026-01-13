@@ -6,12 +6,11 @@ from sqlmodel import select
 
 from src.auth import CurrentUser, check_permission
 from src.database import DatabaseSession
-from src.entities import ModelProvider, Organization, OrganizationModelProvider, Permission
+from src.entities import ModelProvider, OrganizationModelProvider, Permission
 from src.schemas import (
     CreateModelProviderRequest,
     ModelProviderResponse,
     ModelProvidersListResponse,
-    SetDefaultProviderRequest,
 )
 
 router = APIRouter(prefix="/organizations/{organization_id}/model-providers", tags=["model-providers"])
@@ -42,14 +41,6 @@ def list_model_providers(
             detail="Permissao ORGANIZATION_MANAGE necessaria",
         )
 
-    # Busca organizacao
-    organization = db.get(Organization, organization_id)
-    if not organization:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Organizacao nao encontrada",
-        )
-
     # Busca provedores
     statement = (
         select(OrganizationModelProvider)
@@ -59,7 +50,6 @@ def list_model_providers(
     providers = db.exec(statement).all()
 
     return ModelProvidersListResponse(
-        default_provider=organization.default_model_provider.value if organization.default_model_provider else None,
         providers=[
             ModelProviderResponse(
                 id=p.id,
@@ -134,56 +124,6 @@ def create_or_update_model_provider(
     )
 
 
-@router.put("/default", response_model=dict)
-def set_default_provider(
-    organization_id: uuid.UUID,
-    payload: SetDefaultProviderRequest,
-    current_user: CurrentUser,
-    db: DatabaseSession,
-):
-    """Define o provedor padrao da organizacao (requer ORGANIZATION_MANAGE)."""
-    # Verifica permissao
-    if not check_permission(db, current_user.id, organization_id, Permission.ORGANIZATION_MANAGE):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Permissao ORGANIZATION_MANAGE necessaria",
-        )
-
-    # Busca organizacao
-    organization = db.get(Organization, organization_id)
-    if not organization:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Organizacao nao encontrada",
-        )
-
-    if payload.default_provider:
-        # Valida provedor
-        provider_enum = validate_provider(payload.default_provider)
-
-        # Verifica se o provedor esta configurado
-        statement = select(OrganizationModelProvider).where(
-            OrganizationModelProvider.organization_id == organization_id,
-            OrganizationModelProvider.provider == provider_enum,
-        )
-        existing = db.exec(statement).first()
-
-        if not existing:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Configure a API Key do provedor antes de defini-lo como padrao",
-            )
-
-        organization.default_model_provider = provider_enum
-    else:
-        organization.default_model_provider = None
-
-    db.add(organization)
-    db.commit()
-
-    return {"default_provider": payload.default_provider}
-
-
 @router.delete("/{provider_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_model_provider(
     organization_id: uuid.UUID,
@@ -206,12 +146,6 @@ def delete_model_provider(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Provedor nao encontrado",
         )
-
-    # Se este provedor for o padrao, remove como padrao
-    organization = db.get(Organization, organization_id)
-    if organization and organization.default_model_provider == provider.provider:
-        organization.default_model_provider = None
-        db.add(organization)
 
     # Deleta o provedor
     db.delete(provider)

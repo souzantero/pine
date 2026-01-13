@@ -6,7 +6,6 @@ from sqlmodel import Session, select
 from src.auth import CurrentUser, check_permission, get_user_membership
 from src.database import DatabaseSession
 from src.entities import (
-    ModelProvider,
     Organization,
     OrganizationMember,
     Permission,
@@ -109,7 +108,6 @@ def create_organization(
         id=organization.id,
         name=organization.name,
         slug=organization.slug,
-        default_model_provider=organization.default_model_provider.value if organization.default_model_provider else None,
         created_at=organization.created_at,
         updated_at=organization.updated_at,
     )
@@ -141,7 +139,6 @@ def get_organization(
         id=organization.id,
         name=organization.name,
         slug=organization.slug,
-        default_model_provider=organization.default_model_provider.value if organization.default_model_provider else None,
         created_at=organization.created_at,
         updated_at=organization.updated_at,
     )
@@ -187,15 +184,6 @@ def update_organization(
             )
         organization.slug = payload.slug
 
-    if payload.default_model_provider is not None:
-        try:
-            organization.default_model_provider = ModelProvider(payload.default_model_provider)
-        except ValueError:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Provedor invalido. Valores aceitos: {[p.value for p in ModelProvider]}",
-            )
-
     db.add(organization)
     db.commit()
     db.refresh(organization)
@@ -204,7 +192,6 @@ def update_organization(
         id=organization.id,
         name=organization.name,
         slug=organization.slug,
-        default_model_provider=organization.default_model_provider.value if organization.default_model_provider else None,
         created_at=organization.created_at,
         updated_at=organization.updated_at,
     )

@@ -90,19 +90,14 @@ def get_available_models(
         except ValueError:
             pass
 
-    # Se nao especificou ou nao esta configurado, usa o padrao
-    if not active_provider:
-        if organization.default_model_provider and organization.default_model_provider in configured_providers:
-            active_provider = organization.default_model_provider
-        elif configured_providers:
-            # Usa o primeiro configurado
-            active_provider = configured_providers[0]
+    # Se nao especificou ou nao esta configurado, usa o primeiro disponivel
+    if not active_provider and configured_providers:
+        active_provider = configured_providers[0]
 
     # Busca modelos do provedor ativo
     models = MODELS_BY_PROVIDER.get(active_provider, []) if active_provider else []
 
     return ModelsResponse(
-        default_provider=organization.default_model_provider.value if organization.default_model_provider else None,
         selected_provider=active_provider.value if active_provider else None,
         models=models,
         configured_providers=[p.value for p in configured_providers],

@@ -12,12 +12,10 @@ import type {
 
 interface UseModelProvidersReturn {
   providers: ModelProviderConfig[];
-  defaultProvider: ModelProviderType | null;
   isLoading: boolean;
   error: string | null;
   addProvider: (provider: ModelProviderType, apiKey: string) => Promise<MutationResult>;
   removeProvider: (id: string) => Promise<MutationResult>;
-  setDefaultProvider: (provider: ModelProviderType | null) => Promise<MutationResult>;
   refresh: () => Promise<void>;
 }
 
@@ -26,7 +24,6 @@ export function useModelProviders(): UseModelProvidersReturn {
   const orgId = currentMembership?.organizationId;
 
   const [providers, setProviders] = useState<ModelProviderConfig[]>([]);
-  const [defaultProvider, setDefaultProviderState] = useState<ModelProviderType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -49,7 +46,6 @@ export function useModelProviders(): UseModelProvidersReturn {
 
       if (response.data) {
         setProviders(response.data.providers);
-        setDefaultProviderState(response.data.defaultProvider);
       }
     } catch (err) {
       console.error("Erro ao carregar provedores:", err);
@@ -116,33 +112,6 @@ export function useModelProviders(): UseModelProvidersReturn {
     [orgId, loadProviders]
   );
 
-  const setDefaultProvider = useCallback(
-    async (provider: ModelProviderType | null): Promise<MutationResult> => {
-      if (!orgId) {
-        return { error: "Organização não selecionada" };
-      }
-
-      try {
-        const response = await api.put(
-          `/organizations/${orgId}/model-providers/default`,
-          { defaultProvider: provider }
-        );
-
-        if (response.error) {
-          return { error: response.error };
-        }
-
-        // Atualizar estado local
-        setDefaultProviderState(provider);
-
-        return {};
-      } catch {
-        return { error: "Erro ao definir provedor padrão" };
-      }
-    },
-    [orgId]
-  );
-
   const refresh = useCallback(async () => {
     setIsLoading(true);
     await loadProviders();
@@ -150,12 +119,10 @@ export function useModelProviders(): UseModelProvidersReturn {
 
   return {
     providers,
-    defaultProvider,
     isLoading,
     error,
     addProvider,
     removeProvider,
-    setDefaultProvider,
     refresh,
   };
 }

@@ -33,11 +33,9 @@ export default function SettingsPage() {
 
   const {
     providers: modelProviders,
-    defaultProvider,
     isLoading: providersLoading,
     addProvider,
     removeProvider,
-    setDefaultProvider,
   } = useModelProviders();
 
   // Estados do formulário de organização
@@ -129,10 +127,6 @@ export default function SettingsPage() {
     if (result.error) {
       setProviderError(result.error);
     }
-  };
-
-  const handleSetDefaultProvider = async (provider: ModelProviderType | null) => {
-    await setDefaultProvider(provider);
   };
 
   // Provedores disponíveis para adicionar
@@ -267,20 +261,13 @@ export default function SettingsPage() {
                           key={provider.id}
                           className="flex items-center justify-between p-3 bg-muted/50 rounded-md"
                         >
-                          <div className="flex items-center gap-3">
-                            <div className="flex flex-col">
-                              <span className="font-medium">
-                                {providerInfo?.label}
-                              </span>
-                              <span className="text-xs text-muted-foreground">
-                                API Key configurada
-                              </span>
-                            </div>
-                            {defaultProvider === provider.provider && (
-                              <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
-                                Padrão
-                              </span>
-                            )}
+                          <div className="flex flex-col">
+                            <span className="font-medium">
+                              {providerInfo?.label}
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              API Key configurada
+                            </span>
                           </div>
                           <Button
                             variant="ghost"
@@ -294,44 +281,6 @@ export default function SettingsPage() {
                       );
                     })}
                   </div>
-                </div>
-              )}
-
-              {/* Seletor de provedor padrão */}
-              {modelProviders.length > 0 && (
-                <div className="space-y-2">
-                  <Label>Provedor Padrão</Label>
-                  <Select
-                    value={defaultProvider ?? "none"}
-                    onValueChange={(value) =>
-                      handleSetDefaultProvider(
-                        value === "none" ? null : (value as ModelProviderType)
-                      )
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione o provedor padrão" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">Nenhum</SelectItem>
-                      {modelProviders.map((provider) => {
-                        const providerInfo = MODEL_PROVIDERS.find(
-                          (p) => p.value === provider.provider
-                        );
-                        return (
-                          <SelectItem
-                            key={provider.provider}
-                            value={provider.provider}
-                          >
-                            {providerInfo?.label}
-                          </SelectItem>
-                        );
-                      })}
-                    </SelectContent>
-                  </Select>
-                  <p className="text-xs text-muted-foreground">
-                    O provedor padrão será usado nas novas conversas
-                  </p>
                 </div>
               )}
 

@@ -130,14 +130,12 @@ class CreateOrganizationRequest(CamelCaseModel):
 class UpdateOrganizationRequest(CamelCaseModel):
     name: str | None = None
     slug: str | None = None
-    default_model_provider: str | None = None
 
 
 class OrganizationDetailResponse(CamelCaseModel):
     id: uuid.UUID
     name: str
     slug: str
-    default_model_provider: str | None
     created_at: datetime
     updated_at: datetime
 
@@ -322,12 +320,7 @@ class ModelProviderResponse(CamelCaseModel):
 
 
 class ModelProvidersListResponse(CamelCaseModel):
-    default_provider: str | None
     providers: List[ModelProviderResponse]
-
-
-class SetDefaultProviderRequest(CamelCaseModel):
-    default_provider: str | None
 
 
 # =============================================================================
@@ -342,7 +335,6 @@ class ModelInfo(CamelCaseModel):
 
 
 class ModelsResponse(CamelCaseModel):
-    default_provider: str | None
     selected_provider: str | None
     models: List[ModelInfo]
     configured_providers: List[str]

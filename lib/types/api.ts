@@ -126,7 +126,6 @@ export interface ApiModelProvider {
 
 export interface ApiModelProvidersResponse {
   providers: ApiModelProvider[];
-  defaultProvider: ModelProviderType | null;
 }
 
 // ============================================

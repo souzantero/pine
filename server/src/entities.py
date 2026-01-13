@@ -100,7 +100,6 @@ class Organization(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     name: str
     slug: str = Field(unique=True, index=True)
-    default_model_provider: ModelProvider | None = None
     created_at: datetime = Field(default_factory=get_now)
     updated_at: datetime = Field(default_factory=get_now, sa_column_kwargs={"onupdate": get_now})
 
