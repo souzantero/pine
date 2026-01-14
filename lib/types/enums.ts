@@ -26,7 +26,7 @@ export type RoleScope = "PLATFORM" | "ORGANIZATION";
 export type PromptRole = "SYSTEM" | "USER" | "ASSISTANT";
 
 // Provedores de modelos de IA
-export type ModelProviderType = "OPENAI" | "OPENROUTER" | "ANTHROPIC" | "GOOGLE";
+export type ModelProviderType = "OPENAI" | "OPENROUTER";
 
 // Informações de UI dos provedores
 export interface ModelProviderInfo {
@@ -39,6 +39,4 @@ export interface ModelProviderInfo {
 export const MODEL_PROVIDERS: ModelProviderInfo[] = [
   { value: "OPENAI", label: "OpenAI", placeholder: "sk-..." },
   { value: "OPENROUTER", label: "OpenRouter", placeholder: "sk-or-..." },
-  { value: "ANTHROPIC", label: "Anthropic", placeholder: "sk-ant-..." },
-  { value: "GOOGLE", label: "Google AI", placeholder: "AIza..." },
 ];
