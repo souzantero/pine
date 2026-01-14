@@ -273,6 +273,18 @@ function SidebarContent({
               <Plus className="h-4 w-4" />
               <span className="ml-2">Nova conversa</span>
             </Button>
+            {!hasProviders && (
+              <p className="text-xs text-muted-foreground mt-2 px-1">
+                Configure um provedor em{" "}
+                <button
+                  onClick={handleOrganizationClick}
+                  className="text-primary hover:underline"
+                >
+                  Configurações
+                </button>{" "}
+                para iniciar.
+              </p>
+            )}
           </div>
 
           <ScrollArea className="flex-1">

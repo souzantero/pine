@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { MessageSquare, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,8 @@ export function MobileThreadsDrawer({
   onOpenChange,
   hasProviders = true,
 }: MobileThreadsDrawerProps) {
+  const router = useRouter();
+
   const handleSelect = (id: string) => {
     onSelect(id);
     onOpenChange(false);
@@ -30,6 +33,11 @@ export function MobileThreadsDrawer({
   const handleNewChat = () => {
     onNewChat();
     onOpenChange(false);
+  };
+
+  const handleSettingsClick = () => {
+    onOpenChange(false);
+    router.push("/settings");
   };
 
   return (
@@ -51,6 +59,18 @@ export function MobileThreadsDrawer({
               <Plus className="h-4 w-4" />
               <span className="ml-2">Nova conversa</span>
             </Button>
+            {!hasProviders && (
+              <p className="text-xs text-muted-foreground mt-2 px-1">
+                Configure um provedor em{" "}
+                <button
+                  onClick={handleSettingsClick}
+                  className="text-primary hover:underline"
+                >
+                  Configurações
+                </button>{" "}
+                para iniciar.
+              </p>
+            )}
           </div>
 
           <ScrollArea className="flex-1">
