@@ -64,22 +64,33 @@ The app implements role-based access control with organization scoping:
 ### Authentication Flow
 
 1. User logs in via `/auth/login` endpoint, receives JWT token
-2. Token is stored in localStorage (`pinechat_token`)
-3. `AuthProvider` (lib/auth.tsx) manages user state and calls `/auth/me` to validate session
+2. Token is stored in localStorage (`pinechat_token`) via `lib/storage.ts`
+3. `SessionProvider` (lib/session.tsx) manages user state and calls `/auth/me` to validate session
 4. Current organization ID is stored in localStorage (`pinechat_current_org`)
-5. All API calls include `Authorization: Bearer <token>` header
+5. All API calls include `Authorization: Bearer <token>` header via `lib/api.ts`
 
 ### Key Files
 
 **Frontend:**
-- `lib/api.ts` - HTTP client for backend communication, token management
-- `lib/auth.tsx` - AuthContext with `useAuth()` hook providing user, memberships, currentOrg, hasPermission()
+- `lib/api.ts` - HTTP client for backend communication
+- `lib/session.tsx` - SessionContext with `useSession()` hook providing user, memberships, currentMembership, hasPermission()
+- `lib/storage.ts` - LocalStorage management (token, current org, chat settings)
+- `lib/hooks/` - React hooks for API communication (use-threads, use-models, use-members, etc.)
+- `lib/types/` - TypeScript types organized by category (entities, api, enums, inputs, results)
+
+**Frontend Components (organized by feature):**
+- `components/chat/` - Chat interface components (chat-area, agent-selector, chat-settings)
+- `components/layout/` - Layout components (header, sidebar, org-switcher)
+- `components/members/` - Member management components
+- `components/prompts/` - Prompt management components
+- `components/ui/` - shadcn/ui primitives
 
 **Backend:**
 - `server/src/api.py` - FastAPI app with CORS configuration
 - `server/src/routers/` - API route handlers (auth, threads, prompts, members, etc.)
 - `server/src/schemas.py` - Pydantic models with camelCase serialization
-- `server/src/models.py` - SQLAlchemy ORM models
+- `server/src/entities.py` - SQLModel ORM entities
+- `server/src/agent.py` - AI agent invocation logic
 - `server/db/` - Alembic migrations
 
 ### API Structure
@@ -87,8 +98,10 @@ The app implements role-based access control with organization scoping:
 All API routes are served by the Python backend at `localhost:8888`:
 
 - `/auth/*` - Login, register, current user (me)
+- `/organizations` - Create organization
 - `/organizations/{org_id}` - Organization CRUD
 - `/organizations/{org_id}/threads` - Conversation threads
+- `/organizations/{org_id}/threads/{thread_id}/agents/{agent_id}/runs/invoke` - AI agent invocation (streaming)
 - `/organizations/{org_id}/prompts` - System prompts
 - `/organizations/{org_id}/members` - Member management
 - `/organizations/{org_id}/invites` - Organization invites
