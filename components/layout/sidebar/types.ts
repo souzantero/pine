@@ -16,6 +16,12 @@ export interface MobileSidebarProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onThreadsClick: () => void;
+  onSettingsClick: () => void;
+}
+
+export interface MobileSettingsDrawerProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 export interface MobileThreadsDrawerProps {

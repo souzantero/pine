@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import {
   MessageSquare,
@@ -10,22 +10,11 @@ import {
   Users,
   Settings,
   Building2,
-  ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useSession } from "@/lib/session";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { getMenuExpanded, setMenuExpanded } from "@/lib/storage";
 import type { SidebarProps, NavSection } from "./types";
 
@@ -44,17 +33,6 @@ function SidebarContent({
   const pathname = usePathname();
   const { hasPermission } = useSession();
   const [menuExpanded, setMenuExpandedState] = useState(getMenuExpanded);
-
-  // Manter menu de configurações aberto quando estiver em uma página de settings
-  const isInSettings = pathname === "/settings" || pathname === "/members";
-  const [settingsOpen, setSettingsOpen] = useState(isInSettings);
-
-  // Sincronizar estado do menu com a rota e expansão do sidebar
-  useEffect(() => {
-    if (isInSettings && menuExpanded) {
-      setSettingsOpen(true);
-    }
-  }, [isInSettings, menuExpanded]);
 
   // Wrapper para persistir estado no storage
   const handleMenuExpandedChange = (expanded: boolean) => {
@@ -94,6 +72,16 @@ function SidebarContent({
 
   const handleConversasClick = () => {
     router.push("/");
+    onItemClick?.();
+  };
+
+  const handleSettingsClick = () => {
+    // Navegar para a primeira opção disponível
+    if (canManageOrg) {
+      router.push("/settings");
+    } else if (canViewMembers) {
+      router.push("/members");
+    }
     onItemClick?.();
   };
 
@@ -145,122 +133,20 @@ function SidebarContent({
             </li>
             {canAccessSettings && (
               <li>
-                {menuExpanded ? (
-                  <Collapsible open={settingsOpen} onOpenChange={setSettingsOpen}>
-                    <CollapsibleTrigger asChild>
-                      <button
-                        className={cn(
-                          "w-full flex items-center gap-3 px-3 py-2 rounded-md transition-colors",
-                          settingsOpen ? "bg-muted" : "hover:bg-muted"
-                        )}
-                      >
-                        <Settings className="h-5 w-5 shrink-0" />
-                        <span className="text-sm font-medium flex-1 text-left">Configurações</span>
-                        <ChevronDown
-                          className={cn(
-                            "h-4 w-4 transition-transform",
-                            settingsOpen && "rotate-180"
-                          )}
-                        />
-                      </button>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent>
-                      <ul className="ml-4 mt-1 space-y-1 border-l pl-2">
-                        {canManageOrg && (
-                          <li>
-                            <button
-                              onClick={handleOrganizationClick}
-                              className={cn(
-                                "w-full flex items-center gap-3 px-3 py-2 rounded-md transition-colors text-sm",
-                                pathname === "/settings"
-                                  ? "bg-primary text-primary-foreground"
-                                  : "hover:bg-muted"
-                              )}
-                            >
-                              <Building2 className="h-4 w-4 shrink-0" />
-                              <span>Organização</span>
-                            </button>
-                          </li>
-                        )}
-                        {canViewMembers && (
-                          <li>
-                            <button
-                              onClick={handleMembersClick}
-                              className={cn(
-                                "w-full flex items-center gap-3 px-3 py-2 rounded-md transition-colors text-sm",
-                                pathname === "/members"
-                                  ? "bg-primary text-primary-foreground"
-                                  : "hover:bg-muted"
-                              )}
-                            >
-                              <Users className="h-4 w-4 shrink-0" />
-                              <span>Membros</span>
-                            </button>
-                          </li>
-                        )}
-                      </ul>
-                    </CollapsibleContent>
-                  </Collapsible>
-                ) : (
-                  <Popover open={settingsOpen} onOpenChange={setSettingsOpen}>
-                    <PopoverTrigger asChild>
-                      <button
-                        title="Configurações"
-                        className={cn(
-                          "w-full flex items-center justify-center p-2 rounded-md transition-colors",
-                          settingsOpen ? "bg-muted" : "hover:bg-muted"
-                        )}
-                      >
-                        <Settings className="h-5 w-5 shrink-0" />
-                      </button>
-                    </PopoverTrigger>
-                    <PopoverContent side="right" align="start" className="w-48 p-1">
-                      <div className="text-xs font-semibold text-muted-foreground px-2 py-1.5">
-                        Configurações
-                      </div>
-                      <ul className="space-y-1">
-                        {canManageOrg && (
-                          <li>
-                            <button
-                              onClick={() => {
-                                handleOrganizationClick();
-                                setSettingsOpen(false);
-                              }}
-                              className={cn(
-                                "w-full flex items-center gap-3 px-2 py-1.5 rounded-md transition-colors text-sm",
-                                pathname === "/settings"
-                                  ? "bg-primary text-primary-foreground"
-                                  : "hover:bg-muted"
-                              )}
-                            >
-                              <Building2 className="h-4 w-4 shrink-0" />
-                              <span>Organização</span>
-                            </button>
-                          </li>
-                        )}
-                        {canViewMembers && (
-                          <li>
-                            <button
-                              onClick={() => {
-                                handleMembersClick();
-                                setSettingsOpen(false);
-                              }}
-                              className={cn(
-                                "w-full flex items-center gap-3 px-2 py-1.5 rounded-md transition-colors text-sm",
-                                pathname === "/members"
-                                  ? "bg-primary text-primary-foreground"
-                                  : "hover:bg-muted"
-                              )}
-                            >
-                              <Users className="h-4 w-4 shrink-0" />
-                              <span>Membros</span>
-                            </button>
-                          </li>
-                        )}
-                      </ul>
-                    </PopoverContent>
-                  </Popover>
-                )}
+                <button
+                  onClick={handleSettingsClick}
+                  title={!menuExpanded ? "Configurações" : undefined}
+                  className={cn(
+                    "w-full flex items-center rounded-md transition-colors",
+                    menuExpanded ? "gap-3 px-3 py-2" : "justify-center p-2",
+                    activeSection === "settings"
+                      ? "bg-primary text-primary-foreground"
+                      : "hover:bg-muted"
+                  )}
+                >
+                  <Settings className="h-5 w-5 shrink-0" />
+                  {menuExpanded && <span className="text-sm font-medium">Configurações</span>}
+                </button>
               </li>
             )}
           </ul>
@@ -324,6 +210,54 @@ function SidebarContent({
               </ul>
             </nav>
           </ScrollArea>
+        </aside>
+      )}
+
+      {/* Submenu - Configurações (só aparece quando Configurações está ativo) */}
+      {activeSection === "settings" && (
+        <aside className="w-56 border-r bg-muted/40 flex flex-col">
+          <div className={cn("p-2", isMobile && "pt-12")}>
+            <h2 className="px-3 py-2 text-sm font-semibold text-muted-foreground">
+              Configurações
+            </h2>
+          </div>
+
+          <nav className="p-2">
+            <ul className="space-y-1">
+              {canManageOrg && (
+                <li>
+                  <button
+                    onClick={handleOrganizationClick}
+                    className={cn(
+                      "w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors text-left",
+                      pathname === "/settings"
+                        ? "bg-primary text-primary-foreground"
+                        : "hover:bg-muted"
+                    )}
+                  >
+                    <Building2 className="h-4 w-4 shrink-0" />
+                    <span>Organização</span>
+                  </button>
+                </li>
+              )}
+              {canViewMembers && (
+                <li>
+                  <button
+                    onClick={handleMembersClick}
+                    className={cn(
+                      "w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors text-left",
+                      pathname === "/members"
+                        ? "bg-primary text-primary-foreground"
+                        : "hover:bg-muted"
+                    )}
+                  >
+                    <Users className="h-4 w-4 shrink-0" />
+                    <span>Membros</span>
+                  </button>
+                </li>
+              )}
+            </ul>
+          </nav>
         </aside>
       )}
     </div>

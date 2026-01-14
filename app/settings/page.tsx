@@ -38,9 +38,9 @@ export default function SettingsPage() {
     removeProvider,
   } = useModelProviders();
 
-  // Estados do formulário de organização
-  const [name, setName] = useState("");
-  const [slug, setSlug] = useState("");
+  // Estados do formulário de organização (inicializados como undefined para detectar edição)
+  const [name, setName] = useState<string | undefined>(undefined);
+  const [slug, setSlug] = useState<string | undefined>(undefined);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -62,13 +62,9 @@ export default function SettingsPage() {
     }
   }, [authLoading, canManage, router]);
 
-  // Sincronizar formulário com dados da organização
-  useEffect(() => {
-    if (organization) {
-      setName(organization.name);
-      setSlug(organization.slug);
-    }
-  }, [organization]);
+  // Valores do formulário (estado local tem precedência sobre dados do servidor)
+  const nameValue = name ?? organization?.name ?? "";
+  const slugValue = slug ?? organization?.slug ?? "";
 
   // Handlers de organização
   const handleSubmit = async (e: React.FormEvent) => {
@@ -78,7 +74,7 @@ export default function SettingsPage() {
     setSuccess(false);
     setSaving(true);
 
-    const result = await updateOrganization({ name, slug });
+    const result = await updateOrganization({ name: nameValue, slug: slugValue });
 
     if (result.error) {
       setError(result.error);
@@ -180,7 +176,7 @@ export default function SettingsPage() {
                   id="name"
                   type="text"
                   placeholder="Minha Empresa"
-                  value={name}
+                  value={nameValue}
                   onChange={(e) => setName(e.target.value)}
                   required
                 />
@@ -192,7 +188,7 @@ export default function SettingsPage() {
                   id="slug"
                   type="text"
                   placeholder="minha-empresa"
-                  value={slug}
+                  value={slugValue}
                   onChange={(e) =>
                     setSlug(
                       e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "")

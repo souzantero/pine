@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -36,25 +36,20 @@ export function ChangeRoleDialog({
   roles,
   onChangeRole,
 }: ChangeRoleDialogProps) {
-  const [selectedRoleId, setSelectedRoleId] = useState<string>("");
+  const [selectedRoleId, setSelectedRoleId] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Filtrar para não mostrar Owner nas opções
   const availableRoles = roles.filter((r) => r.name !== "Owner");
 
-  // Reset quando o dialog abre com um novo membro
-  useEffect(() => {
-    if (member) {
-      setSelectedRoleId(member.role.id);
-      setError(null);
-    }
-  }, [member]);
+  // Valor atual (estado local tem precedência sobre valor inicial do member)
+  const currentRoleId = selectedRoleId ?? member?.role.id ?? "";
 
   const handleSave = async () => {
-    if (!member || !selectedRoleId) return;
+    if (!member || !currentRoleId) return;
 
-    if (selectedRoleId === member.role.id) {
+    if (currentRoleId === member.role.id) {
       onOpenChange(false);
       return;
     }
@@ -62,7 +57,7 @@ export function ChangeRoleDialog({
     setError(null);
     setLoading(true);
 
-    const result = await onChangeRole(member.id, selectedRoleId);
+    const result = await onChangeRole(member.id, currentRoleId);
 
     if (result.error) {
       setError(result.error);
@@ -71,11 +66,13 @@ export function ChangeRoleDialog({
     }
 
     setLoading(false);
+    setSelectedRoleId(undefined);
     onOpenChange(false);
   };
 
   const handleClose = () => {
     setError(null);
+    setSelectedRoleId(undefined);
     onOpenChange(false);
   };
 
@@ -104,7 +101,7 @@ export function ChangeRoleDialog({
 
           <div className="space-y-2">
             <Label htmlFor="role">Nova função</Label>
-            <Select value={selectedRoleId} onValueChange={setSelectedRoleId}>
+            <Select value={currentRoleId} onValueChange={setSelectedRoleId}>
               <SelectTrigger>
                 <SelectValue placeholder="Selecione uma função" />
               </SelectTrigger>

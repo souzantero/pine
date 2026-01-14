@@ -9,6 +9,7 @@ import { Header } from "./header";
 import { Sidebar } from "./sidebar";
 import { MobileSidebar } from "./sidebar/mobile-sidebar";
 import { MobileThreadsDrawer } from "./sidebar/mobile-threads-drawer";
+import { MobileSettingsDrawer } from "./sidebar/mobile-settings-drawer";
 import type { ApiThread } from "@/lib/types";
 
 interface AppLayoutProps {
@@ -30,6 +31,7 @@ export function AppLayout({ children, showSettingsButton, onSettingsClick }: App
   const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileThreadsOpen, setMobileThreadsOpen] = useState(false);
+  const [mobileSettingsOpen, setMobileSettingsOpen] = useState(false);
 
   // Redirect se não autenticado
   useEffect(() => {
@@ -94,6 +96,7 @@ export function AppLayout({ children, showSettingsButton, onSettingsClick }: App
         open={mobileMenuOpen}
         onOpenChange={setMobileMenuOpen}
         onThreadsClick={() => setMobileThreadsOpen(true)}
+        onSettingsClick={() => setMobileSettingsOpen(true)}
       />
 
       {/* Mobile Threads Drawer */}
@@ -105,6 +108,12 @@ export function AppLayout({ children, showSettingsButton, onSettingsClick }: App
         open={mobileThreadsOpen}
         onOpenChange={setMobileThreadsOpen}
         hasProviders={hasProviders}
+      />
+
+      {/* Mobile Settings Drawer */}
+      <MobileSettingsDrawer
+        open={mobileSettingsOpen}
+        onOpenChange={setMobileSettingsOpen}
       />
 
       <div className="flex flex-1 overflow-hidden">

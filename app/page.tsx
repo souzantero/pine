@@ -69,7 +69,7 @@ export default function Home() {
         loadModelsForProvider(defaultProvider);
       }
     }
-  }, [selectedThread?.id, configuredProviders, modelsProvider, updateConfigMultiple, loadModelsForProvider]);
+  }, [selectedThread, configuredProviders, modelsProvider, updateConfigMultiple, loadModelsForProvider]);
 
   // Auto-selecionar primeiro modelo quando modelos sao carregados e nao ha modelo configurado
   useEffect(() => {
@@ -80,7 +80,7 @@ export default function Home() {
     if (!config.model && modelsProvider === config.provider) {
       updateConfigMultiple(selectedThread.id, { model: availableModels[0].id });
     }
-  }, [selectedThread?.id, availableModels, modelsProvider, updateConfigMultiple]);
+  }, [selectedThread, availableModels, modelsProvider, updateConfigMultiple]);
 
   const handleNewChat = useCallback(async () => {
     await createThread();
@@ -244,6 +244,7 @@ export default function Home() {
         open={mobileMenuOpen}
         onOpenChange={setMobileMenuOpen}
         onThreadsClick={() => setMobileThreadsOpen(true)}
+        onSettingsClick={() => setMobileSettingsOpen(true)}
       />
 
       {/* Mobile Threads Drawer */}

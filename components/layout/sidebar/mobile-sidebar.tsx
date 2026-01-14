@@ -1,14 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import {
-  MessageSquare,
-  Users,
-  Settings,
-  Building2,
-  ChevronDown,
-} from "lucide-react";
+import { usePathname } from "next/navigation";
+import { MessageSquare, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Sheet,
@@ -17,45 +10,40 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { useSession } from "@/lib/session";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 import type { MobileSidebarProps, NavSection } from "./types";
 
 // Menu mobile (apenas navegação, sem lista de threads)
 function MobileMenuContent({
   onItemClick,
   onThreadsClick,
+  onSettingsClick,
 }: {
   onItemClick?: () => void;
   onThreadsClick: () => void;
+  onSettingsClick: () => void;
 }) {
-  const router = useRouter();
+  const pathname = usePathname();
   const { hasPermission } = useSession();
-  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const canViewMembers = hasPermission("MEMBERS_READ");
   const canManageOrg = hasPermission("ORGANIZATION_MANAGE");
   const canAccessSettings = canViewMembers || canManageOrg;
 
   // Determinar qual seção está ativa baseado na rota
-  const activeSection: NavSection = "threads";
-
-  const handleMembersClick = () => {
-    router.push("/members");
-    onItemClick?.();
+  const getActiveSection = (): NavSection => {
+    if (pathname === "/settings" || pathname === "/members") return "settings";
+    return "threads";
   };
-
-  const handleOrganizationClick = () => {
-    router.push("/settings");
-    onItemClick?.();
-  };
+  const activeSection = getActiveSection();
 
   const handleThreadsClick = () => {
     onItemClick?.();
     onThreadsClick();
+  };
+
+  const handleSettingsClick = () => {
+    onItemClick?.();
+    onSettingsClick();
   };
 
   return (
@@ -78,51 +66,18 @@ function MobileMenuContent({
           </li>
           {canAccessSettings && (
             <li>
-              <Collapsible open={settingsOpen} onOpenChange={setSettingsOpen}>
-                <CollapsibleTrigger asChild>
-                  <button
-                    className={cn(
-                      "w-full flex items-center gap-3 px-3 py-2 rounded-md transition-colors",
-                      settingsOpen ? "bg-muted" : "hover:bg-muted"
-                    )}
-                  >
-                    <Settings className="h-5 w-5 shrink-0" />
-                    <span className="text-sm font-medium flex-1 text-left">Configurações</span>
-                    <ChevronDown
-                      className={cn(
-                        "h-4 w-4 transition-transform",
-                        settingsOpen && "rotate-180"
-                      )}
-                    />
-                  </button>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <ul className="ml-4 mt-1 space-y-1 border-l pl-2">
-                    {canManageOrg && (
-                      <li>
-                        <button
-                          onClick={handleOrganizationClick}
-                          className="w-full flex items-center gap-3 px-3 py-2 rounded-md transition-colors text-sm hover:bg-muted"
-                        >
-                          <Building2 className="h-4 w-4 shrink-0" />
-                          <span>Organização</span>
-                        </button>
-                      </li>
-                    )}
-                    {canViewMembers && (
-                      <li>
-                        <button
-                          onClick={handleMembersClick}
-                          className="w-full flex items-center gap-3 px-3 py-2 rounded-md transition-colors text-sm hover:bg-muted"
-                        >
-                          <Users className="h-4 w-4 shrink-0" />
-                          <span>Membros</span>
-                        </button>
-                      </li>
-                    )}
-                  </ul>
-                </CollapsibleContent>
-              </Collapsible>
+              <button
+                onClick={handleSettingsClick}
+                className={cn(
+                  "w-full flex items-center gap-3 px-3 py-2 rounded-md transition-colors",
+                  activeSection === "settings"
+                    ? "bg-primary text-primary-foreground"
+                    : "hover:bg-muted"
+                )}
+              >
+                <Settings className="h-5 w-5 shrink-0" />
+                <span className="text-sm font-medium">Configurações</span>
+              </button>
             </li>
           )}
         </ul>
@@ -132,7 +87,7 @@ function MobileMenuContent({
 }
 
 // Sidebar para mobile (drawer) - apenas menu de navegação
-export function MobileSidebar({ open, onOpenChange, onThreadsClick }: MobileSidebarProps) {
+export function MobileSidebar({ open, onOpenChange, onThreadsClick, onSettingsClick }: MobileSidebarProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="left" className="p-0 w-auto">
@@ -142,6 +97,7 @@ export function MobileSidebar({ open, onOpenChange, onThreadsClick }: MobileSide
         <MobileMenuContent
           onItemClick={() => onOpenChange(false)}
           onThreadsClick={onThreadsClick}
+          onSettingsClick={onSettingsClick}
         />
       </SheetContent>
     </Sheet>
