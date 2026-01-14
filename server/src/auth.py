@@ -84,6 +84,31 @@ async def get_current_user(
 CurrentUser = Annotated[User, Depends(get_current_user)]
 
 
+async def get_current_membership(
+    organization_id: uuid.UUID,
+    current_user: CurrentUser,
+    db: DatabaseSession,
+) -> OrganizationMember:
+    """Dependency que retorna o membership do usuario na organizacao ou 403."""
+    statement = select(OrganizationMember).where(
+        OrganizationMember.user_id == current_user.id,
+        OrganizationMember.organization_id == organization_id,
+    )
+    membership = db.exec(statement).first()
+
+    if not membership:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Voce nao e membro desta organizacao",
+        )
+
+    return membership
+
+
+# Type alias para membership
+CurrentMembership = Annotated[OrganizationMember, Depends(get_current_membership)]
+
+
 def get_user_permissions(db: Session, user_id: uuid.UUID, organization_id: uuid.UUID) -> set[Permission]:
     """Retorna o conjunto de permissoes do usuario na organizacao."""
     # Busca o membership do usuario na organizacao
@@ -133,18 +158,6 @@ def require_permission(required_permission: Permission):
         return current_user
 
     return permission_checker
-
-
-def get_user_membership(
-    db: Session, user_id: uuid.UUID, organization_id: uuid.UUID
-) -> OrganizationMember | None:
-    """Retorna o membership do usuario na organizacao."""
-    statement = select(OrganizationMember).where(
-        OrganizationMember.user_id == user_id,
-        OrganizationMember.organization_id == organization_id,
-    )
-    return db.exec(statement).first()
-
 
 def get_organization_by_id(db: Session, organization_id: uuid.UUID) -> Organization | None:
     """Retorna a organizacao pelo ID."""

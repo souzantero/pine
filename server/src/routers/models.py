@@ -3,7 +3,7 @@ import uuid
 from fastapi import APIRouter, HTTPException, Query, status
 from sqlmodel import select
 
-from src.auth import CurrentUser, get_user_membership
+from src.auth import CurrentMembership, CurrentUser
 from src.database import DatabaseSession
 from src.entities import ModelProvider, Organization, OrganizationModelProvider
 from src.schemas import ModelInfo, ModelsResponse
@@ -45,18 +45,11 @@ MODELS_BY_PROVIDER: dict[ModelProvider, list[ModelInfo]] = {
 def get_available_models(
     organization_id: uuid.UUID,
     current_user: CurrentUser,
+    membership: CurrentMembership,
     db: DatabaseSession,
     provider: str | None = Query(default=None, description="Provedor especifico para buscar modelos"),
 ):
     """Retorna modelos disponiveis baseado no provedor da organizacao."""
-    # Verifica se usuario e membro
-    membership = get_user_membership(db, current_user.id, organization_id)
-    if not membership:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Voce nao e membro desta organizacao",
-        )
-
     # Busca organizacao com provedores
     organization = db.get(Organization, organization_id)
     if not organization:

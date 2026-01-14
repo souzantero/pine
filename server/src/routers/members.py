@@ -4,7 +4,7 @@ from typing import List
 from fastapi import APIRouter, HTTPException, status
 from sqlmodel import select
 
-from src.auth import CurrentUser, check_permission, get_user_membership
+from src.auth import CurrentUser, check_permission
 from src.database import DatabaseSession
 from src.entities import OrganizationMember, Permission, Role
 from src.schemas import (

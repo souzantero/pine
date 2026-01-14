@@ -3,7 +3,7 @@ import uuid
 from fastapi import APIRouter, HTTPException, status
 from sqlmodel import Session, select
 
-from src.auth import CurrentUser, check_permission, get_user_membership
+from src.auth import CurrentMembership, CurrentUser, check_permission
 from src.database import DatabaseSession
 from src.entities import (
     Organization,
@@ -146,17 +146,10 @@ def create_organization(
 def get_organization(
     organization_id: uuid.UUID,
     current_user: CurrentUser,
+    membership: CurrentMembership,
     db: DatabaseSession,
 ):
     """Retorna detalhes de uma organizacao (usuario deve ser membro)."""
-    # Verifica se usuario e membro
-    membership = get_user_membership(db, current_user.id, organization_id)
-    if not membership:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Voce nao e membro desta organizacao",
-        )
-
     organization = db.get(Organization, organization_id)
     if not organization:
         raise HTTPException(

@@ -9,7 +9,7 @@ from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from sqlmodel import col, select
 
 from src.agent import build_agent
-from src.auth import CurrentUser, check_permission, get_user_membership
+from src.auth import CurrentMembership, CurrentUser, check_permission
 from src.database import DatabaseSession, get_checkpoint_saver
 from src.entities import ModelProvider, OrganizationModelProvider, Permission, Thread
 from src.helpers import agent_messages_to_list, chunk_to_text, get_config
@@ -62,11 +62,12 @@ def get_provider_api_key(
 def list_threads(
     organization_id: uuid.UUID,
     current_user: CurrentUser,
+    membership: CurrentMembership,
     db: DatabaseSession,
     offset: int = 0,
     limit: Annotated[int, Query(le=100)] = 50,
 ):
-    """Lista threads da organizacao (requer THREADS_READ)."""
+    """Lista threads do usuario na organizacao (requer THREADS_READ)."""
     # Verifica permissao
     if not check_permission(db, current_user.id, organization_id, Permission.THREADS_READ):
         raise HTTPException(
@@ -74,10 +75,13 @@ def list_threads(
             detail="Permissao THREADS_READ necessaria",
         )
 
-    # Busca threads ordenadas por ultima mensagem (nulls last) ou data de criacao
+    # Busca threads do usuario ordenadas por ultima mensagem (nulls last) ou data de criacao
     statement = (
         select(Thread)
-        .where(Thread.organization_id == organization_id)
+        .where(
+            Thread.organization_id == organization_id,
+            Thread.created_by_id == membership.id,
+        )
         .order_by(
             col(Thread.last_message_at).desc().nulls_last(),
             col(Thread.created_at).desc(),
@@ -106,6 +110,7 @@ def create_thread(
     organization_id: uuid.UUID,
     payload: CreateThreadRequest,
     current_user: CurrentUser,
+    membership: CurrentMembership,
     db: DatabaseSession,
 ):
     """Cria uma nova thread (requer THREADS_WRITE)."""
@@ -114,14 +119,6 @@ def create_thread(
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Permissao THREADS_WRITE necessaria",
-        )
-
-    # Busca o membership do usuario
-    membership = get_user_membership(db, current_user.id, organization_id)
-    if not membership:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Voce nao e membro desta organizacao",
         )
 
     # Cria a thread
