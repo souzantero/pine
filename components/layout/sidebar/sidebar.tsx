@@ -11,7 +11,6 @@ import {
   Settings,
   Building2,
   ChevronDown,
-  FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -65,11 +64,9 @@ function SidebarContent({
 
   const canViewMembers = hasPermission("MEMBERS_READ");
   const canManageOrg = hasPermission("ORGANIZATION_MANAGE");
-  const canViewPrompts = hasPermission("PROMPTS_READ");
 
   // Determinar qual seção está ativa baseado na rota
   const getActiveSection = (): NavSection => {
-    if (pathname === "/prompts") return "prompts";
     if (pathname === "/settings" || pathname === "/members") return "settings";
     return "threads";
   };
@@ -92,11 +89,6 @@ function SidebarContent({
 
   const handleOrganizationClick = () => {
     router.push("/settings");
-    onItemClick?.();
-  };
-
-  const handlePromptsClick = () => {
-    router.push("/prompts");
     onItemClick?.();
   };
 
@@ -151,24 +143,6 @@ function SidebarContent({
                 {menuExpanded && <span className="text-sm font-medium">Conversas</span>}
               </button>
             </li>
-            {canViewPrompts && (
-              <li>
-                <button
-                  onClick={handlePromptsClick}
-                  title={!menuExpanded ? "Prompts" : undefined}
-                  className={cn(
-                    "w-full flex items-center rounded-md transition-colors",
-                    menuExpanded ? "gap-3 px-3 py-2" : "justify-center p-2",
-                    activeSection === "prompts"
-                      ? "bg-primary text-primary-foreground"
-                      : "hover:bg-muted"
-                  )}
-                >
-                  <FileText className="h-5 w-5 shrink-0" />
-                  {menuExpanded && <span className="text-sm font-medium">Prompts</span>}
-                </button>
-              </li>
-            )}
             {canAccessSettings && (
               <li>
                 {menuExpanded ? (

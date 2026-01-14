@@ -3,10 +3,15 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSession } from "@/lib/session";
 import { api, getThreadMessages } from "@/lib/api";
-import { getDefaultAgentId, getDefaultConfig } from "@/lib/agents";
 import { getThreadConfig, setThreadConfig } from "@/lib/storage";
-import type { Thread, ThreadWithMessages, Message, ApiThread, AgentMessage } from "@/lib/types";
-import type { AgentConfig } from "@/lib/agents";
+import type {
+  Thread,
+  ThreadWithMessages,
+  Message,
+  ChatConfig,
+  ApiThread,
+  AgentMessage,
+} from "@/lib/types";
 
 interface UseThreadsReturn {
   threads: ThreadWithMessages[];
@@ -18,19 +23,24 @@ interface UseThreadsReturn {
   createThread: (title?: string) => Promise<ThreadWithMessages | null>;
   addMessage: (threadId: string, message: Message) => void;
   updateThreadTitle: (threadId: string, title: string) => void;
-  updateAgentConfig: (threadId: string, key: string, value: unknown) => void;
-  updateAgentConfigMultiple: (threadId: string, updates: Partial<AgentConfig>) => void;
-  changeAgent: (threadId: string, agentId: string) => void;
+  updateConfig: (threadId: string, key: string, value: unknown) => void;
+  updateConfigMultiple: (threadId: string, updates: Partial<ChatConfig>) => void;
   refresh: () => Promise<void>;
 }
 
-// Obter config: primeiro tenta do storage da thread, senao usa default do codigo
-function getStoredOrDefaultConfig(threadId: string, agentId: string): AgentConfig {
-  const storedConfig = getThreadConfig<AgentConfig>(threadId, agentId);
+// Config padrao
+const DEFAULT_CONFIG: ChatConfig = {
+  provider: null,
+  model: "",
+};
+
+// Obter config: primeiro tenta do storage da thread, senao usa default
+function getStoredOrDefaultConfig(threadId: string): ChatConfig {
+  const storedConfig = getThreadConfig<ChatConfig>(threadId);
   if (storedConfig) {
     return storedConfig;
   }
-  return getDefaultConfig(agentId);
+  return { ...DEFAULT_CONFIG };
 }
 
 // Converter mensagem do agente para mensagem do frontend
@@ -45,7 +55,6 @@ function mapAgentMessageToMessage(m: AgentMessage): Message {
 
 // Converter resposta da API para tipo do frontend
 function mapApiThreadToThread(t: ApiThread): ThreadWithMessages {
-  const defaultAgentId = getDefaultAgentId();
   // Usa lastMessagePreview como titulo se title estiver vazio
   const displayTitle = t.title || t.lastMessagePreview || "Nova conversa";
   return {
@@ -53,8 +62,7 @@ function mapApiThreadToThread(t: ApiThread): ThreadWithMessages {
     title: displayTitle,
     updatedAt: t.lastMessageAt ? new Date(t.lastMessageAt) : new Date(t.updatedAt),
     messages: [],
-    agentId: defaultAgentId,
-    agentConfig: getStoredOrDefaultConfig(t.id, defaultAgentId),
+    config: getStoredOrDefaultConfig(t.id),
   };
 }
 
@@ -166,9 +174,10 @@ export function useThreads(): UseThreadsReturn {
       const updated = prev.map((thread) => {
         if (thread.id === threadId) {
           // Atualiza titulo com preview da msg do usuario
-          const newTitle = message.role === "user"
-            ? message.content.slice(0, 100) + (message.content.length > 100 ? "..." : "")
-            : thread.title;
+          const newTitle =
+            message.role === "user"
+              ? message.content.slice(0, 100) + (message.content.length > 100 ? "..." : "")
+              : thread.title;
           return {
             ...thread,
             title: newTitle,
@@ -192,59 +201,40 @@ export function useThreads(): UseThreadsReturn {
 
   const updateThreadTitle = useCallback((threadId: string, title: string) => {
     setThreads((prev) =>
-      prev.map((thread) =>
-        thread.id === threadId ? { ...thread, title } : thread
-      )
+      prev.map((thread) => (thread.id === threadId ? { ...thread, title } : thread))
     );
   }, []);
 
-  const updateAgentConfig = useCallback(
-    (threadId: string, key: string, value: unknown) => {
-      setThreads((prev) =>
-        prev.map((thread) => {
-          if (thread.id === threadId) {
-            const newConfig = { ...thread.agentConfig, [key]: value } as AgentConfig;
-            // Salva a config no storage da thread
-            setThreadConfig(threadId, thread.agentId, newConfig);
-            return { ...thread, agentConfig: newConfig };
-          }
-          return thread;
-        })
-      );
-    },
-    []
-  );
-
-  const updateAgentConfigMultiple = useCallback(
-    (threadId: string, updates: Partial<AgentConfig>) => {
-      setThreads((prev) =>
-        prev.map((thread) => {
-          if (thread.id === threadId) {
-            const newConfig = { ...thread.agentConfig, ...updates } as AgentConfig;
-            // Salva a config no storage da thread
-            setThreadConfig(threadId, thread.agentId, newConfig);
-            return { ...thread, agentConfig: newConfig };
-          }
-          return thread;
-        })
-      );
-    },
-    []
-  );
-
-  const changeAgent = useCallback((threadId: string, agentId: string) => {
+  const updateConfig = useCallback((threadId: string, key: string, value: unknown) => {
     setThreads((prev) =>
-      prev.map((thread) =>
-        thread.id === threadId
-          ? {
-              ...thread,
-              agentId,
-              agentConfig: getStoredOrDefaultConfig(threadId, agentId),
-            }
-          : thread
-      )
+      prev.map((thread) => {
+        if (thread.id === threadId) {
+          const newConfig = { ...thread.config, [key]: value } as ChatConfig;
+          // Salva a config no storage da thread
+          setThreadConfig(threadId, newConfig);
+          return { ...thread, config: newConfig };
+        }
+        return thread;
+      })
     );
   }, []);
+
+  const updateConfigMultiple = useCallback(
+    (threadId: string, updates: Partial<ChatConfig>) => {
+      setThreads((prev) =>
+        prev.map((thread) => {
+          if (thread.id === threadId) {
+            const newConfig = { ...thread.config, ...updates } as ChatConfig;
+            // Salva a config no storage da thread
+            setThreadConfig(threadId, newConfig);
+            return { ...thread, config: newConfig };
+          }
+          return thread;
+        })
+      );
+    },
+    []
+  );
 
   const refresh = useCallback(async () => {
     setIsLoading(true);
@@ -261,9 +251,8 @@ export function useThreads(): UseThreadsReturn {
     createThread,
     addMessage,
     updateThreadTitle,
-    updateAgentConfig,
-    updateAgentConfigMultiple,
-    changeAgent,
+    updateConfig,
+    updateConfigMultiple,
     refresh,
   };
 }

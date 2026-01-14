@@ -36,9 +36,6 @@ ADMIN_PERMISSIONS = [
     Permission.ROLES_READ,
     Permission.ROLES_MANAGE,
     Permission.ORGANIZATION_MANAGE,
-    Permission.PROMPTS_READ,
-    Permission.PROMPTS_WRITE,
-    Permission.PROMPTS_DELETE,
 ]
 
 # Permissoes padrao para role Membro
@@ -47,7 +44,6 @@ MEMBER_PERMISSIONS = [
     Permission.THREADS_WRITE,
     Permission.AGENTS_READ,
     Permission.MEMBERS_READ,
-    Permission.PROMPTS_READ,
 ]
 
 

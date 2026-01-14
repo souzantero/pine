@@ -1,6 +1,6 @@
 "use client";
 
-import { Settings, PanelRightClose, PanelRight, Bot, Database, Search, FileText } from "lucide-react";
+import { Settings, PanelRightClose, PanelRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,33 +11,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Slider } from "@/components/ui/slider";
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { getAgent } from "@/lib/agents";
-import type { AgentConfigField } from "@/lib/agents";
-import type { LucideIcon } from "lucide-react";
-
-export interface SystemPrompt {
-  id: string;
-  name: string;
-  content: string;
-}
-
-export interface ModelOption {
-  id: string;
-  name: string;
-  description?: string;
-}
-
-export interface ProviderOption {
-  value: string;
-  label: string;
-}
+import type { ChatConfig, ModelOption } from "@/lib/types";
 
 // Mapeamento de nomes de provedores para labels amigaveis
 const PROVIDER_LABELS: Record<string, string> = {
@@ -47,20 +27,10 @@ const PROVIDER_LABELS: Record<string, string> = {
   GOOGLE: "Google AI",
 };
 
-// Mapeamento de ícones
-const iconMap: Record<string, LucideIcon> = {
-  Bot: Bot,
-  Database: Database,
-  Search: Search,
-  FileText: FileText,
-};
-
 interface SettingsContentProps {
-  agentId: string;
-  agentConfig: Record<string, unknown>;
+  config: ChatConfig;
   onConfigChange: (key: string, value: unknown) => void;
   availableModels: ModelOption[];
-  systemPrompts: SystemPrompt[];
   configuredProviders: string[];
   onProviderChange: (provider: string) => void;
 }
@@ -139,148 +109,27 @@ function ModelField({
   );
 }
 
-// Componente para renderizar campo de prompt
-function PromptField({
-  value,
-  onChange,
-  systemPrompts,
-  description,
-}: {
-  value: string | null;
-  onChange: (value: string | null) => void;
-  systemPrompts: SystemPrompt[];
-  description?: string;
-}) {
-  return (
-    <div className="space-y-2">
-      <label className="text-sm font-medium">System Prompt</label>
-      <Select
-        value={value ?? "none"}
-        onValueChange={(v) => onChange(v === "none" ? null : v)}
-      >
-        <SelectTrigger className="w-full">
-          <SelectValue placeholder="Selecione um prompt" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="none">Nenhum</SelectItem>
-          {systemPrompts.map((prompt) => (
-            <SelectItem key={prompt.id} value={prompt.id}>
-              {prompt.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      {description && (
-        <p className="text-xs text-muted-foreground">{description}</p>
-      )}
-    </div>
-  );
-}
-
-// Componente para renderizar campo de temperatura
-function TemperatureField({
-  value,
-  onChange,
-  field,
-}: {
-  value: number;
-  onChange: (value: number) => void;
-  field: AgentConfigField;
-}) {
-  return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <label className="text-sm font-medium">{field.label}</label>
-        <span className="text-sm text-muted-foreground">{value.toFixed(1)}</span>
-      </div>
-      <Slider
-        value={[value]}
-        onValueChange={(v) => onChange(v[0])}
-        min={field.min ?? 0}
-        max={field.max ?? 2}
-        step={field.step ?? 0.1}
-        className="w-full"
-      />
-      {field.description && (
-        <p className="text-xs text-muted-foreground">{field.description}</p>
-      )}
-    </div>
-  );
-}
-
 // Conteúdo compartilhado das configurações
 function SettingsContent({
-  agentId,
-  agentConfig,
+  config,
   onConfigChange,
   availableModels,
-  systemPrompts,
   configuredProviders,
   onProviderChange,
 }: SettingsContentProps) {
-  const agent = getAgent(agentId);
-  const AgentIcon = agent ? iconMap[agent.icon] ?? Bot : Bot;
-
-  if (!agent) {
-    return (
-      <div className="p-4">
-        <p className="text-sm text-muted-foreground">Agente não encontrado</p>
-      </div>
-    );
-  }
-
   return (
     <div className="p-4 space-y-4">
-      {/* Header com info do agente */}
-      <div className="flex items-center gap-2 text-sm">
-        <AgentIcon className="h-4 w-4 text-muted-foreground" />
-        <span className="font-medium">{agent.name}</span>
-      </div>
-      <Separator />
+      <ProviderField
+        value={config.provider}
+        onChange={onProviderChange}
+        configuredProviders={configuredProviders}
+      />
 
-      {/* Renderizar campos baseado no schema do agente */}
-      {agent.configSchema.map((field, index) => {
-        const isLast = index === agent.configSchema.length - 1;
-
-        return (
-          <div key={field.key}>
-            {field.type === "provider" && (
-              <ProviderField
-                value={(agentConfig[field.key] as string | null) ?? null}
-                onChange={onProviderChange}
-                configuredProviders={configuredProviders}
-              />
-            )}
-
-            {field.type === "model" && (
-              <ModelField
-                value={(agentConfig[field.key] as string) ?? ""}
-                onChange={(value) => onConfigChange(field.key, value)}
-                availableModels={availableModels}
-              />
-            )}
-
-            {field.type === "prompt" && (
-              <PromptField
-                value={(agentConfig[field.key] as string | null) ?? null}
-                onChange={(value) => onConfigChange(field.key, value)}
-                systemPrompts={systemPrompts}
-                description={field.description}
-              />
-            )}
-
-            {field.type === "temperature" && (
-              <TemperatureField
-                value={(agentConfig[field.key] as number) ?? 0.7}
-                onChange={(value) => onConfigChange(field.key, value)}
-                field={field}
-              />
-            )}
-
-            {!isLast && field.type !== "provider" && <Separator className="mt-4" />}
-          </div>
-        );
-      })}
+      <ModelField
+        value={config.model}
+        onChange={(value) => onConfigChange("model", value)}
+        availableModels={availableModels}
+      />
     </div>
   );
 }
@@ -292,11 +141,9 @@ interface ChatSettingsProps extends SettingsContentProps {
 
 // Desktop Settings Panel
 export function ChatSettings({
-  agentId,
-  agentConfig,
+  config,
   onConfigChange,
   availableModels,
-  systemPrompts,
   configuredProviders,
   onProviderChange,
   expanded,
@@ -333,11 +180,9 @@ export function ChatSettings({
       {expanded && (
         <div className="flex-1 overflow-y-auto">
           <SettingsContent
-            agentId={agentId}
-            agentConfig={agentConfig}
+            config={config}
             onConfigChange={onConfigChange}
             availableModels={availableModels}
-            systemPrompts={systemPrompts}
             configuredProviders={configuredProviders}
             onProviderChange={onProviderChange}
           />
@@ -367,11 +212,9 @@ interface MobileChatSettingsProps extends SettingsContentProps {
 
 // Mobile Settings (Sheet/Drawer)
 export function MobileChatSettings({
-  agentId,
-  agentConfig,
+  config,
   onConfigChange,
   availableModels,
-  systemPrompts,
   configuredProviders,
   onProviderChange,
   open,
@@ -387,11 +230,9 @@ export function MobileChatSettings({
           </SheetTitle>
         </SheetHeader>
         <SettingsContent
-          agentId={agentId}
-          agentConfig={agentConfig}
+          config={config}
           onConfigChange={onConfigChange}
           availableModels={availableModels}
-          systemPrompts={systemPrompts}
           configuredProviders={configuredProviders}
           onProviderChange={onProviderChange}
         />

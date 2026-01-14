@@ -40,12 +40,10 @@ class RunInput(CamelCaseModel):
 
 
 class RunConfig(CamelCaseModel):
-    """Configuracao de execucao do agente."""
+    """Configuracao de execucao."""
 
     provider: str  # OPENAI, OPENROUTER
     model: str
-    temperature: float = 0.7
-    system_prompt_id: uuid.UUID | None = None
 
 
 class RunRequest(CamelCaseModel):
@@ -271,33 +269,6 @@ class ThreadResponse(CamelCaseModel):
     title: str | None
     last_message_at: datetime | None
     last_message_preview: str | None
-    created_by_id: uuid.UUID
-    created_at: datetime
-    updated_at: datetime
-
-
-# =============================================================================
-# Prompt Schemas
-# =============================================================================
-
-
-class CreatePromptRequest(CamelCaseModel):
-    name: str
-    content: str
-    role: str = "SYSTEM"  # SYSTEM, USER, ASSISTANT
-
-
-class UpdatePromptRequest(CamelCaseModel):
-    name: str | None = None
-    content: str | None = None
-    role: str | None = None
-
-
-class PromptResponse(CamelCaseModel):
-    id: uuid.UUID
-    name: str
-    content: str
-    role: str
     created_by_id: uuid.UUID
     created_at: datetime
     updated_at: datetime

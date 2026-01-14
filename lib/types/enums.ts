@@ -14,16 +14,10 @@ export type Permission =
   | "ROLES_READ"
   | "ROLES_MANAGE"
   | "ORGANIZATION_MANAGE"
-  | "PLATFORM_MANAGE"
-  | "PROMPTS_READ"
-  | "PROMPTS_WRITE"
-  | "PROMPTS_DELETE";
+  | "PLATFORM_MANAGE";
 
 // Escopo de roles
 export type RoleScope = "PLATFORM" | "ORGANIZATION";
-
-// Roles de prompts
-export type PromptRole = "SYSTEM" | "USER" | "ASSISTANT";
 
 // Provedores de modelos de IA
 export type ModelProviderType = "OPENAI" | "OPENROUTER";

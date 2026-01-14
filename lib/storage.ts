@@ -38,11 +38,11 @@ export function clearCurrentOrgId(): void {
   localStorage.removeItem(CURRENT_ORG_KEY);
 }
 
-// Configurações específicas por thread + agente
-// Chave: pinechat_thread_{threadId}_{agentId}
-export function getThreadConfig<T>(threadId: string, agentId: string): T | null {
+// Configurações específicas por thread
+// Chave: pinechat_thread_{threadId}
+export function getThreadConfig<T>(threadId: string): T | null {
   if (typeof window === "undefined") return null;
-  const key = THREAD_CONFIG_PREFIX + threadId + "_" + agentId;
+  const key = THREAD_CONFIG_PREFIX + threadId;
   const stored = localStorage.getItem(key);
   if (!stored) return null;
   try {
@@ -52,15 +52,15 @@ export function getThreadConfig<T>(threadId: string, agentId: string): T | null 
   }
 }
 
-export function setThreadConfig<T>(threadId: string, agentId: string, config: T): void {
+export function setThreadConfig<T>(threadId: string, config: T): void {
   if (typeof window === "undefined") return;
-  const key = THREAD_CONFIG_PREFIX + threadId + "_" + agentId;
+  const key = THREAD_CONFIG_PREFIX + threadId;
   localStorage.setItem(key, JSON.stringify(config));
 }
 
-export function clearThreadConfig(threadId: string, agentId: string): void {
+export function clearThreadConfig(threadId: string): void {
   if (typeof window === "undefined") return;
-  const key = THREAD_CONFIG_PREFIX + threadId + "_" + agentId;
+  const key = THREAD_CONFIG_PREFIX + threadId;
   localStorage.removeItem(key);
 }
 

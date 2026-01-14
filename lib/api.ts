@@ -86,14 +86,13 @@ export const api = {
     request<T>(endpoint, { ...options, method: "DELETE" }),
 };
 
-// Funcao para invocar o agente
-export async function invokeAgent(
+// Funcao para invocar execucao
+export async function invokeRun(
   organizationId: string,
   threadId: string,
-  agentId: string,
   payload: InvokePayload
 ): Promise<{ data?: InvokeResponse; error?: string }> {
-  const endpoint = `/organizations/${organizationId}/threads/${threadId}/agents/${agentId}/runs/invoke`;
+  const endpoint = `/organizations/${organizationId}/threads/${threadId}/runs/invoke`;
   return api.post<InvokeResponse>(endpoint, payload);
 }
 

@@ -11,7 +11,7 @@ from sqlmodel import col, select
 from src.agent import build_agent
 from src.auth import CurrentUser, check_permission, get_user_membership
 from src.database import DatabaseSession, get_checkpoint_saver
-from src.entities import ModelProvider, OrganizationModelProvider, Permission, Prompt, Thread
+from src.entities import ModelProvider, OrganizationModelProvider, Permission, Thread
 from src.helpers import agent_messages_to_list, chunk_to_text, get_config
 from src.schemas import CreateThreadRequest, RunRequest, ThreadResponse, UpdateThreadRequest
 
@@ -56,22 +56,6 @@ def get_provider_api_key(
         )
 
     return provider, org_provider.api_key
-
-
-def resolve_system_prompt(
-    db: DatabaseSession,
-    organization_id: uuid.UUID,
-    prompt_id: uuid.UUID | None,
-) -> str | None:
-    """Busca o conteudo do system prompt pelo ID."""
-    if not prompt_id:
-        return None
-
-    prompt = db.get(Prompt, prompt_id)
-    if not prompt or prompt.organization_id != organization_id:
-        return None
-
-    return prompt.content
 
 
 @router.get("", response_model=List[ThreadResponse])
@@ -291,17 +275,16 @@ async def get_thread_messages(
     return {"messages": agent_messages_to_list(state_messages)}
 
 
-@router.post("/{thread_id}/agents/{agent_id}/runs/invoke")
+@router.post("/{thread_id}/runs/invoke")
 async def invoke_run(
     organization_id: uuid.UUID,
     thread_id: str,
-    agent_id: str,
     payload: RunRequest,
     current_user: CurrentUser,
     db: DatabaseSession,
     checkpointer: CheckpointSaver,
 ):
-    """Executa o agente e retorna todas as mensagens (requer THREADS_WRITE)."""
+    """Executa e retorna todas as mensagens (requer THREADS_WRITE)."""
     # Verifica permissao
     if not check_permission(db, current_user.id, organization_id, Permission.THREADS_WRITE):
         raise HTTPException(
@@ -312,15 +295,11 @@ async def invoke_run(
     # Obtem api_key do provedor
     provider, api_key = get_provider_api_key(db, organization_id, payload.config.provider)
 
-    # Resolve system prompt
-    system_prompt = resolve_system_prompt(db, organization_id, payload.config.system_prompt_id)
-
     agent = build_agent(
         provider=provider,
         api_key=api_key,
         config=payload.config,
         checkpointer=checkpointer,
-        system_prompt=system_prompt,
     )
     messages = [m.to_agent() for m in payload.input.messages]
     state_values = await agent.ainvoke(
@@ -341,17 +320,16 @@ async def invoke_run(
     return {"messages": agent_messages_to_list(state_messages)}
 
 
-@router.post("/{thread_id}/agents/{agent_id}/runs/stream")
+@router.post("/{thread_id}/runs/stream")
 async def stream_run(
     organization_id: uuid.UUID,
     thread_id: str,
-    agent_id: str,
     payload: RunRequest,
     current_user: CurrentUser,
     db: DatabaseSession,
     checkpointer: CheckpointSaver,
 ):
-    """Executa o agente com streaming SSE (requer THREADS_WRITE)."""
+    """Executa com streaming SSE (requer THREADS_WRITE)."""
     # Verifica permissao
     if not check_permission(db, current_user.id, organization_id, Permission.THREADS_WRITE):
         raise HTTPException(
@@ -362,15 +340,11 @@ async def stream_run(
     # Obtem api_key do provedor
     provider, api_key = get_provider_api_key(db, organization_id, payload.config.provider)
 
-    # Resolve system prompt
-    system_prompt = resolve_system_prompt(db, organization_id, payload.config.system_prompt_id)
-
     agent = build_agent(
         provider=provider,
         api_key=api_key,
         config=payload.config,
         checkpointer=checkpointer,
-        system_prompt=system_prompt,
     )
     thread_config = get_config(thread_id)
     messages = [m.to_agent() for m in payload.input.messages]

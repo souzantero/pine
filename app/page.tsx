@@ -3,12 +3,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/session";
-import { useThreads, usePrompts, useModels } from "@/lib/hooks";
+import { useThreads, useModels } from "@/lib/hooks";
 import { Header, Sidebar, MobileSidebar, MobileThreadsDrawer } from "@/components/layout";
 import { ChatArea, ChatSettings, MobileChatSettings } from "@/components/chat";
-import { getDefaultAgentId } from "@/lib/agents";
-import { invokeAgent } from "@/lib/api";
-import type { BasicAgentConfig } from "@/lib/agents";
+import { invokeRun } from "@/lib/api";
 import type { Message } from "@/lib/types";
 
 export default function Home() {
@@ -24,12 +22,9 @@ export default function Home() {
     selectThread,
     createThread,
     addMessage,
-    updateAgentConfig,
-    updateAgentConfigMultiple,
-    changeAgent,
+    updateConfig,
+    updateConfigMultiple,
   } = useThreads();
-
-  const { systemPrompts } = usePrompts();
 
   const {
     models: availableModels,
@@ -60,51 +55,43 @@ export default function Home() {
   useEffect(() => {
     if (!selectedThread || configuredProviders.length === 0) return;
 
-    const agentConfig = selectedThread.agentConfig as BasicAgentConfig;
-    if (agentConfig.provider) {
+    const config = selectedThread.config;
+    if (config.provider) {
       // Provider ja configurado, carregar modelos apenas se ainda nao carregados
-      if (modelsProvider !== agentConfig.provider) {
-        loadModelsForProvider(agentConfig.provider);
+      if (modelsProvider !== config.provider) {
+        loadModelsForProvider(config.provider);
       }
     } else {
       // Sem provider, auto-selecionar primeiro disponivel
       const defaultProvider = configuredProviders[0];
-      updateAgentConfigMultiple(selectedThread.id, { provider: defaultProvider });
+      updateConfigMultiple(selectedThread.id, { provider: defaultProvider });
       if (modelsProvider !== defaultProvider) {
         loadModelsForProvider(defaultProvider);
       }
     }
-  }, [selectedThread?.id, configuredProviders, modelsProvider, updateAgentConfigMultiple, loadModelsForProvider]);
+  }, [selectedThread?.id, configuredProviders, modelsProvider, updateConfigMultiple, loadModelsForProvider]);
 
   // Auto-selecionar primeiro modelo quando modelos sao carregados e nao ha modelo configurado
   useEffect(() => {
     if (!selectedThread || availableModels.length === 0) return;
 
-    const agentConfig = selectedThread.agentConfig as BasicAgentConfig;
+    const config = selectedThread.config;
     // So auto-seleciona se os modelos sao do mesmo provider da thread
-    if (!agentConfig.model && modelsProvider === agentConfig.provider) {
-      updateAgentConfigMultiple(selectedThread.id, { model: availableModels[0].id });
+    if (!config.model && modelsProvider === config.provider) {
+      updateConfigMultiple(selectedThread.id, { model: availableModels[0].id });
     }
-  }, [selectedThread?.id, availableModels, modelsProvider, updateAgentConfigMultiple]);
+  }, [selectedThread?.id, availableModels, modelsProvider, updateConfigMultiple]);
 
   const handleNewChat = useCallback(async () => {
     await createThread();
   }, [createThread]);
 
-  const handleAgentChange = useCallback(
-    (agentId: string) => {
-      if (!selectedId) return;
-      changeAgent(selectedId, agentId);
-    },
-    [selectedId, changeAgent]
-  );
-
-  const handleAgentConfigChange = useCallback(
+  const handleConfigChange = useCallback(
     (key: string, value: unknown) => {
       if (!selectedId) return;
-      updateAgentConfig(selectedId, key, value);
+      updateConfig(selectedId, key, value);
     },
-    [selectedId, updateAgentConfig]
+    [selectedId, updateConfig]
   );
 
   const handleProviderChange = useCallback(
@@ -113,21 +100,21 @@ export default function Home() {
       loadModelsForProvider(provider);
       // Atualizar provider e limpar modelo em uma unica operacao
       if (selectedId) {
-        updateAgentConfigMultiple(selectedId, { provider, model: "" });
+        updateConfigMultiple(selectedId, { provider, model: "" });
       }
     },
-    [loadModelsForProvider, selectedId, updateAgentConfigMultiple]
+    [loadModelsForProvider, selectedId, updateConfigMultiple]
   );
 
-  const invokeAgentForThread = useCallback(
+  const invokeRunForThread = useCallback(
     async (threadId: string, messageContent: string) => {
       const thread = threads.find((t) => t.id === threadId);
       if (!thread || !currentMembership) return;
 
-      const agentConfig = thread.agentConfig as BasicAgentConfig;
+      const config = thread.config;
 
       // Verifica se tem provedor e modelo configurados
-      if (!agentConfig.provider || !agentConfig.model) {
+      if (!config.provider || !config.model) {
         const assistantMessage: Message = {
           id: crypto.randomUUID(),
           role: "assistant",
@@ -141,19 +128,16 @@ export default function Home() {
       setIsInvoking(true);
 
       try {
-        const response = await invokeAgent(
+        const response = await invokeRun(
           currentMembership.organizationId,
           threadId,
-          thread.agentId,
           {
             input: {
               messages: [{ content: messageContent }],
             },
             config: {
-              provider: agentConfig.provider,
-              model: agentConfig.model,
-              temperature: agentConfig.temperature,
-              systemPromptId: agentConfig.systemPromptId,
+              provider: config.provider,
+              model: config.model,
             },
           }
         );
@@ -183,7 +167,7 @@ export default function Home() {
           addMessage(threadId, assistantMessage);
         }
       } catch (error) {
-        console.error("Erro ao invocar agente:", error);
+        console.error("Erro ao invocar execucao:", error);
         const errorMessage: Message = {
           id: crypto.randomUUID(),
           role: "assistant",
@@ -213,7 +197,7 @@ export default function Home() {
             createdAt: new Date(),
           };
           addMessage(newThread.id, userMessage);
-          invokeAgentForThread(newThread.id, content);
+          invokeRunForThread(newThread.id, content);
         }
         return;
       }
@@ -226,9 +210,9 @@ export default function Home() {
       };
 
       addMessage(selectedId, userMessage);
-      invokeAgentForThread(selectedId, content);
+      invokeRunForThread(selectedId, content);
     },
-    [selectedId, createThread, addMessage, invokeAgentForThread]
+    [selectedId, createThread, addMessage, invokeRunForThread]
   );
 
   const isLoading = authLoading || threadsLoading;
@@ -283,8 +267,6 @@ export default function Home() {
             onSendMessage={handleSendMessage}
             isLoading={isInvoking}
             disabled={!selectedThread}
-            selectedAgentId={selectedThread?.agentId ?? getDefaultAgentId()}
-            onAgentChange={handleAgentChange}
           />
         </main>
 
@@ -292,11 +274,9 @@ export default function Home() {
         {selectedThread && (
           <div className="hidden lg:flex h-full">
             <ChatSettings
-              agentId={selectedThread.agentId}
-              agentConfig={selectedThread.agentConfig as Record<string, unknown>}
-              onConfigChange={handleAgentConfigChange}
+              config={selectedThread.config}
+              onConfigChange={handleConfigChange}
               availableModels={availableModels}
-              systemPrompts={systemPrompts}
               configuredProviders={configuredProviders}
               onProviderChange={handleProviderChange}
               expanded={settingsExpanded}
@@ -309,11 +289,9 @@ export default function Home() {
       {/* Mobile Settings */}
       {selectedThread && (
         <MobileChatSettings
-          agentId={selectedThread.agentId}
-          agentConfig={selectedThread.agentConfig as Record<string, unknown>}
-          onConfigChange={handleAgentConfigChange}
+          config={selectedThread.config}
+          onConfigChange={handleConfigChange}
           availableModels={availableModels}
-          systemPrompts={systemPrompts}
           configuredProviders={configuredProviders}
           onProviderChange={handleProviderChange}
           open={mobileSettingsOpen}

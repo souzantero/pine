@@ -24,20 +24,6 @@ export interface ApiThread {
 }
 
 // ============================================
-// Prompts
-// ============================================
-
-export interface ApiPrompt {
-  id: string;
-  name: string;
-  content: string;
-  role: string;
-  createdById: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-// ============================================
 // Members
 // ============================================
 
@@ -143,18 +129,16 @@ export interface ApiModelsResponse {
 // Agent Run (Invoke/Stream)
 // ============================================
 
-export interface AgentRunConfig {
+export interface RunConfig {
   provider: string;
   model: string;
-  temperature: number;
-  systemPromptId: string | null;
 }
 
 export interface InvokePayload {
   input: {
     messages: { content: string }[];
   };
-  config: AgentRunConfig;
+  config: RunConfig;
 }
 
 export interface AgentMessage {

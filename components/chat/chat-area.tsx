@@ -5,7 +5,6 @@ import { Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { AgentSelector } from "./agent-selector";
 
 export interface Message {
   id: string;
@@ -19,11 +18,9 @@ interface ChatAreaProps {
   onSendMessage: (content: string) => void;
   isLoading?: boolean;
   disabled?: boolean;
-  selectedAgentId: string;
-  onAgentChange: (agentId: string) => void;
 }
 
-export function ChatArea({ messages, onSendMessage, isLoading, disabled, selectedAgentId, onAgentChange }: ChatAreaProps) {
+export function ChatArea({ messages, onSendMessage, isLoading, disabled }: ChatAreaProps) {
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -95,11 +92,6 @@ export function ChatArea({ messages, onSendMessage, isLoading, disabled, selecte
       <div className="border-t p-2 md:p-4">
         <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
           <div className="flex gap-2">
-            <AgentSelector
-              selectedAgentId={selectedAgentId}
-              onAgentChange={onAgentChange}
-              disabled={disabled}
-            />
             <Textarea
               ref={textareaRef}
               value={input}

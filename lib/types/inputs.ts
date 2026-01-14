@@ -1,22 +1,6 @@
 // DTOs de entrada para operações de criação e atualização
 
 // ============================================
-// Prompts
-// ============================================
-
-export interface CreatePromptData {
-  name: string;
-  content: string;
-  role: string;
-}
-
-export interface UpdatePromptData {
-  name: string;
-  content: string;
-  role: string;
-}
-
-// ============================================
 // Organization
 // ============================================
 

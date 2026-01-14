@@ -3,7 +3,7 @@ from datetime import UTC, datetime
 from enum import Enum
 
 from sqlalchemy import UniqueConstraint
-from sqlmodel import Field, Relationship, SQLModel, Text
+from sqlmodel import Field, Relationship, SQLModel
 
 
 def get_now():
@@ -44,18 +44,6 @@ class Permission(str, Enum):
     ORGANIZATION_MANAGE = "ORGANIZATION_MANAGE"
     # Plataforma (para roles de plataforma no futuro)
     PLATFORM_MANAGE = "PLATFORM_MANAGE"
-    # Prompts
-    PROMPTS_READ = "PROMPTS_READ"
-    PROMPTS_WRITE = "PROMPTS_WRITE"
-    PROMPTS_DELETE = "PROMPTS_DELETE"
-
-
-class PromptRole(str, Enum):
-    """Role do prompt (para IA)"""
-
-    SYSTEM = "SYSTEM"
-    USER = "USER"
-    ASSISTANT = "ASSISTANT"
 
 
 class ModelProvider(str, Enum):
@@ -108,7 +96,6 @@ class Organization(SQLModel, table=True):
     roles: list["Role"] = Relationship(back_populates="organization")
     invites: list["OrganizationInvite"] = Relationship(back_populates="organization")
     threads: list["Thread"] = Relationship(back_populates="organization")
-    prompts: list["Prompt"] = Relationship(back_populates="organization")
     model_providers: list["OrganizationModelProvider"] = Relationship(back_populates="organization")
 
 
@@ -186,7 +173,6 @@ class OrganizationMember(SQLModel, table=True):
     organization: Organization = Relationship(back_populates="members")
     role: Role = Relationship(back_populates="members")
     threads: list["Thread"] = Relationship(back_populates="created_by")
-    prompts: list["Prompt"] = Relationship(back_populates="created_by")
 
 
 class Thread(SQLModel, table=True):
@@ -206,25 +192,6 @@ class Thread(SQLModel, table=True):
     # Relationships
     organization: Organization = Relationship(back_populates="threads")
     created_by: OrganizationMember = Relationship(back_populates="threads")
-
-
-class Prompt(SQLModel, table=True):
-    """Prompts salvos"""
-
-    __tablename__ = "prompts"
-
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    organization_id: uuid.UUID = Field(foreign_key="organizations.id", index=True)
-    created_by_id: uuid.UUID = Field(foreign_key="organization_members.id", index=True)
-    name: str
-    content: str = Field(sa_type=Text)
-    role: PromptRole = Field(default=PromptRole.SYSTEM)
-    created_at: datetime = Field(default_factory=get_now)
-    updated_at: datetime = Field(default_factory=get_now, sa_column_kwargs={"onupdate": get_now})
-
-    # Relationships
-    organization: Organization = Relationship(back_populates="prompts")
-    created_by: OrganizationMember = Relationship(back_populates="prompts")
 
 
 class OrganizationInvite(SQLModel, table=True):

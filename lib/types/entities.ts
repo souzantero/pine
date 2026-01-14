@@ -1,12 +1,6 @@
 // Entidades de domínio do frontend
 
-import type { AgentConfig } from "@/lib/agents";
-import type {
-  Permission,
-  RoleScope,
-  PromptRole,
-  ModelProviderType,
-} from "./enums";
+import type { Permission, RoleScope, ModelProviderType } from "./enums";
 
 // ============================================
 // Usuário e Sessão
@@ -124,36 +118,18 @@ export interface Message {
   createdAt: Date;
 }
 
+// ============================================
+// Chat Config
+// ============================================
+
+export interface ChatConfig {
+  provider: string | null;
+  model: string;
+}
+
 export interface ThreadWithMessages extends Thread {
   messages: Message[];
-  agentId: string;
-  agentConfig: AgentConfig;
-}
-
-// ============================================
-// Prompts
-// ============================================
-
-export interface Prompt {
-  id: string;
-  name: string;
-  content: string;
-  role: PromptRole;
-  createdAt: string;
-  updatedAt: string;
-  createdBy: {
-    id: string;
-    user: {
-      id: string;
-      name: string;
-    };
-  };
-}
-
-export interface SystemPrompt {
-  id: string;
-  name: string;
-  content: string;
+  config: ChatConfig;
 }
 
 // ============================================

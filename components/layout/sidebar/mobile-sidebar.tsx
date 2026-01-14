@@ -1,14 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   MessageSquare,
   Users,
   Settings,
   Building2,
   ChevronDown,
-  FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -34,17 +33,15 @@ function MobileMenuContent({
   onThreadsClick: () => void;
 }) {
   const router = useRouter();
-  const pathname = usePathname();
   const { hasPermission } = useSession();
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   const canViewMembers = hasPermission("MEMBERS_READ");
   const canManageOrg = hasPermission("ORGANIZATION_MANAGE");
-  const canViewPrompts = hasPermission("PROMPTS_READ");
   const canAccessSettings = canViewMembers || canManageOrg;
 
   // Determinar qual seção está ativa baseado na rota
-  const activeSection: NavSection = pathname === "/prompts" ? "prompts" : "threads";
+  const activeSection: NavSection = "threads";
 
   const handleMembersClick = () => {
     router.push("/members");
@@ -53,11 +50,6 @@ function MobileMenuContent({
 
   const handleOrganizationClick = () => {
     router.push("/settings");
-    onItemClick?.();
-  };
-
-  const handlePromptsClick = () => {
-    router.push("/prompts");
     onItemClick?.();
   };
 
@@ -84,22 +76,6 @@ function MobileMenuContent({
               <span className="text-sm font-medium">Conversas</span>
             </button>
           </li>
-          {canViewPrompts && (
-            <li>
-              <button
-                onClick={handlePromptsClick}
-                className={cn(
-                  "w-full flex items-center gap-3 px-3 py-2 rounded-md transition-colors",
-                  activeSection === "prompts"
-                    ? "bg-primary text-primary-foreground"
-                    : "hover:bg-muted"
-                )}
-              >
-                <FileText className="h-5 w-5 shrink-0" />
-                <span className="text-sm font-medium">Prompts</span>
-              </button>
-            </li>
-          )}
           {canAccessSettings && (
             <li>
               <Collapsible open={settingsOpen} onOpenChange={setSettingsOpen}>
