@@ -50,12 +50,12 @@ function SidebarContent({
   const isInSettings = pathname === "/settings" || pathname === "/members";
   const [settingsOpen, setSettingsOpen] = useState(isInSettings);
 
-  // Sincronizar estado do menu com a rota
+  // Sincronizar estado do menu com a rota e expansão do sidebar
   useEffect(() => {
-    if (isInSettings) {
+    if (isInSettings && menuExpanded) {
       setSettingsOpen(true);
     }
-  }, [isInSettings]);
+  }, [isInSettings, menuExpanded]);
 
   // Wrapper para persistir estado no storage
   const handleMenuExpandedChange = (expanded: boolean) => {
