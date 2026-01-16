@@ -8,7 +8,7 @@ from fastapi.responses import StreamingResponse
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from sqlmodel import col, select
 
-from src.agent import build_agent
+from src.agents.agent import build_agent
 from src.auth import CurrentMembership, CurrentUser, check_permission
 from src.database import DatabaseSession, get_checkpoint_saver
 from src.entities import OrganizationProvider, Permission, Provider, ProviderType, Thread
@@ -279,6 +279,7 @@ async def invoke_run(
     thread_id: str,
     payload: RunRequest,
     current_user: CurrentUser,
+    membership: CurrentMembership,
     db: DatabaseSession,
     checkpointer: CheckpointSaver,
 ):
@@ -294,6 +295,8 @@ async def invoke_run(
     provider, api_key = get_provider_api_key(db, organization_id, payload.config.provider)
 
     agent = build_agent(
+        db=db,
+        organization_id=organization_id,
         provider=provider,
         api_key=api_key,
         config=payload.config,
@@ -339,6 +342,8 @@ async def stream_run(
     provider, api_key = get_provider_api_key(db, organization_id, payload.config.provider)
 
     agent = build_agent(
+        db=db,
+        organization_id=organization_id,
         provider=provider,
         api_key=api_key,
         config=payload.config,

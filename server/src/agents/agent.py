@@ -1,16 +1,22 @@
+import uuid
+from dataclasses import dataclass
 from langchain.agents import create_agent
-from langchain_community.tools import DuckDuckGoSearchRun
 from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.postgres.base import BaseCheckpointSaver
 
+from src.database import Database
 from src.entities import Provider
 from src.env import openrouter_base_url
 from src.schemas import RunConfig
+from src.agents.tools.web_search import create_web_search_tool
 
 
 TEMPERATURE = 0.7
 SYSTEM_PROMPT = "Voce e um assistente virtual de inteligencia artificial."
 
+@dataclass
+class AgentContext:
+    pass
 
 def get_model(
     provider: Provider,
@@ -34,11 +40,9 @@ def get_model(
     else:
         raise ValueError(f"Provedor {provider} nao suportado")
 
-
-search = DuckDuckGoSearchRun()
-
-
 def build_agent(
+    db: Database,
+    organization_id: uuid.UUID,
     provider: Provider,
     api_key: str,
     config: RunConfig,
@@ -51,9 +55,17 @@ def build_agent(
         model=config.model,
     )
 
+    # Cria ferramentas disponiveis para o agente
+    tools = []
+
+    web_search_tool = create_web_search_tool(db, organization_id)
+    if web_search_tool:
+        tools.append(web_search_tool)
+
     return create_agent(
         model=model,
         system_prompt=SYSTEM_PROMPT,
-        tools=[search],
+        tools=tools,
         checkpointer=checkpointer,
+        context_schema=AgentContext
     )

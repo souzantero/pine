@@ -14,6 +14,7 @@ def get_session():
         yield session
 
 
+Database = Session
 # Type alias para injecao de dependencia do banco de dados
 DatabaseSession = Annotated[Session, Depends(get_session)]
 
