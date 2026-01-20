@@ -76,7 +76,7 @@ export function getProvidersForType(type: ProviderType): ProviderInfo[] {
 export type ConfigType = "TOOL";
 
 // Chaves de configuração
-export type ConfigKey = "WEB_SEARCH";
+export type ConfigKey = "WEB_SEARCH" | "WEB_FETCH";
 
 // Informações de UI das ferramentas
 export interface ToolInfo {
@@ -92,6 +92,12 @@ export const TOOLS: ToolInfo[] = [
     key: "WEB_SEARCH",
     label: "Busca na Web",
     description: "Permite ao agente buscar informações na internet",
+    providers: ["TAVILY"],
+  },
+  {
+    key: "WEB_FETCH",
+    label: "Leitura de URLs",
+    description: "Permite ao agente ler e extrair conteúdo de links compartilhados",
     providers: ["TAVILY"],
   },
 ];

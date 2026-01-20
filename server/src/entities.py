@@ -75,6 +75,7 @@ class ConfigKey(str, Enum):
     """Chaves de configuracao (identificador especifico)"""
 
     WEB_SEARCH = "WEB_SEARCH"
+    WEB_FETCH = "WEB_FETCH"
 
 
 # =============================================================================

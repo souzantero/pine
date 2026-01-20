@@ -3,17 +3,15 @@ from dataclasses import dataclass
 from datetime import datetime
 from langchain.agents import create_agent
 from langchain.agents.middleware import dynamic_prompt, ModelRequest
-from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.postgres.base import BaseCheckpointSaver
 
 from src.database import Database
 from src.entities import Provider
-from src.env import openrouter_base_url
 from src.schemas import RunConfig
+from src.agents.tools.common import get_model
 from src.agents.tools.web_search import create_web_search_tool
+from src.agents.tools.web_fetch import create_web_fetch_tool
 
-
-TEMPERATURE = 0.7
 
 SYSTEM_PROMPT_TEMPLATE = """Você é um assistente de inteligência artificial prestativo, criativo e honesto.
 
@@ -42,6 +40,11 @@ SYSTEM_PROMPT_TEMPLATE = """Você é um assistente de inteligência artificial p
 - Diferencie claramente entre fatos e opiniões
 - Seu conhecimento tem data de corte, então para informações muito recentes, considere usar ferramentas de busca se disponíveis
 
+### Ferramentas
+- Quando o usuário compartilhar um link ou URL, use a ferramenta `web_fetch` para acessar e ler o conteúdo da página
+- Para buscar informações atualizadas na internet, use a ferramenta `web_search`
+- Sempre analise o conteúdo obtido antes de responder ao usuário
+
 Você está aqui para ajudar {user_name} da organização {organization_name} com qualquer tarefa ou pergunta."""
 
 
@@ -63,27 +66,6 @@ class AgentContext:
     user_id: str
     user_name: str
 
-def get_model(
-    provider: Provider,
-    api_key: str,
-    model: str,
-):
-    """Cria o modelo de LLM baseado no provedor."""
-    if provider == Provider.OPENAI:
-        return ChatOpenAI(
-            model=model,
-            temperature=TEMPERATURE,
-            openai_api_key=api_key,
-        )
-    elif provider == Provider.OPENROUTER:
-        return ChatOpenAI(
-            model=model,
-            temperature=TEMPERATURE,
-            openai_api_key=api_key,
-            openai_api_base=openrouter_base_url,
-        )
-    else:
-        raise ValueError(f"Provedor {provider} nao suportado")
 
 def build_agent(
     db: Database,
@@ -106,6 +88,10 @@ def build_agent(
     web_search_tool = create_web_search_tool(db, organization_id)
     if web_search_tool:
         tools.append(web_search_tool)
+
+    web_fetch_tool = create_web_fetch_tool(db, organization_id)
+    if web_fetch_tool:
+        tools.append(web_fetch_tool)
 
     return create_agent(
         model=model,

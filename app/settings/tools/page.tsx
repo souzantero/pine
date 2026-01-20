@@ -40,13 +40,13 @@ interface ToolFormState {
   success: boolean;
 }
 
-const defaultWebSearchConfig: ToolFormState = {
+const defaultToolConfig: ToolFormState = {
   isEnabled: true,
   provider: "",
   summarizationProvider: "",
   summarizationModel: "",
-  summarizationMaxTokens: 1000,
-  maxContentLength: 10000,
+  summarizationMaxTokens: 8192,
+  maxContentLength: 50000,
   maxOutputRetries: 3,
   saving: false,
   error: null,
@@ -69,7 +69,8 @@ export default function ToolsPage() {
   const { models } = useModels();
 
   const [formStates, setFormStates] = useState<Record<ConfigKey, ToolFormState>>({
-    WEB_SEARCH: { ...defaultWebSearchConfig },
+    WEB_SEARCH: { ...defaultToolConfig },
+    WEB_FETCH: { ...defaultToolConfig },
   });
 
   const canManage = hasPermission("ORGANIZATION_MANAGE");
@@ -93,12 +94,12 @@ export default function ToolsPage() {
           newStates[tool.key] = {
             ...newStates[tool.key],
             isEnabled: existingConfig.isEnabled,
-            provider: config.provider || "",
-            summarizationProvider: config.summarizationProvider || "",
-            summarizationModel: config.summarizationModel || "",
-            summarizationMaxTokens: config.summarizationMaxTokens || 1000,
-            maxContentLength: config.maxContentLength || 10000,
-            maxOutputRetries: config.maxOutputRetries || 3,
+            provider: config.provider ?? "",
+            summarizationProvider: config.summarizationProvider ?? "",
+            summarizationModel: config.summarizationModel ?? "",
+            summarizationMaxTokens: config.summarizationMaxTokens ?? 8192,
+            maxContentLength: config.maxContentLength ?? 50000,
+            maxOutputRetries: config.maxOutputRetries ?? 3,
           };
         }
       }

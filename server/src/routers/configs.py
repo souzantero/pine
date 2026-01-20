@@ -19,6 +19,7 @@ router = APIRouter(prefix="/organizations/{organization_id}/configs", tags=["con
 # Mapeamento de provedores por key de ferramenta
 PROVIDERS_BY_TOOL_KEY = {
     ConfigKey.WEB_SEARCH: [Provider.TAVILY],
+    ConfigKey.WEB_FETCH: [Provider.TAVILY],
 }
 
 # Provedores LLM validos para sumarizacao

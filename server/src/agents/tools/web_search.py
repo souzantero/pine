@@ -4,13 +4,9 @@ import asyncio
 import logging
 import uuid
 
-from datetime import datetime
 from typing import List, Literal
-from pydantic import BaseModel
 from langchain_core.tools import tool, InjectedToolCallId
-from langchain_core.messages import HumanMessage, ToolMessage
-from langchain.chat_models import init_chat_model
-from langchain_core.language_models import BaseChatModel
+from langchain_core.messages import ToolMessage
 from typing_extensions import Annotated
 from langgraph.types import Command
 from sqlmodel import select
@@ -18,104 +14,18 @@ from tavily import AsyncTavilyClient
 
 from src.entities import (
     OrganizationConfig,
-    OrganizationProvider,
     ConfigType,
     ConfigKey,
     ProviderType,
     Provider,
 )
 from src.database import Database
-
-
-# Prompt para sumarizacao de paginas web
-SUMMARIZE_WEBPAGE_PROMPT = """Voce deve resumir o conteudo bruto de uma pagina web obtida de uma busca. Seu objetivo e criar um resumo que preserve as informacoes mais importantes da pagina original. Este resumo sera usado por um agente de pesquisa, entao e crucial manter os detalhes chave sem perder informacoes essenciais.
-
-Aqui esta o conteudo bruto da pagina:
-
-<webpage_content>
-{webpage_content}
-</webpage_content>
-
-Siga estas diretrizes para criar seu resumo:
-
-1. Identifique e preserve o topico principal ou proposito da pagina.
-2. Mantenha fatos, estatisticas e dados que sao centrais para a mensagem do conteudo.
-3. Preserve citacoes importantes de fontes credíveis ou especialistas.
-4. Mantenha a ordem cronologica dos eventos se o conteudo for sensivel ao tempo ou historico.
-5. Preserve listas ou instrucoes passo a passo se presentes.
-6. Inclua datas, nomes e locais relevantes que sao cruciais para entender o conteudo.
-7. Resuma explicacoes longas mantendo a mensagem central intacta.
-
-Ao lidar com diferentes tipos de conteudo:
-
-- Para noticias: Foque em quem, o que, quando, onde, por que e como.
-- Para conteudo cientifico: Preserve metodologia, resultados e conclusoes.
-- Para artigos de opiniao: Mantenha os argumentos principais e pontos de apoio.
-- Para paginas de produtos: Mantenha recursos principais, especificacoes e diferenciais.
-
-Seu resumo deve ser significativamente mais curto que o conteudo original, mas abrangente o suficiente para funcionar como fonte de informacao. Mire em cerca de 25-30% do tamanho original, a menos que o conteudo ja seja conciso.
-
-Apresente seu resumo no seguinte formato:
-
-```
-{{
-   "summary": "Seu resumo aqui, estruturado com paragrafos ou bullet points conforme necessario",
-   "key_excerpts": "Primeira citacao ou trecho importante, Segunda citacao, Terceira citacao, ...Adicione mais trechos conforme necessario, ate no maximo 5"
-}}
-```
-
-Aqui estao dois exemplos de bons resumos:
-
-Exemplo 1 (para uma noticia):
-```json
-{{
-   "summary": "Em 15 de julho de 2023, a NASA lancou com sucesso a missao Artemis II do Kennedy Space Center. Esta e a primeira missao tripulada a Lua desde a Apollo 17 em 1972. A tripulacao de quatro pessoas, liderada pela Comandante Jane Smith, orbitara a Lua por 10 dias antes de retornar a Terra. Esta missao e um passo crucial nos planos da NASA de estabelecer presenca humana permanente na Lua ate 2030.",
-   "key_excerpts": "Artemis II representa uma nova era na exploracao espacial, disse o Administrador da NASA John Doe. A missao testara sistemas criticos para futuras estadias de longa duracao na Lua, explicou a Engenheira Chefe Sarah Johnson. Nao estamos apenas voltando a Lua, estamos avancando para a Lua, declarou a Comandante Jane Smith durante a coletiva de imprensa pre-lancamento."
-}}
-```
-
-Exemplo 2 (para um artigo cientifico):
-```json
-{{
-   "summary": "Um novo estudo publicado na Nature Climate Change revela que os niveis globais do mar estao subindo mais rapido do que se pensava anteriormente. Pesquisadores analisaram dados de satelite de 1993 a 2022 e descobriram que a taxa de elevacao do nivel do mar acelerou 0,08 mm/ano nas ultimas tres decadas. Essa aceleracao e atribuida principalmente ao derretimento das calotas polares na Groenlandia e Antartica. O estudo projeta que, se as tendencias atuais continuarem, os niveis globais do mar podem subir ate 2 metros ate 2100, representando riscos significativos para comunidades costeiras em todo o mundo.",
-   "key_excerpts": "Nossas descobertas indicam uma clara aceleracao na elevacao do nivel do mar, o que tem implicacoes significativas para o planejamento costeiro e estrategias de adaptacao, afirmou a autora principal Dra. Emily Brown. A taxa de derretimento das calotas polares na Groenlandia e Antartica triplicou desde os anos 1990, relata o estudo. Sem reducoes imediatas e substanciais nas emissoes de gases de efeito estufa, estamos olhando para uma elevacao potencialmente catastrofica do nivel do mar ate o final deste seculo, alertou o coautor Professor Michael Green."
-}}
-```
-
-Lembre-se, seu objetivo e criar um resumo que possa ser facilmente entendido e utilizado por um agente de pesquisa, preservando as informacoes mais criticas da pagina original.
-
-A data de hoje e {date}.
-"""
-
-
-class Summary(BaseModel):
-    """Resumo de pesquisa com descobertas principais."""
-
-    summary: str
-    key_excerpts: str
-
-
-def get_today_str() -> str:
-    """Retorna a data atual formatada para exibicao."""
-    now = datetime.now()
-    return f"{now:%a} {now:%b} {now.day}, {now:%Y}"
-
-
-def get_provider_api_key(
-    db: Database,
-    organization_id: uuid.UUID,
-    provider_type: ProviderType,
-    provider: Provider,
-) -> str | None:
-    """Busca a API key de um provider especifico na organizacao."""
-    statement = select(OrganizationProvider).where(
-        OrganizationProvider.organization_id == organization_id,
-        OrganizationProvider.type == provider_type,
-        OrganizationProvider.provider == provider,
-        OrganizationProvider.is_active == True,
-    )
-    org_provider = db.exec(statement).first()
-    return org_provider.api_key if org_provider else None
+from src.agents.tools.common import (
+    Summary,
+    get_provider_api_key,
+    get_model,
+    summarize_webpage,
+)
 
 
 def get_web_search_config(
@@ -167,45 +77,6 @@ async def tavily_search_async(
     return search_results
 
 
-async def summarize_webpage(model: BaseChatModel, webpage_content: str) -> str:
-    """Sumariza o conteudo de uma pagina web usando modelo de IA.
-
-    Args:
-        model: Modelo de chat configurado para sumarizacao
-        webpage_content: Conteudo bruto da pagina web
-
-    Returns:
-        Resumo formatado com excertos principais, ou conteudo original se falhar
-    """
-    try:
-        prompt_content = SUMMARIZE_WEBPAGE_PROMPT.format(
-            webpage_content=webpage_content, date=get_today_str()
-        )
-
-        summary = await asyncio.wait_for(
-            model.ainvoke([HumanMessage(content=prompt_content)]),
-            timeout=60.0,
-        )
-
-        formatted_summary = (
-            f"<summary>\n{summary.summary}\n</summary>\n\n"
-            f"<key_excerpts>\n{summary.key_excerpts}\n</key_excerpts>"
-        )
-
-        return formatted_summary
-
-    except asyncio.TimeoutError:
-        logging.warning(
-            "Sumarizacao excedeu timeout de 60 segundos, retornando conteudo original"
-        )
-        return webpage_content
-    except Exception as e:
-        logging.warning(
-            f"Sumarizacao falhou com erro: {str(e)}, retornando conteudo original"
-        )
-        return webpage_content
-
-
 def create_web_search_tool(db: Database, organization_id: uuid.UUID):
     """Cria a ferramenta de busca na web para uma organizacao especifica.
 
@@ -247,12 +118,13 @@ def create_web_search_tool(db: Database, organization_id: uuid.UUID):
     # Configuracoes de sumarizacao (opcional)
     summarization_provider_str = config.get("summarizationProvider")
     summarization_model_name = config.get("summarizationModel")
-    summarization_max_tokens = config.get("summarizationMaxTokens", 1000)
-    max_content_length = config.get("maxContentLength", 10000)
+    summarization_max_tokens = config.get("summarizationMaxTokens", 8192)
+    max_content_length = config.get("maxContentLength", 50000)
     max_output_retries = config.get("maxOutputRetries", 3)
 
     # Busca API key do provider de sumarizacao se configurado
     summarization_api_key = None
+    summarization_provider = None
     if summarization_provider_str and summarization_model_name:
         try:
             summarization_provider = Provider(summarization_provider_str)
@@ -303,14 +175,17 @@ def create_web_search_tool(db: Database, organization_id: uuid.UUID):
 
         # Configura modelo de sumarizacao se disponivel
         summarization_model = None
-        if summarization_api_key and summarization_model_name:
+        if summarization_api_key and summarization_model_name and summarization_provider:
             try:
+                base_model = get_model(
+                    provider=summarization_provider,
+                    api_key=summarization_api_key,
+                    model=summarization_model_name,
+                    temperature=0.3,
+                    max_tokens=summarization_max_tokens,
+                )
                 summarization_model = (
-                    init_chat_model(
-                        model=summarization_model_name,
-                        max_tokens=summarization_max_tokens,
-                        api_key=summarization_api_key,
-                    )
+                    base_model
                     .with_structured_output(Summary)
                     .with_retry(stop_after_attempt=max_output_retries)
                 )
