@@ -117,9 +117,12 @@ export function useThreads(): UseThreadsReturn {
       const response = await getThreadMessages(orgId, selectedId);
       if (response.error || !response.data) return;
 
-      // Filtra apenas mensagens human e ai (ignora tool)
+      // Filtra apenas mensagens human e ai (ignora tool e mensagens com toolCalls)
       const messages = response.data.messages
-        .filter((m) => m.type === "human" || m.type === "ai")
+        .filter((m) =>
+          (m.type === "human" || m.type === "ai") &&
+          (!m.toolCalls || m.toolCalls.length === 0)
+        )
         .map(mapAgentMessageToMessage);
 
       setThreads((prev) =>

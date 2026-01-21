@@ -5,6 +5,7 @@ import { Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { MarkdownContent } from "./markdown-content";
 
 export interface Message {
   id: string;
@@ -74,7 +75,16 @@ export function ChatArea({ messages, onSendMessage, isLoading, disabled }: ChatA
                       : "bg-muted"
                   )}
                 >
-                  <p className="whitespace-pre-wrap text-sm md:text-base">{message.content}</p>
+                  {message.role === "assistant" ? (
+                    <MarkdownContent
+                      content={message.content}
+                      className="text-sm md:text-base"
+                    />
+                  ) : (
+                    <p className="whitespace-pre-wrap text-sm md:text-base">
+                      {message.content}
+                    </p>
+                  )}
                 </div>
               </div>
             ))

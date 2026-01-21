@@ -274,6 +274,22 @@ class ThreadResponse(CamelCaseModel):
     updated_at: datetime
 
 
+class AgentMessageResponse(CamelCaseModel):
+    """Mensagem do agente serializada em camelCase."""
+    id: str | None = None
+    type: str | None = None
+    content: str | None = None
+    response_metadata: dict | None = None
+    tool_calls: List[dict] | None = None
+    additional_kwargs: dict | None = None
+    created_at: str | None = None
+
+
+class ThreadMessagesResponse(CamelCaseModel):
+    """Resposta com lista de mensagens da thread."""
+    messages: List[AgentMessageResponse]
+
+
 # =============================================================================
 # Provider Schemas
 # =============================================================================

@@ -13,7 +13,7 @@ from src.auth import CurrentMembership, CurrentUser, check_permission
 from src.database import DatabaseSession, get_checkpoint_saver
 from src.entities import Organization, OrganizationProvider, Permission, Provider, ProviderType, Thread
 from src.helpers import agent_messages_to_list, chunk_to_text, get_config
-from src.schemas import CreateThreadRequest, RunRequest, ThreadResponse, UpdateThreadRequest
+from src.schemas import CreateThreadRequest, RunRequest, ThreadMessagesResponse, ThreadResponse, UpdateThreadRequest
 
 router = APIRouter(prefix="/organizations/{organization_id}/threads", tags=["threads"])
 
@@ -246,7 +246,7 @@ def delete_thread(
     db.delete(thread)
     db.commit()
 
-@router.get("/{thread_id}/state/messages")
+@router.get("/{thread_id}/state/messages", response_model=ThreadMessagesResponse)
 async def get_thread_messages(
     organization_id: uuid.UUID,
     thread_id: str,
@@ -267,13 +267,13 @@ async def get_thread_messages(
     checkpoint_tuple = await checkpointer.aget_tuple(config)
 
     if not checkpoint_tuple or not checkpoint_tuple.checkpoint:
-        return {"messages": []}
+        return ThreadMessagesResponse(messages=[])
 
     state_messages = checkpoint_tuple.checkpoint.get("channel_values", {}).get("messages", [])
-    return {"messages": agent_messages_to_list(state_messages)}
+    return ThreadMessagesResponse(messages=agent_messages_to_list(state_messages))
 
 
-@router.post("/{thread_id}/runs/invoke")
+@router.post("/{thread_id}/runs/invoke", response_model=ThreadMessagesResponse)
 async def invoke_run(
     organization_id: uuid.UUID,
     thread_id: str,
@@ -335,7 +335,7 @@ async def invoke_run(
         db.add(thread)
         db.commit()
 
-    return {"messages": agent_messages_to_list(state_messages)}
+    return ThreadMessagesResponse(messages=agent_messages_to_list(state_messages))
 
 
 @router.post("/{thread_id}/runs/stream")
@@ -414,10 +414,11 @@ async def stream_run(
             state_messages = state_snapshot.values.get("messages", [])
 
             # Evento final entrega o historico completo ja salvo no Postgres/checkpointer
+            messages_response = [m.model_dump(by_alias=True) for m in agent_messages_to_list(state_messages)]
             yield sse_response_payload(
                 {
                     "event": "final",
-                    "messages": agent_messages_to_list(state_messages),
+                    "messages": messages_response,
                 }
             )
             # Evento done apenas sinaliza encerramento da stream

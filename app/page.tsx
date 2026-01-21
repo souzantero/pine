@@ -153,8 +153,10 @@ export default function Home() {
           return;
         }
 
-        // Pega a ultima mensagem do tipo "ai" da resposta
-        const aiMessages = response.data?.messages.filter((m) => m.type === "ai") ?? [];
+        // Pega a ultima mensagem do tipo "ai" sem toolCalls da resposta
+        const aiMessages = response.data?.messages.filter(
+          (m) => m.type === "ai" && (!m.toolCalls || m.toolCalls.length === 0)
+        ) ?? [];
         const lastAiMessage = aiMessages[aiMessages.length - 1];
 
         if (lastAiMessage) {
