@@ -90,7 +90,8 @@ The app implements role-based access control with organization scoping:
 - `server/src/routers/` - API route handlers (auth, threads, prompts, members, etc.)
 - `server/src/schemas.py` - Pydantic models with camelCase serialization
 - `server/src/entities.py` - SQLModel ORM entities
-- `server/src/agent.py` - AI agent invocation logic
+- `server/src/agents/agent.py` - AI agent with LangGraph
+- `server/src/agents/tools/` - Agent tools (web_search, web_fetch)
 - `server/db/` - Alembic migrations
 
 ### API Structure
@@ -101,13 +102,14 @@ All API routes are served by the Python backend at `localhost:8888`:
 - `/organizations` - Create organization
 - `/organizations/{org_id}` - Organization CRUD
 - `/organizations/{org_id}/threads` - Conversation threads
-- `/organizations/{org_id}/threads/{thread_id}/agents/{agent_id}/runs/invoke` - AI agent invocation (streaming)
+- `/organizations/{org_id}/threads/{thread_id}/agents/{agent_id}/runs/stream` - AI agent invocation (streaming)
 - `/organizations/{org_id}/prompts` - System prompts
 - `/organizations/{org_id}/members` - Member management
 - `/organizations/{org_id}/invites` - Organization invites
 - `/organizations/{org_id}/roles` - Role management
 - `/organizations/{org_id}/models` - Available AI models
 - `/organizations/{org_id}/providers` - Provider configuration (LLM, Web Search, etc.)
+- `/organizations/{org_id}/configs` - Tool configurations per organization
 - `/invites/{token}` - Public invite info and accept
 
 ### UI Components
@@ -122,7 +124,7 @@ All API routes are served by the Python backend at `localhost:8888`:
 2. `/onboarding` - Organization creation (requires auth, no org)
 3. `/invite/[token]` - Accept organization invites
 4. `/` - Main chat interface (requires auth + active org)
-5. `/settings`, `/settings/members`, `/settings/providers` - Organization management
+5. `/settings`, `/settings/members`, `/settings/providers`, `/settings/tools` - Organization management
 
 ## Code Conventions
 

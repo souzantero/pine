@@ -88,7 +88,10 @@ pineai/
 - Sistema de permissoes RBAC
 - Convites para organizacoes
 - Gestao de membros e roles
-- Threads de conversacao
+- Threads de conversacao com streaming em tempo real
+- Renderizacao de Markdown nas mensagens
+- Agente de IA com ferramentas (web_search, web_fetch)
+- Configuracao de ferramentas por organizacao
 - Prompts de sistema
 - Configuracao de provedores (LLM: OpenAI, OpenRouter, Anthropic, Google; Web Search: Tavily)
 
@@ -127,5 +130,6 @@ O backend expoe os seguintes endpoints:
 | `GET /organizations/{id}/roles` | Listar roles |
 | `GET /organizations/{id}/models` | Modelos disponiveis |
 | `GET /organizations/{id}/providers` | Provedores configurados (LLM, Web Search) |
+| `GET /organizations/{id}/configs` | Configuracoes de ferramentas |
 
 Documentacao completa da API em: `http://localhost:8888/docs`
