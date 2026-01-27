@@ -14,10 +14,21 @@ export type Permission =
   | "ROLES_READ"
   | "ROLES_MANAGE"
   | "ORGANIZATION_MANAGE"
-  | "PLATFORM_MANAGE";
+  | "PLATFORM_MANAGE"
+  | "COLLECTIONS_READ"
+  | "COLLECTIONS_CREATE"
+  | "COLLECTIONS_UPDATE"
+  | "COLLECTIONS_DELETE"
+  | "DOCUMENTS_READ"
+  | "DOCUMENTS_CREATE"
+  | "DOCUMENTS_UPDATE"
+  | "DOCUMENTS_DELETE";
 
 // Escopo de roles
 export type RoleScope = "PLATFORM" | "ORGANIZATION";
+
+// Status de processamento de documento
+export type DocumentStatus = "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED";
 
 // Tipos de provedores
 export type ProviderType = "LLM" | "WEB_SEARCH" | "STORAGE" | "EMBEDDING";
@@ -93,7 +104,7 @@ export function getProvidersForType(type: ProviderType): ProviderInfo[] {
 export type ConfigType = "TOOL" | "FEATURE";
 
 // Chaves de configuração
-export type ConfigKey = "WEB_SEARCH" | "WEB_FETCH" | "STORAGE";
+export type ConfigKey = "WEB_SEARCH" | "WEB_FETCH" | "KNOWLEDGE";
 
 // Informações de UI das ferramentas
 export interface ToolInfo {

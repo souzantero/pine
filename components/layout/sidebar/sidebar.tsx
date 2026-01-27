@@ -12,7 +12,7 @@ import {
   Building2,
   Plug,
   Wrench,
-  HardDrive,
+  Brain,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -45,10 +45,12 @@ function SidebarContent({
 
   const canViewMembers = hasPermission("MEMBERS_READ");
   const canManageOrg = hasPermission("ORGANIZATION_MANAGE");
+  const canViewCollections = hasPermission("COLLECTIONS_READ");
 
   // Determinar qual seção está ativa baseado na rota
   const getActiveSection = (): NavSection => {
     if (pathname === "/settings" || pathname === "/settings/members" || pathname.startsWith("/settings/")) return "settings";
+    if (pathname.startsWith("/collections")) return "collections";
     return "threads";
   };
   const activeSection = getActiveSection();
@@ -83,8 +85,13 @@ function SidebarContent({
     onItemClick?.();
   };
 
-  const handleStorageClick = () => {
-    router.push("/settings/storage");
+  const handleKnowledgeClick = () => {
+    router.push("/settings/knowledge");
+    onItemClick?.();
+  };
+
+  const handleCollectionsClick = () => {
+    router.push("/collections");
     onItemClick?.();
   };
 
@@ -149,6 +156,24 @@ function SidebarContent({
                 {menuExpanded && <span className="text-sm font-medium">Conversas</span>}
               </button>
             </li>
+            {canViewCollections && (
+              <li>
+                <button
+                  onClick={handleCollectionsClick}
+                  title={!menuExpanded ? "Conhecimento" : undefined}
+                  className={cn(
+                    "w-full flex items-center rounded-md transition-colors",
+                    menuExpanded ? "gap-3 px-3 py-2" : "justify-center p-2",
+                    activeSection === "collections"
+                      ? "bg-primary text-primary-foreground"
+                      : "hover:bg-muted"
+                  )}
+                >
+                  <Brain className="h-5 w-5 shrink-0" />
+                  {menuExpanded && <span className="text-sm font-medium">Conhecimento</span>}
+                </button>
+              </li>
+            )}
             {canAccessSettings && (
               <li>
                 <button
@@ -231,6 +256,23 @@ function SidebarContent({
         </aside>
       )}
 
+      {/* Submenu - Conhecimento (só aparece quando Conhecimento está ativo) */}
+      {activeSection === "collections" && (
+        <aside className="w-56 border-r bg-muted/40 flex flex-col">
+          <div className={cn("p-2", isMobile && "pt-12")}>
+            <h2 className="px-3 py-2 text-sm font-semibold text-muted-foreground">
+              Conhecimento
+            </h2>
+          </div>
+
+          <nav className="p-2">
+            <p className="px-3 py-2 text-sm text-muted-foreground">
+              Gerencie suas coleções de documentos na página principal.
+            </p>
+          </nav>
+        </aside>
+      )}
+
       {/* Submenu - Configurações (só aparece quando Configurações está ativo) */}
       {activeSection === "settings" && (
         <aside className="w-56 border-r bg-muted/40 flex flex-col">
@@ -288,16 +330,16 @@ function SidebarContent({
                   </li>
                   <li>
                     <button
-                      onClick={handleStorageClick}
+                      onClick={handleKnowledgeClick}
                       className={cn(
                         "w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors text-left",
-                        pathname === "/settings/storage"
+                        pathname === "/settings/knowledge"
                           ? "bg-primary text-primary-foreground"
                           : "hover:bg-muted"
                       )}
                     >
-                      <HardDrive className="h-4 w-4 shrink-0" />
-                      <span>Armazenamento</span>
+                      <Brain className="h-4 w-4 shrink-0" />
+                      <span>Conhecimento</span>
                     </button>
                   </li>
                 </>

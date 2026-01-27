@@ -2,7 +2,8 @@ import uuid
 from datetime import UTC, datetime
 from enum import Enum
 
-from sqlalchemy import JSON, UniqueConstraint
+from pgvector.sqlalchemy import Vector
+from sqlalchemy import JSON, Column, UniqueConstraint
 from sqlmodel import Field, Relationship, SQLModel
 
 
@@ -44,6 +45,16 @@ class Permission(str, Enum):
     ORGANIZATION_MANAGE = "ORGANIZATION_MANAGE"
     # Plataforma (para roles de plataforma no futuro)
     PLATFORM_MANAGE = "PLATFORM_MANAGE"
+    # Collections
+    COLLECTIONS_READ = "COLLECTIONS_READ"
+    COLLECTIONS_CREATE = "COLLECTIONS_CREATE"
+    COLLECTIONS_UPDATE = "COLLECTIONS_UPDATE"
+    COLLECTIONS_DELETE = "COLLECTIONS_DELETE"
+    # Documents
+    DOCUMENTS_READ = "DOCUMENTS_READ"
+    DOCUMENTS_CREATE = "DOCUMENTS_CREATE"
+    DOCUMENTS_UPDATE = "DOCUMENTS_UPDATE"
+    DOCUMENTS_DELETE = "DOCUMENTS_DELETE"
 
 
 class ProviderType(str, Enum):
@@ -81,7 +92,16 @@ class ConfigKey(str, Enum):
 
     WEB_SEARCH = "WEB_SEARCH"
     WEB_FETCH = "WEB_FETCH"
-    STORAGE = "STORAGE"
+    KNOWLEDGE = "KNOWLEDGE"  # Configuracoes da feature de conhecimento (storage + embedding)
+
+
+class DocumentStatus(str, Enum):
+    """Status de processamento de documento"""
+
+    PENDING = "PENDING"
+    PROCESSING = "PROCESSING"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
 
 
 # =============================================================================
@@ -127,6 +147,7 @@ class Organization(SQLModel, table=True):
     threads: list["Thread"] = Relationship(back_populates="organization")
     providers: list["OrganizationProvider"] = Relationship(back_populates="organization")
     configs: list["OrganizationConfig"] = Relationship(back_populates="organization")
+    document_collections: list["DocumentCollection"] = Relationship(back_populates="organization")
 
 
 class OrganizationProvider(SQLModel, table=True):
@@ -270,3 +291,65 @@ class OrganizationConfig(SQLModel, table=True):
 
     # Relationships
     organization: Organization = Relationship(back_populates="configs")
+
+
+class DocumentCollection(SQLModel, table=True):
+    """Colecao de documentos"""
+
+    __tablename__ = "document_collections"
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    organization_id: uuid.UUID = Field(foreign_key="organizations.id", index=True)
+    name: str
+    description: str | None = None
+    created_at: datetime = Field(default_factory=get_now)
+    updated_at: datetime = Field(default_factory=get_now, sa_column_kwargs={"onupdate": get_now})
+
+    # Relationships
+    organization: Organization = Relationship(back_populates="document_collections")
+    documents: list["Document"] = Relationship(
+        back_populates="collection",
+        sa_relationship_kwargs={"cascade": "all, delete-orphan"},
+    )
+
+
+class Document(SQLModel, table=True):
+    """Documento em uma colecao"""
+
+    __tablename__ = "documents"
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    collection_id: uuid.UUID = Field(foreign_key="document_collections.id", index=True)
+    name: str
+    file_key: str  # S3 key
+    file_size: int
+    mime_type: str
+    status: DocumentStatus = Field(default=DocumentStatus.PENDING)
+    error_message: str | None = None
+    chunk_count: int = Field(default=0)
+    created_at: datetime = Field(default_factory=get_now)
+    updated_at: datetime = Field(default_factory=get_now, sa_column_kwargs={"onupdate": get_now})
+
+    # Relationships
+    collection: DocumentCollection = Relationship(back_populates="documents")
+    chunks: list["DocumentChunk"] = Relationship(
+        back_populates="document",
+        sa_relationship_kwargs={"cascade": "all, delete-orphan"},
+    )
+
+
+class DocumentChunk(SQLModel, table=True):
+    """Chunk de documento com embedding vetorial"""
+
+    __tablename__ = "document_chunks"
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    document_id: uuid.UUID = Field(foreign_key="documents.id", index=True)
+    content: str
+    embedding: list[float] = Field(sa_column=Column(Vector(1536)))  # OpenAI ada-002 dimension
+    chunk_index: int
+    chunk_metadata: dict = Field(default_factory=dict, sa_type=JSON)  # Metadados do chunk (pagina, etc)
+    created_at: datetime = Field(default_factory=get_now)
+
+    # Relationships
+    document: Document = Relationship(back_populates="chunks")

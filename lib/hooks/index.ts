@@ -7,3 +7,5 @@ export { useProviders } from "./use-providers";
 export { useModels } from "./use-models";
 export { useThreads, useSidebarThreads } from "./use-threads";
 export { useConfigs } from "./use-configs";
+export { useCollections } from "./use-collections";
+export { useDocuments } from "./use-documents";

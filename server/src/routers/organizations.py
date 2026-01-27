@@ -36,6 +36,16 @@ ADMIN_PERMISSIONS = [
     Permission.ROLES_READ,
     Permission.ROLES_MANAGE,
     Permission.ORGANIZATION_MANAGE,
+    # Collections
+    Permission.COLLECTIONS_READ,
+    Permission.COLLECTIONS_CREATE,
+    Permission.COLLECTIONS_UPDATE,
+    Permission.COLLECTIONS_DELETE,
+    # Documents
+    Permission.DOCUMENTS_READ,
+    Permission.DOCUMENTS_CREATE,
+    Permission.DOCUMENTS_UPDATE,
+    Permission.DOCUMENTS_DELETE,
 ]
 
 # Permissoes padrao para role Membro
@@ -44,6 +54,9 @@ MEMBER_PERMISSIONS = [
     Permission.THREADS_WRITE,
     Permission.AGENTS_READ,
     Permission.MEMBERS_READ,
+    # Collections e Documents (somente leitura)
+    Permission.COLLECTIONS_READ,
+    Permission.DOCUMENTS_READ,
 ]
 
 

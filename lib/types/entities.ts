@@ -1,6 +1,6 @@
 // Entidades de domínio do frontend
 
-import type { Permission, RoleScope, Provider, ProviderType, ConfigType, ConfigKey } from "./enums";
+import type { Permission, RoleScope, Provider, ProviderType, ConfigType, ConfigKey, DocumentStatus } from "./enums";
 
 // ============================================
 // Usuário e Sessão
@@ -168,4 +168,33 @@ export interface OrgConfig {
   key: ConfigKey;
   isEnabled: boolean;
   config: WebSearchConfig | Record<string, unknown>;
+}
+
+// ============================================
+// Coleções de Documentos
+// ============================================
+
+export interface Collection {
+  id: string;
+  name: string;
+  description: string | null;
+  documentCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Document {
+  id: string;
+  name: string;
+  fileSize: number;
+  mimeType: string;
+  status: DocumentStatus;
+  errorMessage: string | null;
+  chunkCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DocumentDetail extends Document {
+  downloadUrl: string | null;
 }

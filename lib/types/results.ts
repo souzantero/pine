@@ -6,7 +6,8 @@ import type { Organization } from "./entities";
 // Base
 // ============================================
 
-export interface MutationResult {
+export interface MutationResult<T = void> {
+  data?: T;
   error?: string;
 }
 

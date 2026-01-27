@@ -5,7 +5,10 @@ import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/session";
 import { useConfigs, useProviders, useModels } from "@/lib/hooks";
 import { TOOLS } from "@/lib/types";
-import type { ConfigKey, WebSearchConfig } from "@/lib/types";
+import type { WebSearchConfig } from "@/lib/types";
+
+// Tipo específico para chaves de configuração de ferramentas
+type ToolConfigKey = "WEB_SEARCH" | "WEB_FETCH";
 import { AppLayout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -68,7 +71,7 @@ export default function ToolsPage() {
   const { getProvidersByType } = useProviders();
   const { models } = useModels();
 
-  const [formStates, setFormStates] = useState<Record<ConfigKey, ToolFormState>>({
+  const [formStates, setFormStates] = useState<Record<ToolConfigKey, ToolFormState>>({
     WEB_SEARCH: { ...defaultToolConfig },
     WEB_FETCH: { ...defaultToolConfig },
   });
@@ -88,11 +91,13 @@ export default function ToolsPage() {
       const newStates = { ...formStates };
 
       for (const tool of TOOLS) {
+        const toolKey = tool.key as ToolConfigKey;
+        if (!(toolKey in newStates)) continue; // Ignora chaves que nao sao de ferramentas
         const existingConfig = getConfig("TOOL", tool.key);
         if (existingConfig) {
           const config = existingConfig.config as WebSearchConfig;
-          newStates[tool.key] = {
-            ...newStates[tool.key],
+          newStates[toolKey] = {
+            ...newStates[toolKey],
             isEnabled: existingConfig.isEnabled,
             provider: config.provider ?? "",
             summarizationProvider: config.summarizationProvider ?? "",
@@ -110,7 +115,7 @@ export default function ToolsPage() {
   }, [configsLoading, configs]);
 
   const updateFormState = (
-    key: ConfigKey,
+    key: ToolConfigKey,
     updates: Partial<ToolFormState>
   ) => {
     setFormStates((prev) => ({
@@ -119,7 +124,7 @@ export default function ToolsPage() {
     }));
   };
 
-  const handleSave = async (key: ConfigKey) => {
+  const handleSave = async (key: ToolConfigKey) => {
     const state = formStates[key];
 
     updateFormState(key, { error: null, success: false, saving: true });
@@ -176,7 +181,9 @@ export default function ToolsPage() {
 
         <div className="space-y-6">
           {TOOLS.map((tool) => {
-            const state = formStates[tool.key];
+            const toolKey = tool.key as ToolConfigKey;
+            if (!(toolKey in formStates)) return null; // Ignora chaves que nao sao de ferramentas
+            const state = formStates[toolKey];
             const existingConfig = getConfig("TOOL", tool.key);
 
             return (
@@ -190,7 +197,7 @@ export default function ToolsPage() {
                     <Switch
                       checked={state.isEnabled}
                       onCheckedChange={(checked) =>
-                        updateFormState(tool.key, { isEnabled: checked })
+                        updateFormState(toolKey, { isEnabled: checked })
                       }
                     />
                   </div>
@@ -227,7 +234,7 @@ export default function ToolsPage() {
                       <Select
                         value={state.provider}
                         onValueChange={(value) =>
-                          updateFormState(tool.key, { provider: value })
+                          updateFormState(toolKey, { provider: value })
                         }
                         disabled={!state.isEnabled}
                       >
@@ -269,7 +276,7 @@ export default function ToolsPage() {
                           <Select
                             value={state.summarizationProvider}
                             onValueChange={(value) =>
-                              updateFormState(tool.key, {
+                              updateFormState(toolKey, {
                                 summarizationProvider: value,
                               })
                             }
@@ -297,7 +304,7 @@ export default function ToolsPage() {
                         <Select
                           value={state.summarizationModel}
                           onValueChange={(value) =>
-                            updateFormState(tool.key, {
+                            updateFormState(toolKey, {
                               summarizationModel: value,
                             })
                           }
@@ -323,7 +330,7 @@ export default function ToolsPage() {
                         type="number"
                         value={state.summarizationMaxTokens}
                         onChange={(e) =>
-                          updateFormState(tool.key, {
+                          updateFormState(toolKey, {
                             summarizationMaxTokens: parseInt(e.target.value) || 1000,
                           })
                         }
@@ -350,7 +357,7 @@ export default function ToolsPage() {
                           type="number"
                           value={state.maxContentLength}
                           onChange={(e) =>
-                            updateFormState(tool.key, {
+                            updateFormState(toolKey, {
                               maxContentLength: parseInt(e.target.value) || 10000,
                             })
                           }
@@ -369,7 +376,7 @@ export default function ToolsPage() {
                           type="number"
                           value={state.maxOutputRetries}
                           onChange={(e) =>
-                            updateFormState(tool.key, {
+                            updateFormState(toolKey, {
                               maxOutputRetries: parseInt(e.target.value) || 3,
                             })
                           }
@@ -386,7 +393,7 @@ export default function ToolsPage() {
 
                   <div className="flex justify-end pt-4">
                     <Button
-                      onClick={() => handleSave(tool.key)}
+                      onClick={() => handleSave(toolKey)}
                       disabled={state.saving}
                     >
                       {state.saving && (

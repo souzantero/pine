@@ -2,7 +2,7 @@
 
 import type { Thread } from "@/lib/types";
 
-export type NavSection = "threads" | "settings";
+export type NavSection = "threads" | "collections" | "settings";
 
 export interface SidebarProps {
   threads: Thread[];

@@ -63,6 +63,56 @@ async function request<T>(
   }
 }
 
+// Função auxiliar para upload de arquivos (FormData)
+async function uploadRequest<T>(
+  endpoint: string,
+  formData: FormData,
+  options: RequestInit = {}
+): Promise<{ data?: T; error?: string; status: number }> {
+  const token = getToken();
+
+  const headers: HeadersInit = {
+    // Não definir Content-Type para FormData - o browser define automaticamente com boundary
+    ...options.headers,
+  };
+
+  if (token) {
+    (headers as Record<string, string>)["Authorization"] = `Bearer ${token}`;
+  }
+
+  try {
+    const response = await fetch(`${API_URL}${endpoint}`, {
+      ...options,
+      method: "POST",
+      headers,
+      body: formData,
+    });
+
+    let data: T | ApiError | undefined;
+    const contentType = response.headers.get("content-type");
+    const contentLength = response.headers.get("content-length");
+
+    if (contentType?.includes("application/json") && contentLength !== "0" && response.status !== 204) {
+      const text = await response.text();
+      if (text) {
+        data = JSON.parse(text);
+      }
+    }
+
+    if (!response.ok) {
+      const errorData = data as ApiError;
+      const errorMessage =
+        errorData?.detail || errorData?.error || "Erro desconhecido";
+      return { error: errorMessage, status: response.status };
+    }
+
+    return { data: data as T, status: response.status };
+  } catch (error) {
+    console.error("API upload error:", error);
+    return { error: "Erro ao conectar com o servidor", status: 0 };
+  }
+}
+
 // Métodos HTTP convenientes
 export const api = {
   get: <T>(endpoint: string, options?: RequestInit) =>
@@ -84,6 +134,9 @@ export const api = {
 
   delete: <T>(endpoint: string, options?: RequestInit) =>
     request<T>(endpoint, { ...options, method: "DELETE" }),
+
+  upload: <T>(endpoint: string, formData: FormData, options?: RequestInit) =>
+    uploadRequest<T>(endpoint, formData, options),
 };
 
 // Funcao para buscar mensagens de uma thread
