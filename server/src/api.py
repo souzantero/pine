@@ -7,7 +7,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.database import open_checkpointer, close_checkpointer
 from src.auth.router import router as auth_router
 from src.organization.router import router as organization_router
-from src.routers import collections, configs, documents, invites, members, models, providers, roles, threads
+from src.organization.members.router import router as members_router
+from src.organization.invites.router import router as invites_router
+from src.roles.router import router as roles_router
+from src.routers import collections, configs, documents, models, providers, threads
 
 
 @asynccontextmanager
@@ -39,9 +42,9 @@ app.add_middleware(
 # Routers
 app.include_router(auth_router)
 app.include_router(organization_router)
-app.include_router(members.router)
-app.include_router(invites.router)
-app.include_router(roles.router)
+app.include_router(members_router)
+app.include_router(invites_router)
+app.include_router(roles_router)
 app.include_router(threads.router)
 app.include_router(providers.router)
 app.include_router(models.router)

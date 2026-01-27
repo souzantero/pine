@@ -3,14 +3,14 @@ import uuid
 from datetime import UTC, datetime, timedelta
 from typing import List
 
-from fastapi import APIRouter, HTTPException, status
-from sqlmodel import select
+from fastapi import HTTPException, status
+from sqlmodel import Session, select
 
-from src.auth import CurrentUser, check_permission
-from src.database import DatabaseSession
-from src.entities import Organization, OrganizationInvite, OrganizationMember, Permission, Role
+from src.entities import Organization, OrganizationInvite, OrganizationMember, Role
 from src.organization.schemas import OrganizationResponse
-from src.schemas import (
+from src.roles.schemas import RoleResponse
+
+from .schemas import (
     CreateInviteRequest,
     InviteCreatedByResponse,
     InviteInfoCreatedBy,
@@ -19,10 +19,7 @@ from src.schemas import (
     InviteInfoRole,
     InviteListItemResponse,
     InviteResponse,
-    RoleResponse,
 )
-
-router = APIRouter(tags=["invites"])
 
 
 def generate_invite_token() -> str:
@@ -36,24 +33,8 @@ def get_invite_link(token: str) -> str:
     return f"http://localhost:3000/invite/{token}"
 
 
-@router.get(
-    "/organizations/{organization_id}/invites",
-    response_model=List[InviteListItemResponse],
-)
-def list_invites(
-    organization_id: uuid.UUID,
-    current_user: CurrentUser,
-    db: DatabaseSession,
-):
-    """Lista convites pendentes da organizacao (requer MEMBERS_INVITE)."""
-    # Verifica permissao
-    if not check_permission(db, current_user.id, organization_id, Permission.MEMBERS_INVITE):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Permissao MEMBERS_INVITE necessaria",
-        )
-
-    # Busca convites pendentes (nao usados e nao expirados)
+def list_invites(organization_id: uuid.UUID, db: Session) -> List[InviteListItemResponse]:
+    """Lista convites pendentes da organizacao."""
     now = datetime.now(UTC)
     statement = (
         select(OrganizationInvite)
@@ -67,14 +48,12 @@ def list_invites(
 
     result = []
     for invite in invites:
-        # Verifica se expirou
         expires_at = invite.expires_at
         if expires_at.tzinfo is None:
             expires_at = expires_at.replace(tzinfo=UTC)
         if expires_at < now:
-            continue  # Pula convites expirados
+            continue
 
-        # Carrega relacionamentos
         db.refresh(invite, ["role", "created_by"])
 
         result.append(
@@ -100,26 +79,10 @@ def list_invites(
     return result
 
 
-@router.post(
-    "/organizations/{organization_id}/invites",
-    response_model=InviteResponse,
-    status_code=status.HTTP_201_CREATED,
-)
 def create_invite(
-    organization_id: uuid.UUID,
-    payload: CreateInviteRequest,
-    current_user: CurrentUser,
-    db: DatabaseSession,
-):
-    """Cria um convite para a organizacao (requer MEMBERS_INVITE)."""
-    # Verifica permissao
-    if not check_permission(db, current_user.id, organization_id, Permission.MEMBERS_INVITE):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Permissao MEMBERS_INVITE necessaria",
-        )
-
-    # Verifica se a organizacao existe
+    organization_id: uuid.UUID, payload: CreateInviteRequest, current_user_id: uuid.UUID, db: Session
+) -> InviteResponse:
+    """Cria um convite para a organizacao."""
     organization = db.get(Organization, organization_id)
     if not organization:
         raise HTTPException(
@@ -127,7 +90,6 @@ def create_invite(
             detail="Organizacao nao encontrada",
         )
 
-    # Verifica se a role existe e pertence a organizacao
     role = db.get(Role, payload.role_id)
     if not role or role.organization_id != organization_id:
         raise HTTPException(
@@ -135,12 +97,11 @@ def create_invite(
             detail="Role nao encontrada nesta organizacao",
         )
 
-    # Cria o convite
     invite = OrganizationInvite(
         organization_id=organization_id,
         role_id=payload.role_id,
         token=generate_invite_token(),
-        created_by_id=current_user.id,
+        created_by_id=current_user_id,
         expires_at=datetime.now(UTC) + timedelta(days=payload.expires_in_days),
     )
     db.add(invite)
@@ -167,10 +128,8 @@ def create_invite(
     )
 
 
-@router.get("/invites/{token}", response_model=InviteInfoResponse)
-def get_invite_info(token: str, db: DatabaseSession):
-    """Retorna informacoes publicas do convite (para pagina de aceite)."""
-    # Busca o convite pelo token
+def get_invite_info(token: str, db: Session) -> InviteInfoResponse:
+    """Retorna informacoes publicas do convite."""
     statement = select(OrganizationInvite).where(OrganizationInvite.token == token)
     invite = db.exec(statement).first()
 
@@ -180,11 +139,9 @@ def get_invite_info(token: str, db: DatabaseSession):
             detail="Convite nao encontrado",
         )
 
-    # Carrega relacionamentos
     db.refresh(invite, ["organization", "role", "created_by"])
 
     now = datetime.now(UTC)
-    # Compara como naive datetime se expires_at nao tem timezone
     expires_at = invite.expires_at
     if expires_at.tzinfo is None:
         expires_at = expires_at.replace(tzinfo=UTC)
@@ -208,10 +165,8 @@ def get_invite_info(token: str, db: DatabaseSession):
     )
 
 
-@router.post("/invites/{token}/accept", status_code=status.HTTP_201_CREATED)
-def accept_invite(token: str, current_user: CurrentUser, db: DatabaseSession):
+def accept_invite(token: str, current_user_id: uuid.UUID, db: Session) -> dict:
     """Aceita um convite e adiciona o usuario a organizacao."""
-    # Busca o convite pelo token
     statement = select(OrganizationInvite).where(OrganizationInvite.token == token)
     invite = db.exec(statement).first()
 
@@ -221,14 +176,12 @@ def accept_invite(token: str, current_user: CurrentUser, db: DatabaseSession):
             detail="Convite nao encontrado",
         )
 
-    # Verifica se ja foi usado
     if invite.used_at is not None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Convite ja foi utilizado",
         )
 
-    # Verifica se expirou
     now = datetime.now(UTC)
     expires_at = invite.expires_at
     if expires_at.tzinfo is None:
@@ -239,9 +192,8 @@ def accept_invite(token: str, current_user: CurrentUser, db: DatabaseSession):
             detail="Convite expirado",
         )
 
-    # Verifica se usuario ja e membro
     member_statement = select(OrganizationMember).where(
-        OrganizationMember.user_id == current_user.id,
+        OrganizationMember.user_id == current_user_id,
         OrganizationMember.organization_id == invite.organization_id,
     )
     existing_member = db.exec(member_statement).first()
@@ -252,18 +204,16 @@ def accept_invite(token: str, current_user: CurrentUser, db: DatabaseSession):
             detail="Voce ja e membro desta organizacao",
         )
 
-    # Cria o membership
     member = OrganizationMember(
-        user_id=current_user.id,
+        user_id=current_user_id,
         organization_id=invite.organization_id,
         role_id=invite.role_id,
         is_owner=False,
     )
     db.add(member)
 
-    # Marca convite como usado
     invite.used_at = now
-    invite.used_by_id = current_user.id
+    invite.used_by_id = current_user_id
     db.add(invite)
 
     db.commit()
