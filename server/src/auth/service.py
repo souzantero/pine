@@ -1,25 +1,22 @@
-from fastapi import APIRouter, HTTPException, status
-from sqlmodel import select
+from fastapi import HTTPException, status
+from sqlmodel import Session, select
 
-from src.auth import CurrentUser, create_access_token, hash_password, verify_password
-from src.database import DatabaseSession
 from src.entities import OrganizationMember, RolePermission, User
-from src.schemas import (
+from src.organization.schemas import OrganizationResponse
+
+from .schemas import (
     LoginRequest,
     MembershipResponse,
     MembershipRoleResponse,
     MeResponse,
-    OrganizationResponse,
     RegisterRequest,
     TokenResponse,
     UserResponse,
 )
+from .utils import create_access_token, hash_password, verify_password
 
-router = APIRouter(prefix="/auth", tags=["auth"])
 
-
-@router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
-def register(payload: RegisterRequest, db: DatabaseSession):
+def register_user(payload: RegisterRequest, db: Session) -> TokenResponse:
     """Registra um novo usuario."""
     # Verifica se email ja existe
     statement = select(User).where(User.email == payload.email)
@@ -43,14 +40,11 @@ def register(payload: RegisterRequest, db: DatabaseSession):
 
     # Gera token
     access_token = create_access_token(str(user.id))
-
     return TokenResponse(access_token=access_token)
 
 
-@router.post("/login", response_model=TokenResponse)
-def login(payload: LoginRequest, db: DatabaseSession):
+def login_user(payload: LoginRequest, db: Session) -> TokenResponse:
     """Autentica um usuario e retorna o token JWT."""
-    # Busca usuario pelo email
     statement = select(User).where(User.email == payload.email)
     user = db.exec(statement).first()
 
@@ -61,26 +55,19 @@ def login(payload: LoginRequest, db: DatabaseSession):
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    # Gera token
     access_token = create_access_token(str(user.id))
-
     return TokenResponse(access_token=access_token)
 
 
-@router.get("/me", response_model=MeResponse)
-def get_me(current_user: CurrentUser, db: DatabaseSession):
+def get_current_user_info(user: User, db: Session) -> MeResponse:
     """Retorna o usuario autenticado com suas memberships."""
-    # Busca memberships do usuario com org e role
-    statement = select(OrganizationMember).where(OrganizationMember.user_id == current_user.id)
+    statement = select(OrganizationMember).where(OrganizationMember.user_id == user.id)
     memberships = db.exec(statement).all()
 
-    # Monta response com relacionamentos
     membership_responses = []
     for membership in memberships:
-        # Carrega relacionamentos
         db.refresh(membership, ["organization", "role"])
 
-        # Busca permissoes da role
         perm_statement = select(RolePermission).where(RolePermission.role_id == membership.role.id)
         role_permissions = db.exec(perm_statement).all()
         permissions = [rp.permission.value for rp in role_permissions]
@@ -109,10 +96,10 @@ def get_me(current_user: CurrentUser, db: DatabaseSession):
 
     return MeResponse(
         user=UserResponse(
-            id=current_user.id,
-            email=current_user.email,
-            name=current_user.name,
-            created_at=current_user.created_at,
+            id=user.id,
+            email=user.email,
+            name=user.name,
+            created_at=user.created_at,
         ),
         memberships=membership_responses,
     )

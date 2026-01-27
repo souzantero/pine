@@ -1,57 +1,15 @@
 import uuid
-from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
-import bcrypt
-import jwt
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi.security import HTTPAuthorizationCredentials
 from sqlmodel import Session, select
 
 from src.database import DatabaseSession
-from src.entities import Organization, OrganizationMember, Permission, RolePermission, User
-from src.env import jwt_algorithm, jwt_expiration_hours, jwt_secret
+from src.entities import OrganizationMember, Permission, RolePermission, User
 
-# Bearer token scheme
-bearer_scheme = HTTPBearer()
+from .utils import bearer_scheme, decode_token
 
-
-def hash_password(password: str) -> str:
-    """Gera hash bcrypt da senha."""
-    password_bytes = password.encode("utf-8")
-    salt = bcrypt.gensalt()
-    return bcrypt.hashpw(password_bytes, salt).decode("utf-8")
-
-
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Verifica se a senha corresponde ao hash."""
-    password_bytes = plain_password.encode("utf-8")
-    hashed_bytes = hashed_password.encode("utf-8")
-    return bcrypt.checkpw(password_bytes, hashed_bytes)
-
-
-def create_access_token(user_id: str, expires_delta: timedelta | None = None) -> str:
-    """Cria JWT token para o usuario."""
-    if expires_delta:
-        expire = datetime.now(UTC) + expires_delta
-    else:
-        expire = datetime.now(UTC) + timedelta(hours=jwt_expiration_hours)
-
-    to_encode = {
-        "sub": user_id,
-        "exp": expire,
-        "iat": datetime.now(UTC),
-    }
-    return jwt.encode(to_encode, jwt_secret, algorithm=jwt_algorithm)
-
-
-def decode_token(token: str) -> dict | None:
-    """Decodifica e valida JWT token."""
-    try:
-        payload = jwt.decode(token, jwt_secret, algorithms=[jwt_algorithm])
-        return payload
-    except jwt.PyJWTError:
-        return None
 
 # Dependency para obter o usuario atual
 async def get_current_user(
@@ -111,7 +69,6 @@ CurrentMembership = Annotated[OrganizationMember, Depends(get_current_membership
 
 def get_user_permissions(db: Session, user_id: uuid.UUID, organization_id: uuid.UUID) -> set[Permission]:
     """Retorna o conjunto de permissoes do usuario na organizacao."""
-    # Busca o membership do usuario na organizacao
     member_statement = select(OrganizationMember).where(
         OrganizationMember.user_id == user_id,
         OrganizationMember.organization_id == organization_id,
@@ -121,7 +78,6 @@ def get_user_permissions(db: Session, user_id: uuid.UUID, organization_id: uuid.
     if not member:
         return set()
 
-    # Busca as permissoes da role do membro
     permissions_statement = select(RolePermission).where(RolePermission.role_id == member.role_id)
     role_permissions = db.exec(permissions_statement).all()
 
@@ -158,7 +114,3 @@ def require_permission(required_permission: Permission):
         return current_user
 
     return permission_checker
-
-def get_organization_by_id(db: Session, organization_id: uuid.UUID) -> Organization | None:
-    """Retorna a organizacao pelo ID."""
-    return db.get(Organization, organization_id)

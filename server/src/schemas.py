@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import List
 
 from langchain_core.messages import HumanMessage
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import BaseModel, ConfigDict
 
 
 def to_camel(string: str) -> str:
@@ -51,91 +51,10 @@ class RunRequest(CamelCaseModel):
     config: RunConfig
 
 
-# =============================================================================
-# Auth Schemas
-# =============================================================================
-
-
-class RegisterRequest(CamelCaseModel):
-    email: EmailStr
-    name: str
-    password: str
-
-
-class LoginRequest(CamelCaseModel):
-    email: EmailStr
-    password: str
-
-
-class TokenResponse(CamelCaseModel):
-    access_token: str
-    token_type: str = "bearer"
-
-
-class UserResponse(CamelCaseModel):
-    id: uuid.UUID
-    email: str
-    name: str
-    created_at: datetime
-
-
-class OrganizationResponse(CamelCaseModel):
-    id: uuid.UUID
-    name: str
-    slug: str
-    created_at: datetime
-
-
 class RoleResponse(CamelCaseModel):
     id: uuid.UUID
     name: str
     description: str | None
-
-
-class MembershipRoleResponse(CamelCaseModel):
-    """Role com permissoes para uso no membership."""
-    id: uuid.UUID
-    name: str
-    description: str | None
-    scope: str
-    is_system_role: bool
-    permissions: List[str]
-
-
-class MembershipResponse(CamelCaseModel):
-    id: uuid.UUID
-    organization_id: uuid.UUID
-    organization: OrganizationResponse
-    role: MembershipRoleResponse
-    is_owner: bool
-
-
-class MeResponse(CamelCaseModel):
-    user: UserResponse
-    memberships: List[MembershipResponse]
-
-
-# =============================================================================
-# Organization Schemas
-# =============================================================================
-
-
-class CreateOrganizationRequest(CamelCaseModel):
-    name: str
-    slug: str
-
-
-class UpdateOrganizationRequest(CamelCaseModel):
-    name: str | None = None
-    slug: str | None = None
-
-
-class OrganizationDetailResponse(CamelCaseModel):
-    id: uuid.UUID
-    name: str
-    slug: str
-    created_at: datetime
-    updated_at: datetime
 
 
 # =============================================================================
@@ -175,7 +94,7 @@ class InviteResponse(CamelCaseModel):
     id: uuid.UUID
     token: str
     invite_link: str
-    organization: OrganizationResponse
+    organization: "OrganizationResponse"
     role: RoleResponse
     expires_at: datetime
     created_at: datetime
@@ -430,3 +349,9 @@ class DocumentDetailResponse(CamelCaseModel):
     download_url: str | None = None  # URL pre-assinada para download
     created_at: datetime
     updated_at: datetime
+
+
+# Resolve forward references para evitar import circular
+from src.organization.schemas import OrganizationResponse  # noqa: E402
+
+InviteResponse.model_rebuild()

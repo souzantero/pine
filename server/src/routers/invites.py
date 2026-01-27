@@ -9,6 +9,7 @@ from sqlmodel import select
 from src.auth import CurrentUser, check_permission
 from src.database import DatabaseSession
 from src.entities import Organization, OrganizationInvite, OrganizationMember, Permission, Role
+from src.organization.schemas import OrganizationResponse
 from src.schemas import (
     CreateInviteRequest,
     InviteCreatedByResponse,
@@ -18,7 +19,6 @@ from src.schemas import (
     InviteInfoRole,
     InviteListItemResponse,
     InviteResponse,
-    OrganizationResponse,
     RoleResponse,
 )
 

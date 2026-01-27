@@ -1,10 +1,8 @@
 import uuid
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import HTTPException, status
 from sqlmodel import Session, select
 
-from src.auth import CurrentMembership, CurrentUser, check_permission
-from src.database import DatabaseSession
 from src.entities import (
     Organization,
     OrganizationMember,
@@ -12,15 +10,10 @@ from src.entities import (
     Role,
     RolePermission,
     RoleScope,
-)
-from src.schemas import (
-    CreateOrganizationRequest,
-    OrganizationDetailResponse,
-    UpdateOrganizationRequest,
+    User,
 )
 
-router = APIRouter(prefix="/organizations", tags=["organizations"])
-
+from .schemas import CreateOrganizationRequest, OrganizationDetailResponse, UpdateOrganizationRequest
 
 # Permissoes padrao para role Admin
 ADMIN_PERMISSIONS = [
@@ -36,12 +29,10 @@ ADMIN_PERMISSIONS = [
     Permission.ROLES_READ,
     Permission.ROLES_MANAGE,
     Permission.ORGANIZATION_MANAGE,
-    # Collections
     Permission.COLLECTIONS_READ,
     Permission.COLLECTIONS_CREATE,
     Permission.COLLECTIONS_UPDATE,
     Permission.COLLECTIONS_DELETE,
-    # Documents
     Permission.DOCUMENTS_READ,
     Permission.DOCUMENTS_CREATE,
     Permission.DOCUMENTS_UPDATE,
@@ -54,7 +45,6 @@ MEMBER_PERMISSIONS = [
     Permission.THREADS_WRITE,
     Permission.AGENTS_READ,
     Permission.MEMBERS_READ,
-    # Collections e Documents (somente leitura)
     Permission.COLLECTIONS_READ,
     Permission.DOCUMENTS_READ,
 ]
@@ -70,9 +60,8 @@ def create_admin_role(db: Session, organization_id: uuid.UUID) -> Role:
         is_system_role=True,
     )
     db.add(role)
-    db.flush()  # Para obter o ID da role
+    db.flush()
 
-    # Adiciona todas as permissoes de admin
     for permission in ADMIN_PERMISSIONS:
         role_permission = RolePermission(
             role_id=role.id,
@@ -93,9 +82,8 @@ def create_member_role(db: Session, organization_id: uuid.UUID) -> Role:
         is_system_role=True,
     )
     db.add(role)
-    db.flush()  # Para obter o ID da role
+    db.flush()
 
-    # Adiciona permissoes de membro
     for permission in MEMBER_PERMISSIONS:
         role_permission = RolePermission(
             role_id=role.id,
@@ -106,14 +94,15 @@ def create_member_role(db: Session, organization_id: uuid.UUID) -> Role:
     return role
 
 
-@router.post("", response_model=OrganizationDetailResponse, status_code=status.HTTP_201_CREATED)
+def get_organization_by_id(db: Session, organization_id: uuid.UUID) -> Organization | None:
+    """Retorna a organizacao pelo ID."""
+    return db.get(Organization, organization_id)
+
+
 def create_organization(
-    payload: CreateOrganizationRequest,
-    current_user: CurrentUser,
-    db: DatabaseSession,
-):
+    payload: CreateOrganizationRequest, user: User, db: Session
+) -> OrganizationDetailResponse:
     """Cria uma nova organizacao e adiciona o usuario como owner."""
-    # Verifica se slug ja existe
     statement = select(Organization).where(Organization.slug == payload.slug)
     existing_org = db.exec(statement).first()
 
@@ -123,21 +112,18 @@ def create_organization(
             detail="Slug ja esta em uso",
         )
 
-    # Cria a organizacao
     organization = Organization(
         name=payload.name,
         slug=payload.slug,
     )
     db.add(organization)
-    db.flush()  # Para obter o ID
+    db.flush()
 
-    # Cria as roles padrao
     admin_role = create_admin_role(db, organization.id)
     create_member_role(db, organization.id)
 
-    # Adiciona o usuario como membro owner
     member = OrganizationMember(
-        user_id=current_user.id,
+        user_id=user.id,
         organization_id=organization.id,
         role_id=admin_role.id,
         is_owner=True,
@@ -155,14 +141,8 @@ def create_organization(
     )
 
 
-@router.get("/{organization_id}", response_model=OrganizationDetailResponse)
-def get_organization(
-    organization_id: uuid.UUID,
-    current_user: CurrentUser,
-    membership: CurrentMembership,
-    db: DatabaseSession,
-):
-    """Retorna detalhes de uma organizacao (usuario deve ser membro)."""
+def get_organization(organization_id: uuid.UUID, db: Session) -> OrganizationDetailResponse:
+    """Retorna detalhes de uma organizacao."""
     organization = db.get(Organization, organization_id)
     if not organization:
         raise HTTPException(
@@ -179,21 +159,10 @@ def get_organization(
     )
 
 
-@router.put("/{organization_id}", response_model=OrganizationDetailResponse)
 def update_organization(
-    organization_id: uuid.UUID,
-    payload: UpdateOrganizationRequest,
-    current_user: CurrentUser,
-    db: DatabaseSession,
-):
-    """Atualiza configuracoes da organizacao (requer ORGANIZATION_MANAGE)."""
-    # Verifica permissao
-    if not check_permission(db, current_user.id, organization_id, Permission.ORGANIZATION_MANAGE):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Permissao ORGANIZATION_MANAGE necessaria",
-        )
-
+    organization_id: uuid.UUID, payload: UpdateOrganizationRequest, db: Session
+) -> OrganizationDetailResponse:
+    """Atualiza configuracoes da organizacao."""
     organization = db.get(Organization, organization_id)
     if not organization:
         raise HTTPException(
@@ -201,12 +170,10 @@ def update_organization(
             detail="Organizacao nao encontrada",
         )
 
-    # Atualiza campos
     if payload.name is not None:
         organization.name = payload.name
 
     if payload.slug is not None:
-        # Verifica se novo slug ja existe
         statement = select(Organization).where(
             Organization.slug == payload.slug,
             Organization.id != organization_id,
