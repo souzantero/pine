@@ -18,12 +18,9 @@ from src.database.entities import (
     Provider,
 )
 from src.database import Database
-from src.agents.tools.common import (
-    Summary,
-    get_provider_api_key,
-    get_model,
-    summarize_webpage,
-)
+from src.agent.common import get_model
+from src.providers.service import get_provider_api_key
+from .summarize import Summary, summarize_webpage
 
 
 def get_web_fetch_config(

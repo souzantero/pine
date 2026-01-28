@@ -1,26 +1,14 @@
-"""Funcoes e classes compartilhadas entre ferramentas do agente."""
+"""Funcoes de sumarizacao de conteudo web."""
 
 import asyncio
 import logging
-import uuid
 
 from datetime import datetime
 from pydantic import BaseModel
 from langchain_core.messages import HumanMessage
 from langchain_core.language_models import BaseChatModel
-from langchain_openai import ChatOpenAI
-from sqlmodel import select
-
-from src.database.entities import (
-    OrganizationProvider,
-    ProviderType,
-    Provider,
-)
-from src.database import Database
-from src.core.env import openrouter_base_url
 
 
-# Prompt para sumarizacao de paginas web
 SUMMARIZE_WEBPAGE_PROMPT = """Voce deve resumir o conteudo bruto de uma pagina web. Seu objetivo e criar um resumo que preserve as informacoes mais importantes da pagina original.
 
 Aqui esta o conteudo bruto da pagina:
@@ -73,57 +61,6 @@ def get_today_str() -> str:
     """Retorna a data atual formatada para exibicao."""
     now = datetime.now()
     return f"{now:%a} {now:%b} {now.day}, {now:%Y}"
-
-
-def get_provider_api_key(
-    db: Database,
-    organization_id: uuid.UUID,
-    provider_type: ProviderType,
-    provider: Provider,
-) -> str | None:
-    """Busca a API key de um provider especifico na organizacao."""
-    statement = select(OrganizationProvider).where(
-        OrganizationProvider.organization_id == organization_id,
-        OrganizationProvider.type == provider_type,
-        OrganizationProvider.provider == provider,
-        OrganizationProvider.is_active == True,
-    )
-    org_provider = db.exec(statement).first()
-    return org_provider.credentials.get("apiKey", "") if org_provider else None
-
-
-def get_model(
-    provider: Provider,
-    api_key: str,
-    model: str,
-    temperature: float = 0.7,
-    max_tokens: int | None = None,
-) -> ChatOpenAI:
-    """Cria o modelo de LLM baseado no provedor.
-
-    Args:
-        provider: Provedor do modelo (OPENAI, OPENROUTER, etc)
-        api_key: API key do provedor
-        model: Nome/ID do modelo
-        temperature: Temperatura para geracao (default: 0.7)
-        max_tokens: Maximo de tokens de saida (opcional)
-
-    Returns:
-        Instancia do modelo configurado
-    """
-    kwargs = {
-        "model": model,
-        "temperature": temperature,
-        "openai_api_key": api_key,
-    }
-
-    if max_tokens:
-        kwargs["max_tokens"] = max_tokens
-
-    if provider == Provider.OPENROUTER:
-        kwargs["openai_api_base"] = openrouter_base_url
-
-    return ChatOpenAI(**kwargs)
 
 
 async def summarize_webpage(model: BaseChatModel, webpage_content: str) -> str:

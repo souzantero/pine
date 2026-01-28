@@ -5,7 +5,7 @@ from typing import Annotated, Any, Dict, List
 from fastapi import APIRouter, HTTPException, Query, status
 from fastapi.responses import StreamingResponse
 
-from src.agents.tools import get_tool_display_name
+from src.agent.common import get_tool_display_name
 from src.auth import CurrentMembershipDependency, CurrentUserDependency, check_permission
 from src.database import DatabaseDependency
 from src.database.entities import Permission

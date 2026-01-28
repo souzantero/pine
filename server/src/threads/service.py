@@ -5,7 +5,7 @@ from typing import List
 from fastapi import HTTPException, status
 from sqlmodel import Session, col, select
 
-from src.agents.agent import AgentContext, build_agent
+from src.agent import AgentContext, build_agent
 from src.database import get_checkpointer
 from src.database.entities import Organization, OrganizationProvider, Provider, ProviderType, Thread
 from .helpers import agent_messages_to_list, get_config

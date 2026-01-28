@@ -16,6 +16,23 @@ PROVIDERS_BY_TYPE = {
 }
 
 
+def get_provider_api_key(
+    db: Session,
+    organization_id: uuid.UUID,
+    provider_type: ProviderType,
+    provider: Provider,
+) -> str | None:
+    """Busca a API key de um provider especifico na organizacao."""
+    statement = select(OrganizationProvider).where(
+        OrganizationProvider.organization_id == organization_id,
+        OrganizationProvider.type == provider_type,
+        OrganizationProvider.provider == provider,
+        OrganizationProvider.is_active == True,
+    )
+    org_provider = db.exec(statement).first()
+    return org_provider.credentials.get("apiKey", "") if org_provider else None
+
+
 def validate_provider_type(type_str: str) -> ProviderType:
     """Valida e converte string para ProviderType enum."""
     try:

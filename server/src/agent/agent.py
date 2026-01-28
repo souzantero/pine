@@ -8,9 +8,8 @@ from langgraph.checkpoint.postgres.base import BaseCheckpointSaver
 from src.database import Database
 from src.database.entities import Provider
 from src.threads.schemas import RunConfig
-from src.agents.tools.common import get_model
-from src.agents.tools.web_search import create_web_search_tool
-from src.agents.tools.web_fetch import create_web_fetch_tool
+from .common import get_model
+from src.web import create_web_search_tool, create_web_fetch_tool
 
 
 SYSTEM_PROMPT_TEMPLATE = """Você é um assistente de inteligência artificial prestativo, criativo e honesto.
