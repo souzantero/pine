@@ -85,13 +85,53 @@ The app implements role-based access control with organization scoping:
 - `components/prompts/` - Prompt management components
 - `components/ui/` - shadcn/ui primitives
 
-**Backend:**
-- `server/src/api.py` - FastAPI app with CORS configuration
-- `server/src/routers/` - API route handlers (auth, threads, prompts, members, etc.)
-- `server/src/schemas.py` - Pydantic models with camelCase serialization
-- `server/src/entities.py` - SQLModel ORM entities
-- `server/src/agents/agent.py` - AI agent with LangGraph
-- `server/src/agents/tools/` - Agent tools (web_search, web_fetch)
+**Backend (modular architecture):**
+
+```
+server/src/
+├── api.py                 # FastAPI app, CORS, router registration
+├── core/                  # Shared foundation
+│   ├── env.py             # Environment variables
+│   ├── schemas.py         # CamelCaseModel base class
+│   ├── storage.py         # S3 service
+│   └── embedding.py       # Embedding service
+├── database/              # Database layer
+│   ├── connection.py      # Engine, session, checkpointer
+│   ├── entities.py        # SQLModel ORM entities
+│   └── dependencies.py    # DatabaseDependency
+├── auth/                  # Authentication module
+│   ├── router.py          # /auth/* endpoints
+│   ├── service.py         # Auth business logic, JWT
+│   ├── schemas.py         # Auth request/response models
+│   └── dependencies.py    # CurrentUserDependency, CurrentMembershipDependency
+├── organization/          # Organization module
+│   ├── router.py          # /organizations/* endpoints
+│   ├── service.py         # Org CRUD logic
+│   ├── schemas.py         # Org models
+│   ├── members/           # Submodule: member management
+│   └── invites/           # Submodule: invite management
+├── roles/                 # Role management module
+├── threads/               # Chat threads module
+│   ├── router.py          # Thread CRUD + SSE streaming
+│   ├── service.py         # Thread logic
+│   ├── schemas.py         # Thread + RunRequest models
+│   └── helpers.py         # Message formatting utilities
+├── providers/             # LLM/API provider configuration
+├── models/                # Available AI models
+├── configs/               # Tool configurations
+├── knowledge/             # Document collections + RAG
+│   ├── router.py          # Collections + documents endpoints
+│   ├── service.py         # Upload, processing logic
+│   └── document_processor.py
+├── agent/                 # AI agent core
+│   ├── agent.py           # build_agent, AgentContext
+│   └── common.py          # get_model, tool display names
+└── web/                   # Web tools module
+    ├── search.py          # Web search tool (Tavily)
+    ├── fetch.py           # Web fetch tool (Tavily)
+    └── summarize.py       # Content summarization
+```
+
 - `server/db/` - Alembic migrations
 
 ### API Structure

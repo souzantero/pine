@@ -70,13 +70,22 @@ pineai/
 │   └── ui/                 # shadcn/ui primitives
 ├── lib/                    # Utilitarios frontend
 │   ├── api.ts              # Cliente HTTP para backend
-│   └── auth.tsx            # Context de autenticacao
-├── server/                 # Backend Python
+│   └── session.tsx         # Context de sessao/autenticacao
+├── server/                 # Backend Python (arquitetura modular)
 │   ├── src/
 │   │   ├── api.py          # FastAPI app
-│   │   ├── models.py       # SQLAlchemy models
-│   │   ├── schemas.py      # Pydantic schemas
-│   │   └── routers/        # API routes
+│   │   ├── core/           # Base compartilhada (env, schemas, storage, embedding)
+│   │   ├── database/       # Conexao, entities, dependencies
+│   │   ├── auth/           # Autenticacao, JWT, dependencies
+│   │   ├── organization/   # Organizacoes, members, invites
+│   │   ├── roles/          # Gestao de roles
+│   │   ├── threads/        # Threads de chat, streaming SSE
+│   │   ├── providers/      # Configuracao de provedores LLM
+│   │   ├── models/         # Modelos de IA disponiveis
+│   │   ├── configs/        # Configuracoes de ferramentas
+│   │   ├── knowledge/      # Collections e documentos (RAG)
+│   │   ├── agent/          # Agente de IA (LangGraph)
+│   │   └── web/            # Ferramentas web (search, fetch)
 │   └── db/                 # Alembic migrations
 └── public/                 # Assets estaticos
 ```
