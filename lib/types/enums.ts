@@ -117,15 +117,15 @@ export interface ToolInfo {
 // Constante com lista de ferramentas disponíveis
 export const TOOLS: ToolInfo[] = [
   {
-    key: "WEB_SEARCH",
-    label: "Busca na Web",
-    description: "Permite ao agente buscar informações na internet",
-    providers: ["TAVILY"],
-  },
-  {
     key: "WEB_FETCH",
     label: "Leitura de URLs",
     description: "Permite ao agente ler e extrair conteúdo de links compartilhados",
+    providers: ["TAVILY"],
+  },
+  {
+    key: "WEB_SEARCH",
+    label: "Busca na Web",
+    description: "Permite ao agente buscar informações na internet",
     providers: ["TAVILY"],
   },
 ];

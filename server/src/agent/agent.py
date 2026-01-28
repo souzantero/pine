@@ -81,16 +81,23 @@ def build_agent(
         model=config.model,
     )
 
+    # Lista de ferramentas habilitadas pelo usuario (None = todas habilitadas)
+    enabled_tools = config.enabled_tools
+
     # Cria ferramentas disponiveis para o agente
     tools = []
 
-    web_search_tool = create_web_search_tool(db, organization_id)
-    if web_search_tool:
-        tools.append(web_search_tool)
+    # Web Search: criar apenas se habilitada pelo usuario (ou se enabled_tools for None)
+    if enabled_tools is None or "WEB_SEARCH" in enabled_tools:
+        web_search_tool = create_web_search_tool(db, organization_id)
+        if web_search_tool:
+            tools.append(web_search_tool)
 
-    web_fetch_tool = create_web_fetch_tool(db, organization_id)
-    if web_fetch_tool:
-        tools.append(web_fetch_tool)
+    # Web Fetch: criar apenas se habilitada pelo usuario (ou se enabled_tools for None)
+    if enabled_tools is None or "WEB_FETCH" in enabled_tools:
+        web_fetch_tool = create_web_fetch_tool(db, organization_id)
+        if web_fetch_tool:
+            tools.append(web_fetch_tool)
 
     return create_agent(
         model=model,

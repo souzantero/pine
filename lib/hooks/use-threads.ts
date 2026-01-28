@@ -12,6 +12,7 @@ import type {
   ApiThread,
   AgentMessage,
 } from "@/lib/types";
+import { ALL_TOOLS } from "@/lib/types";
 
 interface UseThreadsReturn {
   threads: ThreadWithMessages[];
@@ -33,12 +34,18 @@ interface UseThreadsReturn {
 const DEFAULT_CONFIG: ChatConfig = {
   provider: null,
   model: "",
+  enabledTools: [...ALL_TOOLS],
 };
 
 // Obter config: primeiro tenta do storage da thread, senao usa default
+// Faz migracao de configs antigas que nao tem enabledTools
 function getStoredOrDefaultConfig(threadId: string): ChatConfig {
   const storedConfig = getThreadConfig<ChatConfig>(threadId);
   if (storedConfig) {
+    // Migracao: se config antiga nao tem enabledTools, adiciona default
+    if (!storedConfig.enabledTools) {
+      return { ...storedConfig, enabledTools: [...ALL_TOOLS] };
+    }
     return storedConfig;
   }
   return { ...DEFAULT_CONFIG };

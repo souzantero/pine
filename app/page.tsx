@@ -7,7 +7,7 @@ import { useThreads, useModels } from "@/lib/hooks";
 import { Header, Sidebar, MobileSidebar, MobileThreadsDrawer } from "@/components/layout";
 import { ChatArea, ChatSettings, MobileChatSettings } from "@/components/chat";
 import { streamRun } from "@/lib/api";
-import type { Message } from "@/lib/types";
+import type { Message, ToolKey } from "@/lib/types";
 
 export default function Home() {
   const router = useRouter();
@@ -107,6 +107,18 @@ export default function Home() {
     [loadModelsForProvider, selectedId, updateConfigMultiple]
   );
 
+  const handleToolToggle = useCallback(
+    (tool: ToolKey, enabled: boolean) => {
+      if (!selectedThread) return;
+      const currentTools = selectedThread.config.enabledTools;
+      const newTools = enabled
+        ? [...currentTools, tool]
+        : currentTools.filter((t) => t !== tool);
+      updateConfig(selectedId!, "enabledTools", newTools);
+    },
+    [selectedThread, selectedId, updateConfig]
+  );
+
   const streamRunForThread = useCallback(
     async (threadId: string, messageContent: string) => {
       const thread = threads.find((t) => t.id === threadId);
@@ -135,6 +147,7 @@ export default function Home() {
         config: {
           provider: config.provider,
           model: config.model,
+          enabledTools: config.enabledTools,
         },
       };
 
@@ -285,6 +298,7 @@ export default function Home() {
               availableModels={availableModels}
               configuredProviders={configuredProviders}
               onProviderChange={handleProviderChange}
+              onToolToggle={handleToolToggle}
               expanded={settingsExpanded}
               onExpandedChange={setSettingsExpanded}
             />
@@ -300,6 +314,7 @@ export default function Home() {
           availableModels={availableModels}
           configuredProviders={configuredProviders}
           onProviderChange={handleProviderChange}
+          onToolToggle={handleToolToggle}
           open={mobileSettingsOpen}
           onOpenChange={setMobileSettingsOpen}
         />

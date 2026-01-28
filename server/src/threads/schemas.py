@@ -28,6 +28,7 @@ class RunConfig(CamelCaseModel):
 
     provider: str  # OPENAI, OPENROUTER
     model: str
+    enabled_tools: List[str] | None = None  # Lista de ferramentas habilitadas pelo usuario
 
 
 class RunRequest(CamelCaseModel):

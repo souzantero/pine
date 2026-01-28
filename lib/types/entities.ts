@@ -122,9 +122,15 @@ export interface Message {
 // Chat Config
 // ============================================
 
+// Ferramentas que podem ser habilitadas/desabilitadas pelo usuário
+export type ToolKey = "WEB_FETCH" | "WEB_SEARCH";
+
+export const ALL_TOOLS: ToolKey[] = ["WEB_FETCH", "WEB_SEARCH"];
+
 export interface ChatConfig {
   provider: string | null;
   model: string;
+  enabledTools: ToolKey[];
 }
 
 export interface ThreadWithMessages extends Thread {

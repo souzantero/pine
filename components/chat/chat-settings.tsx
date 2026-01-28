@@ -1,6 +1,6 @@
 "use client";
 
-import { Settings, PanelRightClose, PanelRight } from "lucide-react";
+import { Settings, PanelRightClose, PanelRight, Globe, Link } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,7 +17,8 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import type { ChatConfig, ModelOption } from "@/lib/types";
+import { Switch } from "@/components/ui/switch";
+import type { ChatConfig, ModelOption, ToolKey } from "@/lib/types";
 
 // Mapeamento de nomes de provedores para labels amigaveis
 const PROVIDER_LABELS: Record<string, string> = {
@@ -33,6 +34,7 @@ interface SettingsContentProps {
   availableModels: ModelOption[];
   configuredProviders: string[];
   onProviderChange: (provider: string) => void;
+  onToolToggle: (tool: ToolKey, enabled: boolean) => void;
 }
 
 // Componente para renderizar campo de provedor
@@ -109,6 +111,65 @@ function ModelField({
   );
 }
 
+// Informacoes das ferramentas para exibicao
+const TOOL_INFO: Record<ToolKey, { label: string; description: string; icon: typeof Globe }> = {
+  WEB_SEARCH: {
+    label: "Busca na Web",
+    description: "Buscar informações na internet",
+    icon: Globe,
+  },
+  WEB_FETCH: {
+    label: "Leitura de URLs",
+    description: "Ler conteúdo de links",
+    icon: Link,
+  },
+};
+
+// Componente para renderizar toggles de ferramentas
+function ToolsField({
+  enabledTools,
+  onToggle,
+}: {
+  enabledTools: ToolKey[];
+  onToggle: (tool: ToolKey, enabled: boolean) => void;
+}) {
+  const tools: ToolKey[] = ["WEB_FETCH", "WEB_SEARCH"];
+
+  return (
+    <div className="space-y-3">
+      <label className="text-sm font-medium">Ferramentas</label>
+      <div className="space-y-3">
+        {tools.map((tool) => {
+          const info = TOOL_INFO[tool];
+          const Icon = info.icon;
+          const isEnabled = enabledTools.includes(tool);
+
+          return (
+            <div
+              key={tool}
+              className="flex items-center justify-between gap-3 py-1"
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <Icon className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-sm font-medium truncate">{info.label}</p>
+                  <p className="text-xs text-muted-foreground truncate">
+                    {info.description}
+                  </p>
+                </div>
+              </div>
+              <Switch
+                checked={isEnabled}
+                onCheckedChange={(checked) => onToggle(tool, checked)}
+              />
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 // Conteúdo compartilhado das configurações
 function SettingsContent({
   config,
@@ -116,6 +177,7 @@ function SettingsContent({
   availableModels,
   configuredProviders,
   onProviderChange,
+  onToolToggle,
 }: SettingsContentProps) {
   return (
     <div className="p-4 space-y-4">
@@ -129,6 +191,13 @@ function SettingsContent({
         value={config.model}
         onChange={(value) => onConfigChange("model", value)}
         availableModels={availableModels}
+      />
+
+      <Separator />
+
+      <ToolsField
+        enabledTools={config.enabledTools}
+        onToggle={onToolToggle}
       />
     </div>
   );
@@ -146,6 +215,7 @@ export function ChatSettings({
   availableModels,
   configuredProviders,
   onProviderChange,
+  onToolToggle,
   expanded,
   onExpandedChange,
 }: ChatSettingsProps) {
@@ -185,6 +255,7 @@ export function ChatSettings({
             availableModels={availableModels}
             configuredProviders={configuredProviders}
             onProviderChange={onProviderChange}
+            onToolToggle={onToolToggle}
           />
         </div>
       )}
@@ -217,6 +288,7 @@ export function MobileChatSettings({
   availableModels,
   configuredProviders,
   onProviderChange,
+  onToolToggle,
   open,
   onOpenChange,
 }: MobileChatSettingsProps) {
@@ -235,6 +307,7 @@ export function MobileChatSettings({
           availableModels={availableModels}
           configuredProviders={configuredProviders}
           onProviderChange={onProviderChange}
+          onToolToggle={onToolToggle}
         />
       </SheetContent>
     </Sheet>
