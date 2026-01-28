@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status
 
-from src.database import DatabaseSession
+from src.core.database import DatabaseSession
 
 from .dependencies import CurrentUser
 from .schemas import MeResponse, TokenResponse, LoginRequest, RegisterRequest

@@ -1,14 +1,11 @@
 import uuid
 
-from fastapi import APIRouter, HTTPException, Query, status
-from sqlmodel import select
+from fastapi import HTTPException, status
+from sqlmodel import Session, select
 
-from src.auth import CurrentMembership, CurrentUser
-from src.database import DatabaseSession
-from src.entities import Organization, OrganizationProvider, Provider, ProviderType
-from src.schemas import ModelInfo, ModelsResponse
+from src.core.entities import Organization, OrganizationProvider, Provider, ProviderType
 
-router = APIRouter(prefix="/organizations/{organization_id}/models", tags=["models"])
+from .schemas import ModelInfo, ModelsResponse
 
 # Definicao dos modelos disponiveis por provedor (apenas provedores LLM)
 MODELS_BY_PROVIDER: dict[Provider, list[ModelInfo]] = {
@@ -55,16 +52,10 @@ MODELS_BY_PROVIDER: dict[Provider, list[ModelInfo]] = {
 }
 
 
-@router.get("", response_model=ModelsResponse)
 def get_available_models(
-    organization_id: uuid.UUID,
-    current_user: CurrentUser,
-    membership: CurrentMembership,
-    db: DatabaseSession,
-    provider: str | None = Query(default=None, description="Provedor especifico para buscar modelos"),
-):
+    organization_id: uuid.UUID, db: Session, provider_filter: str | None = None
+) -> ModelsResponse:
     """Retorna modelos disponiveis baseado no provedor da organizacao."""
-    # Busca organizacao com provedores
     organization = db.get(Organization, organization_id)
     if not organization:
         raise HTTPException(
@@ -72,7 +63,6 @@ def get_available_models(
             detail="Organizacao nao encontrada",
         )
 
-    # Busca provedores LLM ativos
     statement = (
         select(OrganizationProvider)
         .where(
@@ -85,24 +75,19 @@ def get_available_models(
     active_providers = db.exec(statement).all()
     configured_providers = [p.provider for p in active_providers]
 
-    # Determina qual provedor usar
     active_provider: Provider | None = None
-    requested_provider: Provider | None = None
 
-    # Tenta usar o provedor solicitado
-    if provider:
+    if provider_filter:
         try:
-            requested_provider = Provider(provider)
+            requested_provider = Provider(provider_filter)
             if requested_provider in configured_providers:
                 active_provider = requested_provider
         except ValueError:
             pass
 
-    # Se nao especificou ou nao esta configurado, usa o primeiro disponivel
     if not active_provider and configured_providers:
         active_provider = configured_providers[0]
 
-    # Busca modelos do provedor ativo
     models = MODELS_BY_PROVIDER.get(active_provider, []) if active_provider else []
 
     return ModelsResponse(

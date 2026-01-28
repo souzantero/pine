@@ -4,8 +4,8 @@ from typing import List
 from fastapi import APIRouter, HTTPException, status
 
 from src.auth import CurrentUser, check_permission
-from src.database import DatabaseSession
-from src.entities import Permission
+from src.core.database import DatabaseSession
+from src.core.entities import Permission
 
 from .schemas import CreateRoleRequest, RoleDetailResponse, UpdateRoleRequest
 from .service import (

@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from src.schemas import CamelCaseModel
+from src.core.schemas import CamelCaseModel
 
 
 class OrganizationResponse(CamelCaseModel):

@@ -4,7 +4,7 @@ import bcrypt
 import jwt
 from fastapi.security import HTTPBearer
 
-from src.env import jwt_algorithm, jwt_expiration_hours, jwt_secret
+from src.core.env import jwt_algorithm, jwt_expiration_hours, jwt_secret
 
 # Bearer token scheme
 bearer_scheme = HTTPBearer()

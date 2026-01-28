@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 
 from src.roles.schemas import RoleResponse
-from src.schemas import CamelCaseModel
+from src.core.schemas import CamelCaseModel
 
 
 class MemberUserResponse(CamelCaseModel):

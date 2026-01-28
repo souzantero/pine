@@ -5,7 +5,7 @@ import uuid
 
 from sqlmodel import Session, select
 
-from src.entities import (
+from src.core.entities import (
     Document,
     DocumentChunk,
     DocumentStatus,
@@ -16,8 +16,8 @@ from src.entities import (
     ConfigType,
     ConfigKey,
 )
-from src.services.storage import S3Service
-from src.services.embedding import EmbeddingService
+from src.core.storage import S3Service
+from src.core.embedding import EmbeddingService
 
 logger = logging.getLogger(__name__)
 

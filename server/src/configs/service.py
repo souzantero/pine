@@ -1,20 +1,11 @@
 import uuid
 
-from fastapi import APIRouter, HTTPException, status
-from sqlmodel import select
+from fastapi import HTTPException, status
+from sqlmodel import Session, select
 
-from src.auth import CurrentUser, check_permission
-from src.database import DatabaseSession
-from src.entities import OrganizationConfig, Permission, Provider, ProviderType, ConfigType, ConfigKey, OrganizationProvider
-from src.schemas import (
-    CreateOrgConfigRequest,
-    UpdateOrgConfigRequest,
-    OrgConfigResponse,
-    OrgConfigsListResponse,
-)
+from src.core.entities import ConfigKey, ConfigType, OrganizationConfig, OrganizationProvider, Provider, ProviderType
 
-router = APIRouter(prefix="/organizations/{organization_id}/configs", tags=["configs"])
-
+from .schemas import OrgConfigResponse, OrgConfigsListResponse
 
 # Mapeamento de provedores por key de ferramenta
 PROVIDERS_BY_TOOL_KEY = {
@@ -92,7 +83,9 @@ def validate_llm_provider(provider_str: str | None) -> Provider | None:
     return provider
 
 
-def check_provider_configured(db: DatabaseSession, organization_id: uuid.UUID, provider: Provider, provider_type: ProviderType) -> None:
+def check_provider_configured(
+    db: Session, organization_id: uuid.UUID, provider: Provider, provider_type: ProviderType
+) -> None:
     """Verifica se o provedor esta configurado na organizacao."""
     statement = select(OrganizationProvider).where(
         OrganizationProvider.organization_id == organization_id,
@@ -107,15 +100,13 @@ def check_provider_configured(db: DatabaseSession, organization_id: uuid.UUID, p
         )
 
 
-def validate_tool_config(db: DatabaseSession, organization_id: uuid.UUID, key: ConfigKey, config: dict) -> None:
+def validate_tool_config(db: Session, organization_id: uuid.UUID, key: ConfigKey, config: dict) -> None:
     """Valida configuracao de ferramenta."""
-    # Valida provider da ferramenta
     provider_str = config.get("provider")
     if provider_str:
         provider = validate_tool_provider(provider_str, key)
         check_provider_configured(db, organization_id, provider, ProviderType.WEB_SEARCH)
 
-    # Valida provider de sumarizacao
     summarization_provider_str = config.get("summarizationProvider")
     if summarization_provider_str:
         summarization_provider = validate_llm_provider(summarization_provider_str)
@@ -123,13 +114,15 @@ def validate_tool_config(db: DatabaseSession, organization_id: uuid.UUID, key: C
             check_provider_configured(db, organization_id, summarization_provider, ProviderType.LLM)
 
 
-def validate_config(db: DatabaseSession, organization_id: uuid.UUID, config_type: ConfigType, key: ConfigKey, config: dict) -> None:
+def validate_config(
+    db: Session, organization_id: uuid.UUID, config_type: ConfigType, key: ConfigKey, config: dict
+) -> None:
     """Valida configuracao baseado no tipo."""
     if config_type == ConfigType.TOOL:
         validate_tool_config(db, organization_id, key, config)
 
 
-def to_response(config: OrganizationConfig) -> OrgConfigResponse:
+def _to_response(config: OrganizationConfig) -> OrgConfigResponse:
     """Converte entidade para response."""
     return OrgConfigResponse(
         id=config.id,
@@ -142,50 +135,28 @@ def to_response(config: OrganizationConfig) -> OrgConfigResponse:
     )
 
 
-@router.get("", response_model=OrgConfigsListResponse)
 def list_configs(
-    organization_id: uuid.UUID,
-    current_user: CurrentUser,
-    db: DatabaseSession,
-    type: str | None = None,
-):
-    """Lista configuracoes da organizacao (requer ORGANIZATION_MANAGE)."""
-    if not check_permission(db, current_user.id, organization_id, Permission.ORGANIZATION_MANAGE):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Permissao ORGANIZATION_MANAGE necessaria",
-        )
-
+    organization_id: uuid.UUID, db: Session, type_filter: str | None = None
+) -> OrgConfigsListResponse:
+    """Lista configuracoes da organizacao."""
     statement = select(OrganizationConfig).where(OrganizationConfig.organization_id == organization_id)
 
-    # Filtra por tipo se especificado
-    if type:
-        config_type = validate_config_type(type)
+    if type_filter:
+        config_type = validate_config_type(type_filter)
         statement = statement.where(OrganizationConfig.type == config_type)
 
     statement = statement.order_by(OrganizationConfig.type, OrganizationConfig.key)
     configs = db.exec(statement).all()
 
-    return OrgConfigsListResponse(configs=[to_response(c) for c in configs])
+    return OrgConfigsListResponse(configs=[_to_response(c) for c in configs])
 
 
-@router.get("/{type}/{key}", response_model=OrgConfigResponse)
 def get_config(
-    organization_id: uuid.UUID,
-    type: str,
-    key: str,
-    current_user: CurrentUser,
-    db: DatabaseSession,
-):
-    """Retorna configuracao especifica (requer ORGANIZATION_MANAGE)."""
-    if not check_permission(db, current_user.id, organization_id, Permission.ORGANIZATION_MANAGE):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Permissao ORGANIZATION_MANAGE necessaria",
-        )
-
-    config_type = validate_config_type(type)
-    config_key = validate_config_key(key)
+    organization_id: uuid.UUID, type_str: str, key_str: str, db: Session
+) -> OrgConfigResponse:
+    """Retorna configuracao especifica."""
+    config_type = validate_config_type(type_str)
+    config_key = validate_config_key(key_str)
 
     statement = select(OrganizationConfig).where(
         OrganizationConfig.organization_id == organization_id,
@@ -197,33 +168,22 @@ def get_config(
     if not config:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Configuracao {type}/{key} nao encontrada",
+            detail=f"Configuracao {type_str}/{key_str} nao encontrada",
         )
 
-    return to_response(config)
+    return _to_response(config)
 
 
-@router.post("", response_model=OrgConfigResponse, status_code=status.HTTP_201_CREATED)
 def create_config(
-    organization_id: uuid.UUID,
-    payload: CreateOrgConfigRequest,
-    current_user: CurrentUser,
-    db: DatabaseSession,
-):
-    """Cria configuracao (requer ORGANIZATION_MANAGE)."""
-    if not check_permission(db, current_user.id, organization_id, Permission.ORGANIZATION_MANAGE):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Permissao ORGANIZATION_MANAGE necessaria",
-        )
+    organization_id: uuid.UUID, type_str: str, key_str: str,
+    is_enabled: bool, config_data: dict, db: Session
+) -> OrgConfigResponse:
+    """Cria configuracao."""
+    config_type = validate_config_type(type_str)
+    config_key = validate_config_key(key_str)
 
-    config_type = validate_config_type(payload.type)
-    config_key = validate_config_key(payload.key)
+    validate_config(db, organization_id, config_type, config_key, config_data)
 
-    # Valida configuracao especifica
-    validate_config(db, organization_id, config_type, config_key, payload.config)
-
-    # Verifica se ja existe
     statement = select(OrganizationConfig).where(
         OrganizationConfig.organization_id == organization_id,
         OrganizationConfig.type == config_type,
@@ -239,34 +199,23 @@ def create_config(
         organization_id=organization_id,
         type=config_type,
         key=config_key,
-        is_enabled=payload.is_enabled,
-        config=payload.config,
+        is_enabled=is_enabled,
+        config=config_data,
     )
     db.add(config)
     db.commit()
     db.refresh(config)
 
-    return to_response(config)
+    return _to_response(config)
 
 
-@router.put("/{type}/{key}", response_model=OrgConfigResponse)
 def update_config(
-    organization_id: uuid.UUID,
-    type: str,
-    key: str,
-    payload: UpdateOrgConfigRequest,
-    current_user: CurrentUser,
-    db: DatabaseSession,
-):
-    """Atualiza configuracao (requer ORGANIZATION_MANAGE)."""
-    if not check_permission(db, current_user.id, organization_id, Permission.ORGANIZATION_MANAGE):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Permissao ORGANIZATION_MANAGE necessaria",
-        )
-
-    config_type = validate_config_type(type)
-    config_key = validate_config_key(key)
+    organization_id: uuid.UUID, type_str: str, key_str: str,
+    is_enabled: bool | None, config_data: dict | None, db: Session
+) -> OrgConfigResponse:
+    """Atualiza configuracao."""
+    config_type = validate_config_type(type_str)
+    config_key = validate_config_key(key_str)
 
     statement = select(OrganizationConfig).where(
         OrganizationConfig.organization_id == organization_id,
@@ -278,41 +227,27 @@ def update_config(
     if not config:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Configuracao {type}/{key} nao encontrada",
+            detail=f"Configuracao {type_str}/{key_str} nao encontrada",
         )
 
-    # Valida nova configuracao se fornecida
-    if payload.config is not None:
-        validate_config(db, organization_id, config_type, config_key, payload.config)
-        config.config = payload.config
+    if config_data is not None:
+        validate_config(db, organization_id, config_type, config_key, config_data)
+        config.config = config_data
 
-    if payload.is_enabled is not None:
-        config.is_enabled = payload.is_enabled
+    if is_enabled is not None:
+        config.is_enabled = is_enabled
 
     db.add(config)
     db.commit()
     db.refresh(config)
 
-    return to_response(config)
+    return _to_response(config)
 
 
-@router.delete("/{type}/{key}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_config(
-    organization_id: uuid.UUID,
-    type: str,
-    key: str,
-    current_user: CurrentUser,
-    db: DatabaseSession,
-):
-    """Remove configuracao (requer ORGANIZATION_MANAGE)."""
-    if not check_permission(db, current_user.id, organization_id, Permission.ORGANIZATION_MANAGE):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Permissao ORGANIZATION_MANAGE necessaria",
-        )
-
-    config_type = validate_config_type(type)
-    config_key = validate_config_key(key)
+def delete_config(organization_id: uuid.UUID, type_str: str, key_str: str, db: Session) -> None:
+    """Remove configuracao."""
+    config_type = validate_config_type(type_str)
+    config_key = validate_config_key(key_str)
 
     statement = select(OrganizationConfig).where(
         OrganizationConfig.organization_id == organization_id,
@@ -324,7 +259,7 @@ def delete_config(
     if not config:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Configuracao {type}/{key} nao encontrada",
+            detail=f"Configuracao {type_str}/{key_str} nao encontrada",
         )
 
     db.delete(config)

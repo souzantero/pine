@@ -4,7 +4,7 @@ from typing import List
 
 from src.organization.schemas import OrganizationResponse
 from src.roles.schemas import RoleResponse
-from src.schemas import CamelCaseModel
+from src.core.schemas import CamelCaseModel
 
 
 class CreateInviteRequest(CamelCaseModel):

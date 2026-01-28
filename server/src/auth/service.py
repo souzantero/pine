@@ -1,7 +1,7 @@
 from fastapi import HTTPException, status
 from sqlmodel import Session, select
 
-from src.entities import OrganizationMember, RolePermission, User
+from src.core.entities import OrganizationMember, RolePermission, User
 from src.organization.schemas import OrganizationResponse
 
 from .schemas import (

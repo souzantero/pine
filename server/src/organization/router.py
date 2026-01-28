@@ -3,8 +3,8 @@ import uuid
 from fastapi import APIRouter, status
 
 from src.auth import CurrentMembership, CurrentUser, check_permission
-from src.database import DatabaseSession
-from src.entities import Permission
+from src.core.database import DatabaseSession
+from src.core.entities import Permission
 
 from .schemas import CreateOrganizationRequest, OrganizationDetailResponse, UpdateOrganizationRequest
 from .service import (

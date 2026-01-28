@@ -3,7 +3,7 @@ import uuid
 from fastapi import HTTPException, status
 from sqlmodel import Session, select
 
-from src.entities import (
+from src.core.entities import (
     Organization,
     OrganizationMember,
     Permission,

@@ -11,13 +11,13 @@ from langchain_core.language_models import BaseChatModel
 from langchain_openai import ChatOpenAI
 from sqlmodel import select
 
-from src.entities import (
+from src.core.entities import (
     OrganizationProvider,
     ProviderType,
     Provider,
 )
-from src.database import Database
-from src.env import openrouter_base_url
+from src.core.database import Database
+from src.core.env import openrouter_base_url
 
 
 # Prompt para sumarizacao de paginas web

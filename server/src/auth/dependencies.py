@@ -5,8 +5,8 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials
 from sqlmodel import Session, select
 
-from src.database import DatabaseSession
-from src.entities import OrganizationMember, Permission, RolePermission, User
+from src.core.database import DatabaseSession
+from src.core.entities import OrganizationMember, Permission, RolePermission, User
 
 from .utils import bearer_scheme, decode_token
 

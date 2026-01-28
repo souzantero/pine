@@ -4,7 +4,7 @@ from langchain_core.messages import (
     AIMessageChunk,
 )
 
-from src.schemas import AgentMessageResponse
+from .schemas import AgentMessageResponse
 
 
 def get_config(thread_id: str):

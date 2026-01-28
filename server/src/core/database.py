@@ -5,7 +5,7 @@ from fastapi import Depends
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from sqlmodel import Session, create_engine
 
-from src.env import database_url, checkpoint_saver_url
+from src.core.env import database_url, checkpoint_saver_url
 
 engine = create_engine(database_url)
 

@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import List
 
-from src.schemas import CamelCaseModel
+from src.core.schemas import CamelCaseModel
 
 
 class RoleResponse(CamelCaseModel):

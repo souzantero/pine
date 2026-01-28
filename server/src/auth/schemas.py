@@ -4,7 +4,7 @@ from typing import List
 
 from pydantic import EmailStr
 
-from src.schemas import CamelCaseModel
+from src.core.schemas import CamelCaseModel
 
 
 # =============================================================================
