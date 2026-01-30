@@ -7,7 +7,7 @@ from sqlalchemy import pool
 from alembic import context
 from dotenv import load_dotenv
 
-import src.entities  # noqa: F401
+import src.database.entities  # noqa: F401
 
 load_dotenv()
 

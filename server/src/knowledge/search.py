@@ -16,7 +16,7 @@ from src.database.entities import (
     DocumentStatus,
 )
 from src.database import Database
-from src.core.embedding import get_embeddings_client
+from .config import get_embedding_service
 
 logger = logging.getLogger(__name__)
 
@@ -31,9 +31,9 @@ def create_knowledge_search_tool(db: Database, organization_id: uuid.UUID):
     Returns:
         Ferramenta de busca configurada ou None se nao houver configuracao
     """
-    # Usa a factory para obter o cliente de embeddings
-    embeddings = get_embeddings_client(db, organization_id)
-    if not embeddings:
+    # Usa a factory para obter o servico de embeddings
+    embedding_service = get_embedding_service(db, organization_id)
+    if not embedding_service:
         logger.warning(f"Embeddings nao configurado para organizacao {organization_id}")
         return None
 
@@ -75,12 +75,12 @@ def create_knowledge_search_tool(db: Database, organization_id: uuid.UUID):
         """
         try:
             # Gera embedding da query
-            query_embedding = embeddings.embed_query(query)
+            query_embedding = embedding_service.embed_single(query)
 
             # Busca chunks similares usando pgvector
             # Usa SQL raw para aproveitar o operador <=> (cosine distance)
             # Nota: usamos \: para escapar o :: do cast PostgreSQL
-            sql = text("""
+            sql = text(r"""
                 SELECT
                     dc.content,
                     dc.chunk_index,

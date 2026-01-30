@@ -3,7 +3,8 @@ from datetime import UTC, datetime
 from enum import Enum
 
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import JSON, Column, UniqueConstraint
+from sqlalchemy import JSON, Column, Computed, Text, UniqueConstraint
+from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlmodel import Field, Relationship, SQLModel
 
 
@@ -326,6 +327,7 @@ class Document(SQLModel, table=True):
     mime_type: str
     status: DocumentStatus = Field(default=DocumentStatus.PENDING)
     error_message: str | None = None
+    content: str | None = Field(default=None, sa_type=Text)  # Texto extraido do documento
     chunk_count: int = Field(default=0)
     created_at: datetime = Field(default_factory=get_now)
     updated_at: datetime = Field(default_factory=get_now, sa_column_kwargs={"onupdate": get_now})
@@ -347,6 +349,13 @@ class DocumentChunk(SQLModel, table=True):
     document_id: uuid.UUID = Field(foreign_key="documents.id", index=True)
     content: str
     embedding: list[float] = Field(sa_column=Column(Vector(1536)))  # OpenAI ada-002 dimension
+    keywords: str | None = Field(
+        default=None,
+        sa_column=Column(
+            TSVECTOR,
+            Computed("to_tsvector('portuguese', coalesce(content, ''))", persisted=True),
+        ),
+    )  # tsvector para busca full-text
     chunk_index: int
     chunk_metadata: dict = Field(default_factory=dict, sa_type=JSON)  # Metadados do chunk (pagina, etc)
     created_at: datetime = Field(default_factory=get_now)

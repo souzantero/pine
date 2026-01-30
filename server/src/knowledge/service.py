@@ -8,7 +8,8 @@ from fastapi import HTTPException, UploadFile, status
 from sqlmodel import Session, func, select
 
 from src.database.entities import Document, DocumentCollection, DocumentStatus
-from .document_processor import DocumentProcessor, DocumentProcessorError
+from .pipeline import DocumentPipeline, PipelineError
+from .config import ConfigurationError, get_storage_service
 
 from .schemas import (
     CollectionDetailResponse,
@@ -219,13 +220,13 @@ def delete_collection(organization_id: uuid.UUID, collection_id: uuid.UUID, db: 
 
     # Remove arquivos do S3 para cada documento
     try:
-        processor = DocumentProcessor(db, organization_id)
+        storage = get_storage_service(db, organization_id)
         for document in collection.documents:
             try:
-                processor.delete_document_files(document)
-            except DocumentProcessorError:
+                storage.delete(document.file_key)
+            except Exception:
                 pass
-    except DocumentProcessorError:
+    except ConfigurationError:
         pass
 
     db.delete(collection)
@@ -273,10 +274,9 @@ def get_document(
 
     download_url = None
     try:
-        processor = DocumentProcessor(db, organization_id)
-        s3 = processor._get_s3_service()
-        download_url = s3.generate_presigned_url(document.file_key, expiration=3600)
-    except DocumentProcessorError as e:
+        storage = get_storage_service(db, organization_id)
+        download_url = storage.get_download_url(document.file_key, expiration=3600)
+    except ConfigurationError as e:
         logger.warning(f"Nao foi possivel gerar URL de download: {e}")
 
     return DocumentDetailResponse(
@@ -320,17 +320,18 @@ async def upload_document(
             detail="Arquivo vazio",
         )
 
+    # Cria o pipeline (valida configuracoes)
     try:
-        processor = DocumentProcessor(db, organization_id)
-        s3 = processor._get_s3_service()
-    except DocumentProcessorError as e:
+        pipeline = DocumentPipeline.create(db, organization_id)
+    except ConfigurationError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e),
         )
 
+    # Upload do arquivo para S3
     try:
-        file_key = s3.upload_file(
+        file_key = pipeline.storage.upload(
             content=content,
             filename=file.filename or "document.pdf",
             content_type=file.content_type or "application/pdf",
@@ -343,6 +344,7 @@ async def upload_document(
             detail="Erro ao enviar arquivo para armazenamento",
         )
 
+    # Cria registro do documento
     document = Document(
         collection_id=collection_id,
         name=file.filename or "document.pdf",
@@ -355,10 +357,11 @@ async def upload_document(
     db.commit()
     db.refresh(document)
 
+    # Processa o documento (extrai texto, chunks, embeddings)
     try:
-        processor.process_document(document)
+        pipeline.process(document)
         db.refresh(document)
-    except DocumentProcessorError as e:
+    except PipelineError as e:
         logger.error(f"Erro ao processar documento: {e}")
         db.refresh(document)
 
@@ -384,9 +387,9 @@ def delete_document(
         )
 
     try:
-        processor = DocumentProcessor(db, organization_id)
-        processor.delete_document_files(document)
-    except DocumentProcessorError:
+        storage = get_storage_service(db, organization_id)
+        storage.delete(document.file_key)
+    except (ConfigurationError, Exception):
         pass
 
     db.delete(document)
