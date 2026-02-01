@@ -53,7 +53,10 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4">
+      <Link href="/" className="mb-8 text-2xl font-bold hover:opacity-80 transition-opacity">
+        PineAI
+      </Link>
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">
