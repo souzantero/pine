@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Bot, Shield, Users, Zap, ArrowRight, Database, DatabaseZap, Check, FileText, Settings } from "lucide-react";
+import { Bot, Shield, Users, Zap, ArrowRight, Database, DatabaseZap, Check, FileText, Settings, Plug, Building, Cloud, Target } from "lucide-react";
 
 export default function LandingPage() {
   return (
@@ -219,6 +219,98 @@ export default function LandingPage() {
                     </span>
                   </li>
                 </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ERP/CRM Integration Section */}
+      <section className="py-24 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <div className="max-w-5xl mx-auto">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div className="space-y-6">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">
+                  <Plug className="h-4 w-4" />
+                  Integrações
+                </div>
+                <h2 className="text-3xl md:text-4xl font-bold">
+                  Conecte seu ERP e CRM
+                  <br />
+                  ao poder da IA
+                </h2>
+                <p className="text-lg text-muted-foreground">
+                  Integre sistemas como SAP, Salesforce, HubSpot, Totvs e outros.
+                  O agente acessa dados em tempo real e executa ações diretamente
+                  nos seus sistemas de gestão.
+                </p>
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-3">
+                    <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="h-4 w-4 text-primary" />
+                    </div>
+                    <span className="text-muted-foreground">
+                      Consulta de clientes, pedidos e estoque via chat
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="h-4 w-4 text-primary" />
+                    </div>
+                    <span className="text-muted-foreground">
+                      Criação de leads, oportunidades e tickets automaticamente
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="h-4 w-4 text-primary" />
+                    </div>
+                    <span className="text-muted-foreground">
+                      Relatórios e dashboards gerados por linguagem natural
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="h-4 w-4 text-primary" />
+                    </div>
+                    <span className="text-muted-foreground">
+                      APIs seguras com controle de permissões granular
+                    </span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="relative">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-background border rounded-xl p-5 flex flex-col items-center gap-3 text-center">
+                    <div className="h-12 w-12 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                      <Building className="h-6 w-6 text-blue-600" />
+                    </div>
+                    <p className="font-medium">SAP</p>
+                  </div>
+                  <div className="bg-background border rounded-xl p-5 flex flex-col items-center gap-3 text-center">
+                    <div className="h-12 w-12 rounded-lg bg-sky-500/10 flex items-center justify-center">
+                      <Cloud className="h-6 w-6 text-sky-600" />
+                    </div>
+                    <p className="font-medium">Salesforce</p>
+                  </div>
+                  <div className="bg-background border rounded-xl p-5 flex flex-col items-center gap-3 text-center">
+                    <div className="h-12 w-12 rounded-lg bg-orange-500/10 flex items-center justify-center">
+                      <Target className="h-6 w-6 text-orange-600" />
+                    </div>
+                    <p className="font-medium">HubSpot</p>
+                  </div>
+                  <div className="bg-background border rounded-xl p-5 flex flex-col items-center gap-3 text-center">
+                    <div className="h-12 w-12 rounded-lg bg-green-500/10 flex items-center justify-center">
+                      <Building className="h-6 w-6 text-green-600" />
+                    </div>
+                    <p className="font-medium">Totvs</p>
+                  </div>
+                </div>
+                <div className="absolute -bottom-4 -right-4 bg-primary text-primary-foreground rounded-lg px-4 py-2 text-sm font-medium shadow-lg">
+                  Em breve
+                </div>
               </div>
             </div>
           </div>
