@@ -60,7 +60,7 @@ export default function CollectionsPage() {
   // Redirect se sem permissão
   useEffect(() => {
     if (!authLoading && !canRead) {
-      router.push("/");
+      router.push("/chat");
     }
   }, [authLoading, canRead, router]);
 
@@ -210,7 +210,7 @@ export default function CollectionsPage() {
               <Card
                 key={collection.id}
                 className="cursor-pointer hover:border-primary/50 transition-colors"
-                onClick={() => router.push(`/collections/${collection.id}`)}
+                onClick={() => router.push(`/chat/collections/${collection.id}`)}
               >
                 <CardHeader className="pb-2">
                   <div className="flex items-start justify-between">

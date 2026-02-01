@@ -154,7 +154,7 @@ export default function KnowledgePage() {
   // Redirect se sem permissao
   useEffect(() => {
     if (!authLoading && !canManage) {
-      router.push("/");
+      router.push("/chat");
     }
   }, [authLoading, canManage, router]);
 

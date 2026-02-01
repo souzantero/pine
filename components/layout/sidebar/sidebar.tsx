@@ -49,8 +49,8 @@ function SidebarContent({
 
   // Determinar qual seção está ativa baseado na rota
   const getActiveSection = (): NavSection => {
-    if (pathname === "/settings" || pathname === "/settings/members" || pathname.startsWith("/settings/")) return "settings";
-    if (pathname.startsWith("/collections")) return "collections";
+    if (pathname === "/chat/settings" || pathname === "/chat/settings/members" || pathname.startsWith("/chat/settings/")) return "settings";
+    if (pathname.startsWith("/chat/collections")) return "collections";
     return "threads";
   };
   const activeSection = getActiveSection();
@@ -66,46 +66,46 @@ function SidebarContent({
   };
 
   const handleMembersClick = () => {
-    router.push("/settings/members");
+    router.push("/chat/settings/members");
     onItemClick?.();
   };
 
   const handleOrganizationClick = () => {
-    router.push("/settings");
+    router.push("/chat/settings");
     onItemClick?.();
   };
 
   const handleProvidersClick = () => {
-    router.push("/settings/providers");
+    router.push("/chat/settings/providers");
     onItemClick?.();
   };
 
   const handleToolsClick = () => {
-    router.push("/settings/tools");
+    router.push("/chat/settings/tools");
     onItemClick?.();
   };
 
   const handleKnowledgeClick = () => {
-    router.push("/settings/knowledge");
+    router.push("/chat/settings/knowledge");
     onItemClick?.();
   };
 
   const handleCollectionsClick = () => {
-    router.push("/collections");
+    router.push("/chat/collections");
     onItemClick?.();
   };
 
   const handleConversasClick = () => {
-    router.push("/");
+    router.push("/chat");
     onItemClick?.();
   };
 
   const handleSettingsClick = () => {
     // Navegar para a primeira opção disponível
     if (canManageOrg) {
-      router.push("/settings");
+      router.push("/chat/settings");
     } else if (canViewMembers) {
-      router.push("/settings/members");
+      router.push("/chat/settings/members");
     }
     onItemClick?.();
   };
@@ -291,7 +291,7 @@ function SidebarContent({
                       onClick={handleOrganizationClick}
                       className={cn(
                         "w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors text-left",
-                        pathname === "/settings"
+                        pathname === "/chat/settings"
                           ? "bg-primary text-primary-foreground"
                           : "hover:bg-muted"
                       )}
@@ -305,7 +305,7 @@ function SidebarContent({
                       onClick={handleProvidersClick}
                       className={cn(
                         "w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors text-left",
-                        pathname === "/settings/providers"
+                        pathname === "/chat/settings/providers"
                           ? "bg-primary text-primary-foreground"
                           : "hover:bg-muted"
                       )}
@@ -319,7 +319,7 @@ function SidebarContent({
                       onClick={handleToolsClick}
                       className={cn(
                         "w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors text-left",
-                        pathname === "/settings/tools"
+                        pathname === "/chat/settings/tools"
                           ? "bg-primary text-primary-foreground"
                           : "hover:bg-muted"
                       )}
@@ -333,7 +333,7 @@ function SidebarContent({
                       onClick={handleKnowledgeClick}
                       className={cn(
                         "w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors text-left",
-                        pathname === "/settings/knowledge"
+                        pathname === "/chat/settings/knowledge"
                           ? "bg-primary text-primary-foreground"
                           : "hover:bg-muted"
                       )}
@@ -350,7 +350,7 @@ function SidebarContent({
                     onClick={handleMembersClick}
                     className={cn(
                       "w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors text-left",
-                      pathname === "/settings/members"
+                      pathname === "/chat/settings/members"
                         ? "bg-primary text-primary-foreground"
                         : "hover:bg-muted"
                     )}

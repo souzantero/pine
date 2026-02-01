@@ -39,7 +39,7 @@ export default function SettingsPage() {
   // Redirect se sem permissão
   useEffect(() => {
     if (!authLoading && !canManage) {
-      router.push("/");
+      router.push("/chat");
     }
   }, [authLoading, canManage, router]);
 

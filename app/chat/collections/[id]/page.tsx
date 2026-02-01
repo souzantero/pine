@@ -79,7 +79,7 @@ export default function CollectionDetailPage() {
   // Redirect se sem permissão
   useEffect(() => {
     if (!authLoading && !canRead) {
-      router.push("/");
+      router.push("/chat");
     }
   }, [authLoading, canRead, router]);
 
@@ -166,7 +166,7 @@ export default function CollectionDetailPage() {
             <p className="text-muted-foreground mb-4">
               A coleção que você está procurando não existe ou foi removida.
             </p>
-            <Button onClick={() => router.push("/collections")}>
+            <Button onClick={() => router.push("/chat/collections")}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Voltar para Coleções
             </Button>
@@ -181,7 +181,7 @@ export default function CollectionDetailPage() {
       <div className="max-w-4xl mx-auto py-6 px-4">
         {/* Header */}
         <div className="flex items-center gap-4 mb-6">
-          <Button variant="ghost" size="icon" onClick={() => router.push("/collections")}>
+          <Button variant="ghost" size="icon" onClick={() => router.push("/chat/collections")}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="flex-1">

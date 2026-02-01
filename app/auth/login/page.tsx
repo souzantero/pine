@@ -27,7 +27,7 @@ export default function LoginPage() {
   // Redirecionar quando o usuário estiver logado
   useEffect(() => {
     if (!isLoading && isLoggedIn) {
-      router.push(hasOrganization ? "/" : "/onboarding");
+      router.push(hasOrganization ? "/chat" : "/chat/onboarding");
     }
   }, [isLoading, isLoggedIn, hasOrganization, router]);
 
@@ -91,7 +91,7 @@ export default function LoginPage() {
             </Button>
             <p className="text-sm text-muted-foreground text-center">
               Não tem uma conta?{" "}
-              <Link href="/signup" className="text-primary hover:underline">
+              <Link href="/auth/signup" className="text-primary hover:underline">
                 Cadastre-se
               </Link>
             </p>

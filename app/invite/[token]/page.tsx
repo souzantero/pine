@@ -53,7 +53,7 @@ export default function InvitePage({
 
     // Redirecionar após 2 segundos
     setTimeout(() => {
-      router.push("/");
+      router.push("/chat");
     }, 2000);
   };
 
@@ -96,7 +96,7 @@ export default function InvitePage({
             <Button
               variant="outline"
               className="w-full"
-              onClick={() => router.push("/")}
+              onClick={() => router.push("/chat")}
             >
               Voltar ao Início
             </Button>
@@ -153,7 +153,7 @@ export default function InvitePage({
             <Button
               variant="outline"
               className="w-full"
-              onClick={() => router.push("/")}
+              onClick={() => router.push("/chat")}
             >
               Voltar ao Início
             </Button>
@@ -185,7 +185,7 @@ export default function InvitePage({
             <Button
               variant="outline"
               className="w-full"
-              onClick={() => router.push("/")}
+              onClick={() => router.push("/chat")}
             >
               Voltar ao Início
             </Button>
@@ -255,7 +255,7 @@ export default function InvitePage({
             <Button
               className="w-full"
               onClick={() =>
-                router.push(`/login?callbackUrl=/invite/${token}`)
+                router.push(`/auth/login?callbackUrl=/invite/${token}`)
               }
             >
               Fazer Login para Aceitar
@@ -264,7 +264,7 @@ export default function InvitePage({
           <Button
             variant="ghost"
             className="w-full"
-            onClick={() => router.push("/")}
+            onClick={() => router.push("/chat")}
           >
             Cancelar
           </Button>

@@ -39,7 +39,7 @@ export function Header({ onMenuClick, onSettingsClick, showSettingsButton }: Hea
   const handleLogout = async () => {
     setLoggingOut(true);
     await signOut();
-    router.push("/login");
+    router.push("/auth/login");
   };
 
   const getInitials = () => {

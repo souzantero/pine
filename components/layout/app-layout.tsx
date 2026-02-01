@@ -37,9 +37,9 @@ export function AppLayout({ children, showSettingsButton, onSettingsClick }: App
   useEffect(() => {
     if (!authLoading) {
       if (!isLoggedIn) {
-        router.push("/login");
+        router.push("/auth/login");
       } else if (!hasOrganization) {
-        router.push("/onboarding");
+        router.push("/chat/onboarding");
       }
     }
   }, [authLoading, isLoggedIn, hasOrganization, router]);
@@ -47,7 +47,7 @@ export function AppLayout({ children, showSettingsButton, onSettingsClick }: App
   // Handle thread selection - navigate to home
   const handleSelectThread = (id: string) => {
     setSelectedThreadId(id);
-    router.push("/");
+    router.push("/chat");
   };
 
   // Handle new chat
@@ -62,7 +62,7 @@ export function AppLayout({ children, showSettingsButton, onSettingsClick }: App
 
       if (response.error || !response.data) return;
 
-      router.push("/");
+      router.push("/chat");
     } catch (error) {
       console.error("Erro ao criar thread:", error);
     }

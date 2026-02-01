@@ -31,9 +31,9 @@ export default function OnboardingPage() {
     if (isLoading) return;
 
     if (!isLoggedIn) {
-      router.push("/login");
+      router.push("/auth/login");
     } else if (hasOrganization) {
-      router.push("/");
+      router.push("/chat");
     }
   }, [isLoading, isLoggedIn, hasOrganization, router]);
 
@@ -85,7 +85,7 @@ export default function OnboardingPage() {
       return;
     }
 
-    router.push("/");
+    router.push("/chat");
   };
 
   // Mostrar loading enquanto verifica autenticação
