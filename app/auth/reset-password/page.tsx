@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/card";
 import { PasswordStrength } from "@/components/ui/password-strength";
 import { CheckCircle, XCircle } from "lucide-react";
+import { Logo } from "@/components/logo";
 
 function ResetPasswordContent() {
   const router = useRouter();
@@ -75,9 +76,9 @@ function ResetPasswordContent() {
       <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4">
         <Link
           href="/"
-          className="mb-8 text-2xl font-bold hover:opacity-80 transition-opacity"
+          className="mb-8 hover:opacity-80 transition-opacity"
         >
-          PineAI
+          <Logo size="lg" />
         </Link>
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1">
@@ -113,9 +114,9 @@ function ResetPasswordContent() {
       <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4">
         <Link
           href="/"
-          className="mb-8 text-2xl font-bold hover:opacity-80 transition-opacity"
+          className="mb-8 hover:opacity-80 transition-opacity"
         >
-          PineAI
+          <Logo size="lg" />
         </Link>
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1">
@@ -140,9 +141,9 @@ function ResetPasswordContent() {
     <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4">
       <Link
         href="/"
-        className="mb-8 text-2xl font-bold hover:opacity-80 transition-opacity"
+        className="mb-8 hover:opacity-80 transition-opacity"
       >
-        PineAI
+        <Logo size="lg" />
       </Link>
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">

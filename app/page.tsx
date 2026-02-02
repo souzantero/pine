@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/logo";
 import { Bot, Shield, Users, Zap, ArrowRight, Database, DatabaseZap, Check, FileText, Settings, Plug, Building, Cloud, Target } from "lucide-react";
 
 export default function LandingPage() {
@@ -8,7 +9,7 @@ export default function LandingPage() {
       {/* Header */}
       <header className="border-b">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <span className="text-xl font-bold">PineAI</span>
+          <Logo size="md" />
           <div className="flex items-center gap-4">
             <Button variant="ghost" asChild>
               <Link href="/auth/login">Entrar</Link>
@@ -666,7 +667,7 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-3 gap-8 mb-8">
             {/* Logo e descrição */}
             <div className="space-y-4">
-              <span className="text-xl font-bold">PineAI</span>
+              <Logo size="md" />
               <p className="text-sm text-muted-foreground">
                 Plataforma de agentes de IA para empresas.
               </p>

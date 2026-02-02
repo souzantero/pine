@@ -1,4 +1,4 @@
-# PineAI
+# Pineai
 
 Aplicacao de chat com integracao de agentes de IA e gestao multi-tenant de organizacoes.
 

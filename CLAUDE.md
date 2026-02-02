@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-PineAI is a platform with AI agent integration and multi-tenant organization management. The project uses a decoupled architecture:
+Pineai is a platform with AI agent integration and multi-tenant organization management. The project uses a decoupled architecture:
 
 - **Frontend**: Next.js 16.1 + React 19 (TypeScript)
 - **Backend**: Python FastAPI with SQLAlchemy ORM and PostgreSQL
@@ -251,7 +251,7 @@ JWT_EXPIRATION_HOURS=24
 
 # Email (Resend)
 RESEND_API_KEY=re_...
-RESEND_FROM_EMAIL=PineAI <noreply@pine.net.br>
+RESEND_FROM_EMAIL=Pineai <noreply@pine.net.br>
 APP_URL=http://localhost:3000
 
 # Email verification

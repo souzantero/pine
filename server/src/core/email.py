@@ -25,7 +25,7 @@ def send_verification_email(to_email: str, name: str, token: str) -> bool:
             {
                 "from": resend_from_email,
                 "to": to_email,
-                "subject": "Verifique seu email - PineAI",
+                "subject": "Verifique seu email - Pineai",
                 "html": _get_verification_email_html(name, verification_link),
             }
         )
@@ -55,7 +55,7 @@ def send_password_reset_email(to_email: str, name: str, token: str) -> bool:
             {
                 "from": resend_from_email,
                 "to": to_email,
-                "subject": "Recuperacao de senha - PineAI",
+                "subject": "Recuperacao de senha - Pineai",
                 "html": _get_password_reset_email_html(name, reset_link),
             }
         )
@@ -103,7 +103,7 @@ def _get_password_reset_email_html(name: str, reset_link: str) -> str:
             </div>
         </div>
         <p style="color: #a1a1aa; font-size: 12px; text-align: center; margin-top: 24px;">
-            PineAI - Inteligencia Artificial para sua empresa
+            Pineai - Inteligencia Artificial para sua empresa
         </p>
     </div>
 </body>
@@ -124,7 +124,7 @@ def _get_verification_email_html(name: str, verification_link: str) -> str:
     <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
         <div style="background-color: white; border-radius: 8px; padding: 40px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
             <h1 style="color: #18181b; font-size: 24px; font-weight: 600; margin: 0 0 8px 0;">
-                Bem-vindo ao PineAI, {name}!
+                Bem-vindo ao Pineai, {name}!
             </h1>
             <p style="color: #71717a; font-size: 16px; line-height: 1.5; margin: 0 0 24px 0;">
                 Para completar seu cadastro, clique no botao abaixo para verificar seu email:
@@ -144,12 +144,12 @@ def _get_verification_email_html(name: str, verification_link: str) -> str:
             </p>
             <div style="border-top: 1px solid #e4e4e7; margin-top: 32px; padding-top: 24px;">
                 <p style="color: #a1a1aa; font-size: 12px; margin: 0;">
-                    Este link expira em 24 horas. Se voce nao criou uma conta no PineAI, ignore este email.
+                    Este link expira em 24 horas. Se voce nao criou uma conta no Pineai, ignore este email.
                 </p>
             </div>
         </div>
         <p style="color: #a1a1aa; font-size: 12px; text-align: center; margin-top: 24px;">
-            PineAI - Inteligencia Artificial para sua empresa
+            Pineai - Inteligencia Artificial para sua empresa
         </p>
     </div>
 </body>

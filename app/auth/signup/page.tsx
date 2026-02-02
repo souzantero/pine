@@ -17,6 +17,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { PasswordStrength } from "@/components/ui/password-strength";
+import { Logo } from "@/components/logo";
 
 export default function SignupPage() {
   const [name, setName] = useState("");
@@ -70,8 +71,8 @@ export default function SignupPage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4">
-      <Link href="/" className="mb-8 text-2xl font-bold hover:opacity-80 transition-opacity">
-        PineAI
+      <Link href="/" className="mb-8 hover:opacity-80 transition-opacity">
+        <Logo size="lg" />
       </Link>
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">

@@ -36,7 +36,7 @@ export default function PrivacyPage() {
             </p>
             <p>
               Esta política descreve como coletamos, usamos, armazenamos e
-              protegemos suas informações quando você utiliza a plataforma PineAI.
+              protegemos suas informações quando você utiliza a plataforma Pineai.
             </p>
           </section>
 
@@ -75,7 +75,7 @@ export default function PrivacyPage() {
             <h2 className="text-xl font-semibold">3. Como Usamos seus Dados</h2>
             <p>Utilizamos suas informações para:</p>
             <ul className="list-disc pl-6 space-y-2">
-              <li>Fornecer e manter a plataforma PineAI funcionando.</li>
+              <li>Fornecer e manter a plataforma Pineai funcionando.</li>
               <li>Processar suas conversas com os agentes de IA.</li>
               <li>Indexar documentos na base de conhecimento da sua organização.</li>
               <li>Enviar comunicações importantes sobre sua conta ou o serviço.</li>

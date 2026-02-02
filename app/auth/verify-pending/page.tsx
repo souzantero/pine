@@ -14,6 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Mail, RefreshCw } from "lucide-react";
+import { Logo } from "@/components/logo";
 
 function VerifyPendingContent() {
   const router = useRouter();
@@ -78,9 +79,9 @@ function VerifyPendingContent() {
     <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4">
       <Link
         href="/"
-        className="mb-8 text-2xl font-bold hover:opacity-80 transition-opacity"
+        className="mb-8 hover:opacity-80 transition-opacity"
       >
-        PineAI
+        <Logo size="lg" />
       </Link>
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
