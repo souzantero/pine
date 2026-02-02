@@ -496,6 +496,149 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Pricing Section */}
+      <section id="pricing" className="py-24 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold mb-4">
+              Planos simples e transparentes
+            </h2>
+            <p className="text-muted-foreground max-w-xl mx-auto">
+              Comece gratuitamente e faça upgrade quando precisar de mais recursos.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {/* Free Plan */}
+            <div className="bg-background border rounded-2xl p-8 space-y-6">
+              <div>
+                <h3 className="text-2xl font-bold">Free</h3>
+                <p className="text-muted-foreground mt-2">
+                  Perfeito para experimentar a plataforma
+                </p>
+              </div>
+              <div className="flex items-baseline gap-1">
+                <span className="text-4xl font-bold">$0</span>
+                <span className="text-muted-foreground">/mês</span>
+              </div>
+              <ul className="space-y-3">
+                <li className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                  <span>1 membro</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                  <span>1 coleção de conhecimento</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                  <span>50 conversas</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                  <span>200 chamadas de ferramentas/mês</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                  <span>100MB de armazenamento</span>
+                </li>
+              </ul>
+              <Button variant="outline" size="lg" className="w-full" asChild>
+                <Link href="/auth/signup">Começar grátis</Link>
+              </Button>
+            </div>
+
+            {/* Team Plan */}
+            <div className="bg-background border-2 border-primary rounded-2xl p-8 space-y-6 relative">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                <span className="bg-primary text-primary-foreground text-sm font-medium px-3 py-1 rounded-full">
+                  Mais popular
+                </span>
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold flex items-center gap-2">
+                  Team
+                  <Zap className="h-5 w-5 text-yellow-500" />
+                </h3>
+                <p className="text-muted-foreground mt-2">
+                  Para equipes que precisam de mais poder
+                </p>
+              </div>
+              <div className="flex items-baseline gap-1">
+                <span className="text-4xl font-bold">$29</span>
+                <span className="text-muted-foreground">/mês</span>
+              </div>
+              <ul className="space-y-3">
+                <li className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                  <span>10 membros</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                  <span>Coleções ilimitadas</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                  <span>Conversas ilimitadas</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                  <span>Chamadas de ferramentas ilimitadas</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                  <span>5GB de armazenamento</span>
+                </li>
+              </ul>
+              <Button size="lg" className="w-full" asChild>
+                <Link href="/auth/signup">Começar agora</Link>
+              </Button>
+            </div>
+
+            {/* Enterprise Plan */}
+            <div className="bg-background border rounded-2xl p-8 space-y-6">
+              <div>
+                <h3 className="text-2xl font-bold flex items-center gap-2">
+                  Enterprise
+                  <Shield className="h-5 w-5 text-blue-500" />
+                </h3>
+                <p className="text-muted-foreground mt-2">
+                  Para grandes organizações com necessidades específicas
+                </p>
+              </div>
+              <div className="flex items-baseline gap-1">
+                <span className="text-4xl font-bold">Custom</span>
+              </div>
+              <ul className="space-y-3">
+                <li className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                  <span>Membros ilimitados</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                  <span>Todos os recursos do Team</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                  <span>Armazenamento personalizado</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                  <span>Suporte prioritário</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                  <span>SLA garantido</span>
+                </li>
+              </ul>
+              <Button variant="outline" size="lg" className="w-full" asChild>
+                <a href="mailto:contato@pine.net.br">Falar com vendas</a>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-24">
         <div className="container mx-auto px-4">

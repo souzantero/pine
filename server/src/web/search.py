@@ -12,6 +12,7 @@ from langgraph.types import Command
 from sqlmodel import select
 from tavily import AsyncTavilyClient
 
+from src.billing.limits import check_tool_calls_limit, increment_tool_calls
 from src.database.entities import (
     OrganizationConfig,
     ConfigType,
@@ -153,6 +154,21 @@ def create_web_search_tool(db: Database, organization_id: uuid.UUID):
         Returns:
             Resultados formatados com sumarios e fontes
         """
+        # Verificar limite de tool calls
+        try:
+            check_tool_calls_limit(db, organization_id)
+        except Exception:
+            return Command(
+                update={
+                    "messages": [
+                        ToolMessage(
+                            "Limite de chamadas de ferramentas atingido. Faca upgrade para o plano Team para continuar usando ferramentas.",
+                            tool_call_id=tool_call_id,
+                        )
+                    ]
+                }
+            )
+
         # Executa as buscas
         search_results = await tavily_search_async(
             tavily_api_key=search_api_key,
@@ -240,6 +256,9 @@ def create_web_search_tool(db: Database, organization_id: uuid.UUID):
             formatted_output += f"URL: {url}\n\n"
             formatted_output += f"CONTEUDO:\n{result['content']}\n"
             formatted_output += "\n" + "-" * 80 + "\n"
+
+        # Incrementar contador de tool calls
+        increment_tool_calls(db, organization_id)
 
         return Command(
             update={

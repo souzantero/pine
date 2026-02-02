@@ -204,3 +204,34 @@ export interface Document {
 export interface DocumentDetail extends Document {
   downloadUrl: string | null;
 }
+
+// ============================================
+// Billing
+// ============================================
+
+export type PlanType = "FREE" | "TEAM";
+
+export interface UsageItem {
+  current: number;
+  limit: number | null;
+}
+
+export interface ToolCallsUsage {
+  current: number;
+  limit: number | null;
+  resetsAt: string;
+}
+
+export interface StorageUsage {
+  current: number;
+  limit: number | null;
+}
+
+export interface BillingUsage {
+  plan: PlanType;
+  members: UsageItem;
+  collections: UsageItem;
+  threads: UsageItem;
+  toolCalls: ToolCallsUsage;
+  storage: StorageUsage;
+}

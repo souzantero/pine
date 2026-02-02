@@ -10,6 +10,7 @@ from langgraph.types import Command
 from sqlmodel import select
 from tavily import AsyncTavilyClient
 
+from src.billing.limits import check_tool_calls_limit, increment_tool_calls
 from src.database.entities import (
     OrganizationConfig,
     ConfigType,
@@ -130,6 +131,21 @@ def create_web_fetch_tool(db: Database, organization_id: uuid.UUID):
         Returns:
             Conteudo extraido da pagina, opcionalmente sumarizado
         """
+        # Verificar limite de tool calls
+        try:
+            check_tool_calls_limit(db, organization_id)
+        except Exception:
+            return Command(
+                update={
+                    "messages": [
+                        ToolMessage(
+                            "Limite de chamadas de ferramentas atingido. Faca upgrade para o plano Team para continuar usando ferramentas.",
+                            tool_call_id=tool_call_id,
+                        )
+                    ]
+                }
+            )
+
         # Extrai conteudo da URL
         try:
             extract_result = await tavily_extract_async(
@@ -210,6 +226,9 @@ def create_web_fetch_tool(db: Database, organization_id: uuid.UUID):
         formatted_output += "-" * 80 + "\n\n"
         formatted_output += content
         formatted_output += "\n\n" + "-" * 80
+
+        # Incrementar contador de tool calls
+        increment_tool_calls(db, organization_id)
 
         return Command(
             update={

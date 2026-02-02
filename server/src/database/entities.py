@@ -1,6 +1,7 @@
 import uuid
 from datetime import UTC, datetime
 from enum import Enum
+from typing import Optional
 
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import JSON, Column, Computed, Text, UniqueConstraint
@@ -105,6 +106,13 @@ class DocumentStatus(str, Enum):
     FAILED = "FAILED"
 
 
+class OrganizationPlan(str, Enum):
+    """Plano da organizacao"""
+
+    FREE = "FREE"
+    TEAM = "TEAM"
+
+
 # =============================================================================
 # MODELS
 # =============================================================================
@@ -160,6 +168,27 @@ class Organization(SQLModel, table=True):
     providers: list["OrganizationProvider"] = Relationship(back_populates="organization")
     configs: list["OrganizationConfig"] = Relationship(back_populates="organization")
     document_collections: list["DocumentCollection"] = Relationship(back_populates="organization")
+    billing: Optional["OrganizationBilling"] = Relationship(back_populates="organization")
+
+
+class OrganizationBilling(SQLModel, table=True):
+    """Dados de billing da organizacao"""
+
+    __tablename__ = "organization_billing"
+
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    organization_id: uuid.UUID = Field(foreign_key="organizations.id", unique=True, index=True)
+    plan: OrganizationPlan = Field(default=OrganizationPlan.FREE)
+    stripe_customer_id: str | None = Field(default=None, index=True)
+    stripe_subscription_id: str | None = Field(default=None, index=True)
+    tool_calls_count: int = Field(default=0)
+    tool_calls_reset_at: datetime = Field(default_factory=get_now)
+    storage_used_bytes: int = Field(default=0)
+    created_at: datetime = Field(default_factory=get_now)
+    updated_at: datetime = Field(default_factory=get_now, sa_column_kwargs={"onupdate": get_now})
+
+    # Relationships
+    organization: Organization = Relationship(back_populates="billing")
 
 
 class OrganizationProvider(SQLModel, table=True):

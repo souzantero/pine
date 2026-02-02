@@ -6,6 +6,7 @@ from fastapi import HTTPException, status
 from sqlmodel import Session, col, select
 
 from src.agent import AgentContext, build_agent
+from src.billing.limits import check_thread_limit
 from src.database import get_checkpointer
 from src.database.entities import Organization, OrganizationProvider, Provider, ProviderType, Thread
 from .helpers import agent_messages_to_list, get_config
@@ -97,6 +98,9 @@ def create_thread(
     organization_id: uuid.UUID, membership_id: uuid.UUID,
     title: str | None, db: Session,
 ) -> ThreadResponse:
+    # Verificar limite de threads do plano
+    check_thread_limit(db, organization_id)
+
     thread = Thread(
         organization_id=organization_id,
         created_by_id=membership_id,

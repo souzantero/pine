@@ -9,6 +9,7 @@ from typing_extensions import Annotated
 from langgraph.types import Command
 from sqlmodel import select
 
+from src.billing.limits import check_tool_calls_limit, increment_tool_calls
 from src.database.entities import (
     DocumentCollection,
     Document,
@@ -78,6 +79,21 @@ def create_knowledge_search_tool(db: Database, organization_id: uuid.UUID):
         Returns:
             Trechos relevantes dos documentos com suas fontes
         """
+        # Verificar limite de tool calls
+        try:
+            check_tool_calls_limit(db, organization_id)
+        except Exception:
+            return Command(
+                update={
+                    "messages": [
+                        ToolMessage(
+                            "Limite de chamadas de ferramentas atingido. Faca upgrade para o plano Team para continuar usando ferramentas.",
+                            tool_call_id=tool_call_id,
+                        )
+                    ]
+                }
+            )
+
         try:
             # Gera embedding da query
             query_embedding = embedding_service.embed_single(query)
@@ -120,6 +136,9 @@ def create_knowledge_search_tool(db: Database, organization_id: uuid.UUID):
                 formatted_output += f"Parte: {result.chunk_index + 1}\n\n"
                 formatted_output += f"{result.content}\n"
                 formatted_output += "\n" + "-" * 60 + "\n\n"
+
+            # Incrementar contador de tool calls
+            increment_tool_calls(db, organization_id)
 
             return Command(
                 update={

@@ -7,6 +7,7 @@ from typing import List
 from fastapi import HTTPException, UploadFile, status
 from sqlmodel import Session, func, select
 
+from src.billing.limits import check_collection_limit, check_storage_limit, update_storage_used
 from src.database.entities import Document, DocumentCollection, DocumentStatus
 from .pipeline import DocumentPipeline, PipelineError
 from .config import ConfigurationError, get_storage_service
@@ -147,6 +148,9 @@ def create_collection(
     organization_id: uuid.UUID, name: str, description: str | None, db: Session
 ) -> CollectionResponse:
     """Cria uma nova colecao."""
+    # Verificar limite de colecoes do plano
+    check_collection_limit(db, organization_id)
+
     if not name or not name.strip():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -320,6 +324,9 @@ async def upload_document(
             detail="Arquivo vazio",
         )
 
+    # Verificar limite de storage do plano
+    check_storage_limit(db, organization_id, file_size)
+
     # Cria o pipeline (valida configuracoes)
     try:
         pipeline = DocumentPipeline.create(db, organization_id)
@@ -357,6 +364,9 @@ async def upload_document(
     db.commit()
     db.refresh(document)
 
+    # Atualiza uso de storage
+    update_storage_used(db, organization_id, file_size)
+
     # Processa o documento (extrai texto, chunks, embeddings)
     try:
         pipeline.process(document)
@@ -386,6 +396,8 @@ def delete_document(
             detail="Documento nao encontrado",
         )
 
+    file_size = document.file_size
+
     try:
         storage = get_storage_service(db, organization_id)
         storage.delete(document.file_key)
@@ -394,3 +406,6 @@ def delete_document(
 
     db.delete(document)
     db.commit()
+
+    # Atualiza uso de storage (decrementa)
+    update_storage_used(db, organization_id, -file_size)

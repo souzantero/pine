@@ -9,3 +9,4 @@ export { useThreads, useSidebarThreads } from "./use-threads";
 export { useConfigs } from "./use-configs";
 export { useCollections } from "./use-collections";
 export { useDocuments } from "./use-documents";
+export { useBilling } from "./use-billing";

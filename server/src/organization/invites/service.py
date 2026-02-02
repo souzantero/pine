@@ -6,6 +6,7 @@ from typing import List
 from fastapi import HTTPException, status
 from sqlmodel import Session, select
 
+from src.billing.limits import check_member_limit
 from src.database.entities import Organization, OrganizationInvite, OrganizationMember, Role
 from src.organization.schemas import OrganizationResponse
 from src.roles.schemas import RoleResponse
@@ -203,6 +204,9 @@ def accept_invite(token: str, current_user_id: uuid.UUID, db: Session) -> dict:
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Voce ja e membro desta organizacao",
         )
+
+    # Verificar limite de membros do plano
+    check_member_limit(db, invite.organization_id)
 
     member = OrganizationMember(
         user_id=current_user_id,
