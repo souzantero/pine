@@ -38,7 +38,7 @@ export function StepLLMProvider({
   const selectedProviderInfo = llmProviders.find((p) => p.value === provider);
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col items-center space-y-6">
       {/* Ícone e título */}
       <div className="text-center space-y-2">
         <div className="inline-flex p-3 bg-primary/10 rounded-full">
@@ -52,13 +52,13 @@ export function StepLLMProvider({
 
       {/* Erro */}
       {error && (
-        <div className="p-3 text-sm text-red-500 bg-red-50 dark:bg-red-950/50 rounded-md">
+        <div className="w-full p-3 text-sm text-red-500 bg-red-50 dark:bg-red-950/50 rounded-md">
           {error}
         </div>
       )}
 
       {/* Formulário */}
-      <div className="space-y-4">
+      <div className="w-full space-y-4">
         <div className="space-y-2">
           <Label htmlFor="llm-provider">Provedor</Label>
           <Select
@@ -67,7 +67,7 @@ export function StepLLMProvider({
               onProviderChange(value ? (value as Provider) : null)
             }
           >
-            <SelectTrigger id="llm-provider">
+            <SelectTrigger id="llm-provider" className="w-full">
               <SelectValue placeholder="Selecione um provedor" />
             </SelectTrigger>
             <SelectContent>
@@ -90,7 +90,7 @@ export function StepLLMProvider({
                 placeholder={selectedProviderInfo?.placeholder || "sk-..."}
                 value={apiKey}
                 onChange={(e) => onApiKeyChange(e.target.value)}
-                className="pr-10"
+                className="w-full pr-10"
               />
               <button
                 type="button"

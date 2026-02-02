@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/session";
-import { useThreads, useModels } from "@/lib/hooks";
+import { useThreads, useModels, useConfigs, useProviders } from "@/lib/hooks";
 import { Header, Sidebar, MobileSidebar, MobileThreadsDrawer } from "@/components/layout";
 import { ChatArea, ChatSettings, MobileChatSettings } from "@/components/chat";
 import { streamRun } from "@/lib/api";
@@ -34,6 +34,37 @@ export default function Home() {
     configuredProviders,
     loadModelsForProvider,
   } = useModels();
+
+  // Hooks para verificar tools disponíveis
+  const { getConfig } = useConfigs("TOOL");
+  const { getProvidersByType } = useProviders();
+
+  // Calcula quais tools estão disponíveis baseado nas configurações e provedores
+  const availableTools = useMemo<ToolKey[]>(() => {
+    const tools: ToolKey[] = [];
+
+    // WEB_SEARCH: precisa de config habilitada + provider WEB_SEARCH configurado
+    const webSearchConfig = getConfig("TOOL", "WEB_SEARCH");
+    const hasWebSearchProvider = getProvidersByType("WEB_SEARCH").length > 0;
+    if (webSearchConfig?.isEnabled && hasWebSearchProvider) {
+      tools.push("WEB_SEARCH");
+    }
+
+    // WEB_FETCH: precisa de config habilitada + provider WEB_SEARCH configurado (usa Tavily)
+    const webFetchConfig = getConfig("TOOL", "WEB_FETCH");
+    if (webFetchConfig?.isEnabled && hasWebSearchProvider) {
+      tools.push("WEB_FETCH");
+    }
+
+    // KNOWLEDGE: precisa de config habilitada + provider EMBEDDING configurado
+    const knowledgeConfig = getConfig("TOOL", "KNOWLEDGE");
+    const hasEmbeddingProvider = getProvidersByType("EMBEDDING").length > 0;
+    if (knowledgeConfig?.isEnabled && hasEmbeddingProvider) {
+      tools.push("KNOWLEDGE");
+    }
+
+    return tools;
+  }, [getConfig, getProvidersByType]);
 
   // Estados de UI
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -300,6 +331,7 @@ export default function Home() {
               configuredProviders={configuredProviders}
               onProviderChange={handleProviderChange}
               onToolToggle={handleToolToggle}
+              availableTools={availableTools}
               expanded={settingsExpanded}
               onExpandedChange={setSettingsExpanded}
             />
@@ -316,6 +348,7 @@ export default function Home() {
           configuredProviders={configuredProviders}
           onProviderChange={handleProviderChange}
           onToolToggle={handleToolToggle}
+          availableTools={availableTools}
           open={mobileSettingsOpen}
           onOpenChange={setMobileSettingsOpen}
         />

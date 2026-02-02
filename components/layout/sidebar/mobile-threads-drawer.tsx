@@ -37,7 +37,7 @@ export function MobileThreadsDrawer({
 
   const handleSettingsClick = () => {
     onOpenChange(false);
-    router.push("/settings");
+    router.push("/chat/settings");
   };
 
   return (

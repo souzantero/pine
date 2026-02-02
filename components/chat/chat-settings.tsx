@@ -35,6 +35,7 @@ interface SettingsContentProps {
   configuredProviders: string[];
   onProviderChange: (provider: string) => void;
   onToolToggle: (tool: ToolKey, enabled: boolean) => void;
+  availableTools: ToolKey[];
 }
 
 // Componente para renderizar campo de provedor
@@ -134,17 +135,29 @@ const TOOL_INFO: Record<ToolKey, { label: string; description: string; icon: typ
 function ToolsField({
   enabledTools,
   onToggle,
+  availableTools,
 }: {
   enabledTools: ToolKey[];
   onToggle: (tool: ToolKey, enabled: boolean) => void;
+  availableTools: ToolKey[];
 }) {
-  const tools: ToolKey[] = ["WEB_FETCH", "WEB_SEARCH", "KNOWLEDGE"];
+  // Filtra apenas as ferramentas disponíveis (configuradas no backend)
+  if (availableTools.length === 0) {
+    return (
+      <div className="space-y-3">
+        <label className="text-sm font-medium">Ferramentas</label>
+        <p className="text-sm text-muted-foreground">
+          Configure ferramentas em Configurações &gt; Ferramentas
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-3">
       <label className="text-sm font-medium">Ferramentas</label>
       <div className="space-y-3">
-        {tools.map((tool) => {
+        {availableTools.map((tool) => {
           const info = TOOL_INFO[tool];
           const Icon = info.icon;
           const isEnabled = enabledTools.includes(tool);
@@ -183,6 +196,7 @@ function SettingsContent({
   configuredProviders,
   onProviderChange,
   onToolToggle,
+  availableTools,
 }: SettingsContentProps) {
   return (
     <div className="p-4 space-y-4">
@@ -203,6 +217,7 @@ function SettingsContent({
       <ToolsField
         enabledTools={config.enabledTools}
         onToggle={onToolToggle}
+        availableTools={availableTools}
       />
     </div>
   );
@@ -221,6 +236,7 @@ export function ChatSettings({
   configuredProviders,
   onProviderChange,
   onToolToggle,
+  availableTools,
   expanded,
   onExpandedChange,
 }: ChatSettingsProps) {
@@ -261,6 +277,7 @@ export function ChatSettings({
             configuredProviders={configuredProviders}
             onProviderChange={onProviderChange}
             onToolToggle={onToolToggle}
+            availableTools={availableTools}
           />
         </div>
       )}
@@ -294,6 +311,7 @@ export function MobileChatSettings({
   configuredProviders,
   onProviderChange,
   onToolToggle,
+  availableTools,
   open,
   onOpenChange,
 }: MobileChatSettingsProps) {
@@ -313,6 +331,7 @@ export function MobileChatSettings({
           configuredProviders={configuredProviders}
           onProviderChange={onProviderChange}
           onToolToggle={onToolToggle}
+          availableTools={availableTools}
         />
       </SheetContent>
     </Sheet>

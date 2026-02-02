@@ -25,17 +25,17 @@ export function MobileSettingsDrawer({
   const canManageOrg = hasPermission("ORGANIZATION_MANAGE");
 
   const handleOrganizationClick = () => {
-    router.push("/settings");
+    router.push("/chat/settings");
     onOpenChange(false);
   };
 
   const handleProvidersClick = () => {
-    router.push("/settings/providers");
+    router.push("/chat/settings/providers");
     onOpenChange(false);
   };
 
   const handleMembersClick = () => {
-    router.push("/settings/members");
+    router.push("/chat/settings/members");
     onOpenChange(false);
   };
 

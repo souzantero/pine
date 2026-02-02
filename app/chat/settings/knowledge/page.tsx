@@ -294,7 +294,7 @@ export default function KnowledgePage() {
                   )}
                 </ul>
                 <button
-                  onClick={() => router.push("/settings/providers")}
+                  onClick={() => router.push("/chat/settings/providers")}
                   className="text-sm text-amber-800 dark:text-amber-200 underline hover:no-underline mt-2"
                 >
                   Configurar na página de Provedores

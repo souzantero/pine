@@ -7,8 +7,6 @@ import { WizardProgress } from "./wizard-progress";
 import { WizardNavigation } from "./wizard-navigation";
 import { StepOrganization } from "./steps/step-organization";
 import { StepLLMProvider } from "./steps/step-llm-provider";
-import { StepSearchTools } from "./steps/step-search-tools";
-import { StepInviteMembers } from "./steps/step-invite-members";
 import { StepCompletion } from "./steps/step-completion";
 import { cn } from "@/lib/utils";
 
@@ -74,24 +72,6 @@ export function OnboardingWizard({ userName }: OnboardingWizardProps) {
             apiKey={state.llmApiKey}
             onProviderChange={(v) => updateField("llmProvider", v)}
             onApiKeyChange={(v) => updateField("llmApiKey", v)}
-            error={error}
-          />
-        );
-
-      case "search":
-        return (
-          <StepSearchTools
-            apiKey={state.searchApiKey}
-            onApiKeyChange={(v) => updateField("searchApiKey", v)}
-            error={error}
-          />
-        );
-
-      case "invite":
-        return (
-          <StepInviteMembers
-            emails={state.inviteEmails}
-            onEmailsChange={(v) => updateField("inviteEmails", v)}
             error={error}
           />
         );

@@ -223,7 +223,7 @@ export default function ToolsPage() {
                       <p className="text-sm text-muted-foreground">
                         Nenhum provedor de busca configurado.{" "}
                         <a
-                          href="/settings/providers"
+                          href="/chat/settings/providers"
                           className="text-primary hover:underline"
                         >
                           Configure um provedor

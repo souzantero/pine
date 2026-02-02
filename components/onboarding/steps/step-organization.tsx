@@ -41,7 +41,7 @@ export function StepOrganization({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col items-center space-y-6">
       {/* Ícone e título */}
       <div className="text-center space-y-2">
         <div className="inline-flex p-3 bg-primary/10 rounded-full">
@@ -55,13 +55,13 @@ export function StepOrganization({
 
       {/* Erro */}
       {error && (
-        <div className="p-3 text-sm text-red-500 bg-red-50 dark:bg-red-950/50 rounded-md">
+        <div className="w-full p-3 text-sm text-red-500 bg-red-50 dark:bg-red-950/50 rounded-md">
           {error}
         </div>
       )}
 
       {/* Formulário */}
-      <div className="space-y-4">
+      <div className="w-full space-y-4">
         <div className="space-y-2">
           <Label htmlFor="org-name">Nome da Organização</Label>
           <Input

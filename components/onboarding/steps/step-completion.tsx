@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, Sparkles, Search, Users, Building2 } from "lucide-react";
+import { CheckCircle2, Sparkles, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSession } from "@/lib/session";
 import type { OnboardingState } from "@/lib/hooks/use-onboarding";
@@ -28,11 +28,9 @@ export function StepCompletion({ state }: StepCompletionProps) {
   };
 
   const hasLLM = !!state.llmProvider && !!state.llmApiKey;
-  const hasSearch = !!state.searchApiKey;
-  const inviteCount = state.inviteEmails.length;
 
   return (
-    <div className="space-y-8">
+    <div className="flex flex-col items-center space-y-8">
       {/* Ícone e título */}
       <div className="text-center space-y-3">
         <div className="inline-flex p-4 bg-green-100 dark:bg-green-950/50 rounded-full">
@@ -45,7 +43,7 @@ export function StepCompletion({ state }: StepCompletionProps) {
       </div>
 
       {/* Resumo */}
-      <div className="space-y-3 p-4 bg-muted/50 rounded-lg">
+      <div className="w-full space-y-3 p-4 bg-muted/50 rounded-lg">
         {/* Organização */}
         <div className="flex items-center gap-3">
           <div className="p-2 bg-primary/10 rounded-lg">
@@ -72,44 +70,6 @@ export function StepCompletion({ state }: StepCompletionProps) {
             </p>
           </div>
           {hasLLM ? (
-            <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
-          ) : (
-            <div className="h-5 w-5 rounded-full border-2 border-muted-foreground/30" />
-          )}
-        </div>
-
-        {/* Busca na Web */}
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-primary/10 rounded-lg">
-            <Search className="h-4 w-4 text-primary" />
-          </div>
-          <div className="flex-1">
-            <p className="text-sm font-medium">Busca na Web</p>
-            <p className="text-sm text-muted-foreground">
-              {hasSearch ? "Tavily habilitado" : "Não configurado"}
-            </p>
-          </div>
-          {hasSearch ? (
-            <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
-          ) : (
-            <div className="h-5 w-5 rounded-full border-2 border-muted-foreground/30" />
-          )}
-        </div>
-
-        {/* Convites */}
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-primary/10 rounded-lg">
-            <Users className="h-4 w-4 text-primary" />
-          </div>
-          <div className="flex-1">
-            <p className="text-sm font-medium">Equipe</p>
-            <p className="text-sm text-muted-foreground">
-              {inviteCount > 0
-                ? `${inviteCount} convite${inviteCount > 1 ? "s" : ""} criado${inviteCount > 1 ? "s" : ""}`
-                : "Nenhum convite criado"}
-            </p>
-          </div>
-          {inviteCount > 0 ? (
             <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
           ) : (
             <div className="h-5 w-5 rounded-full border-2 border-muted-foreground/30" />

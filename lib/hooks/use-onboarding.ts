@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import { api } from "@/lib/api";
 import { setCurrentOrgId } from "@/lib/storage";
-import type { Provider, ProviderType, Organization, Role } from "@/lib/types";
+import type { Provider, ProviderType, Organization } from "@/lib/types";
 
 // Estado do wizard de onboarding
 export interface OnboardingState {
@@ -13,13 +13,8 @@ export interface OnboardingState {
   // Step 2: Provedor LLM
   llmProvider: Provider | null;
   llmApiKey: string;
-  // Step 3: Busca na Web
-  searchApiKey: string;
-  // Step 4: Convites
-  inviteEmails: string[];
   // Interno
   createdOrgId: string | null;
-  createdInviteLinks: string[];
 }
 
 export interface OnboardingStep {
@@ -31,8 +26,6 @@ export interface OnboardingStep {
 export const ONBOARDING_STEPS: OnboardingStep[] = [
   { id: "organization", label: "Organização", required: true },
   { id: "llm", label: "Modelo de IA", required: false },
-  { id: "search", label: "Busca", required: false },
-  { id: "invite", label: "Equipe", required: false },
   { id: "completion", label: "Pronto", required: true },
 ];
 
@@ -41,10 +34,7 @@ const initialState: OnboardingState = {
   organizationSlug: "",
   llmProvider: null,
   llmApiKey: "",
-  searchApiKey: "",
-  inviteEmails: [],
   createdOrgId: null,
-  createdInviteLinks: [],
 };
 
 interface UseOnboardingReturn {
@@ -120,18 +110,6 @@ export function useOnboarding(): UseOnboardingReturn {
           return "API Key é obrigatória quando um provedor está selecionado";
         }
         break;
-      case 2: // Search
-        if (state.searchApiKey.trim() && state.searchApiKey.length < 10) {
-          return "API Key do Tavily parece inválida";
-        }
-        break;
-      case 3: // Invites
-        for (const email of state.inviteEmails) {
-          if (!email.includes("@") || !email.includes(".")) {
-            return `Email inválido: ${email}`;
-          }
-        }
-        break;
     }
     return null;
   };
@@ -184,52 +162,6 @@ export function useOnboarding(): UseOnboardingReturn {
     return true;
   };
 
-  // Cria convites (Step 4)
-  const createInvites = async (): Promise<boolean> => {
-    const orgId = state.createdOrgId;
-    if (!orgId || state.inviteEmails.length === 0) {
-      return true; // Nada a fazer
-    }
-
-    // Buscar role de membro padrão
-    const rolesResponse = await api.get<Role[]>(
-      `/organizations/${orgId}/roles`
-    );
-
-    if (rolesResponse.error || !rolesResponse.data) {
-      setError("Erro ao buscar roles");
-      return false;
-    }
-
-    const memberRole = rolesResponse.data.find(
-      (r) => r.name === "Membro" && r.isSystemRole
-    );
-
-    if (!memberRole) {
-      setError("Role de membro não encontrada");
-      return false;
-    }
-
-    const inviteLinks: string[] = [];
-
-    for (const email of state.inviteEmails) {
-      const response = await api.post<{ inviteLink: string }>(
-        `/organizations/${orgId}/invites`,
-        { roleId: memberRole.id }
-      );
-
-      if (response.error) {
-        // Continua mesmo com erro em um convite
-        console.error(`Erro ao criar convite para ${email}:`, response.error);
-      } else if (response.data?.inviteLink) {
-        inviteLinks.push(response.data.inviteLink);
-      }
-    }
-
-    setState((prev) => ({ ...prev, createdInviteLinks: inviteLinks }));
-    return true;
-  };
-
   // Executa ação do step atual
   const executeStepAction = async (): Promise<boolean> => {
     switch (currentStep) {
@@ -241,15 +173,6 @@ export function useOnboarding(): UseOnboardingReturn {
           return await addProvider("LLM", state.llmProvider, state.llmApiKey);
         }
         return true;
-
-      case 2: // Search
-        if (state.searchApiKey.trim()) {
-          return await addProvider("WEB_SEARCH", "TAVILY", state.searchApiKey);
-        }
-        return true;
-
-      case 3: // Invites
-        return await createInvites();
 
       default:
         return true;
