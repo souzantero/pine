@@ -293,9 +293,9 @@ export default function CollectionsPage() {
 
             <AlertDialogFooter>
               <AlertDialogCancel disabled={saving}>Cancelar</AlertDialogCancel>
-              <AlertDialogAction onClick={handleCreate} disabled={saving}>
+              <Button onClick={handleCreate} disabled={saving}>
                 {saving ? "Criando..." : "Criar"}
-              </AlertDialogAction>
+              </Button>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>

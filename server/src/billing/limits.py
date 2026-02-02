@@ -75,7 +75,7 @@ def check_member_limit(db: Session, organization_id: uuid.UUID) -> None:
     if count >= max_members:
         raise HTTPException(
             status_code=status.HTTP_402_PAYMENT_REQUIRED,
-            detail=f"Limite de {max_members} membro(s) atingido. Faca upgrade para o plano Team.",
+            detail=f"Limite de {max_members} membro(s) atingido. Faça upgrade para o plano Team para adicionar mais membros.",
         )
 
 
@@ -97,7 +97,7 @@ def check_collection_limit(db: Session, organization_id: uuid.UUID) -> None:
     if count >= max_collections:
         raise HTTPException(
             status_code=status.HTTP_402_PAYMENT_REQUIRED,
-            detail=f"Limite de {max_collections} colecao(oes) atingido. Faca upgrade para o plano Team.",
+            detail=f"Limite de {max_collections} coleção(ões) atingido. Faça upgrade para o plano Team para criar mais coleções.",
         )
 
 
@@ -117,7 +117,7 @@ def check_thread_limit(db: Session, organization_id: uuid.UUID) -> None:
     if count >= max_threads:
         raise HTTPException(
             status_code=status.HTTP_402_PAYMENT_REQUIRED,
-            detail=f"Limite de {max_threads} conversas atingido. Faca upgrade para o plano Team.",
+            detail=f"Limite de {max_threads} conversas atingido. Faça upgrade para o plano Team para conversas ilimitadas.",
         )
 
 
@@ -137,7 +137,7 @@ def check_storage_limit(db: Session, organization_id: uuid.UUID, file_size: int)
         used_mb = billing.storage_used_bytes / (1024 * 1024)
         raise HTTPException(
             status_code=status.HTTP_402_PAYMENT_REQUIRED,
-            detail=f"Limite de armazenamento de {max_mb:.0f}MB atingido (usado: {used_mb:.1f}MB). Faca upgrade para o plano Team.",
+            detail=f"Limite de armazenamento de {max_mb:.0f}MB atingido (usado: {used_mb:.1f}MB). Faça upgrade para o plano Team para 5GB de armazenamento.",
         )
 
 
@@ -166,7 +166,7 @@ def check_tool_calls_limit(db: Session, organization_id: uuid.UUID) -> None:
     if billing.tool_calls_count >= max_calls:
         raise HTTPException(
             status_code=status.HTTP_402_PAYMENT_REQUIRED,
-            detail=f"Limite de {max_calls} chamadas de ferramentas/mes atingido. Faca upgrade para o plano Team.",
+            detail=f"Limite de {max_calls} chamadas de ferramentas/mês atingido. Faça upgrade para o plano Team para chamadas ilimitadas.",
         )
 
 
