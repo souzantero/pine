@@ -43,13 +43,13 @@ export default function SignupPage() {
     setLoading(true);
 
     if (!validation.isValid) {
-      setError("A senha nao atende aos requisitos minimos");
+      setError("A senha não atende aos requisitos mínimos");
       setLoading(false);
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("As senhas nao coincidem");
+      setError("As senhas não coincidem");
       setLoading(false);
       return;
     }

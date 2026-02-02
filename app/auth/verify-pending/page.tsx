@@ -60,10 +60,10 @@ function VerifyPendingContent() {
         return;
       }
 
-      setMessage("Email enviado! Verifique sua caixa de entrada.");
+      setMessage("E-mail enviado! Verifique sua caixa de entrada.");
       setCooldownSeconds(60);
     } catch {
-      setError("Erro ao reenviar email");
+      setError("Erro ao reenviar e-mail");
     } finally {
       setResending(false);
     }
@@ -90,10 +90,10 @@ function VerifyPendingContent() {
             </div>
           </div>
           <CardTitle className="text-2xl font-bold text-center">
-            Verifique seu Email
+            Verifique seu E-mail
           </CardTitle>
           <CardDescription className="text-center">
-            Enviamos um link de verificacao para:
+            Enviamos um link de verificação para:
             <br />
             <span className="font-medium text-foreground">{email}</span>
           </CardDescription>
@@ -128,7 +128,7 @@ function VerifyPendingContent() {
             )}
             {cooldownSeconds > 0
               ? `Reenviar em ${cooldownSeconds}s`
-              : "Reenviar Email"}
+              : "Reenviar E-mail"}
           </Button>
           <p className="text-sm text-muted-foreground text-center">
             Email errado?{" "}

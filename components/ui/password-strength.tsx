@@ -22,9 +22,9 @@ export function PasswordStrength({ password, className }: PasswordStrengthProps)
   }
 
   const requirements = [
-    { key: "minLength", label: "Minimo 8 caracteres", met: validation.checks.minLength },
-    { key: "hasNumber", label: "Pelo menos 1 numero", met: validation.checks.hasNumber },
-    { key: "hasSymbol", label: "Pelo menos 1 simbolo", met: validation.checks.hasSymbol },
+    { key: "minLength", label: "Mínimo 8 caracteres", met: validation.checks.minLength },
+    { key: "hasNumber", label: "Pelo menos 1 número", met: validation.checks.hasNumber },
+    { key: "hasSymbol", label: "Pelo menos 1 símbolo", met: validation.checks.hasSymbol },
   ];
 
   return (

@@ -88,14 +88,14 @@ def create_invite(
     if not organization:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Organizacao nao encontrada",
+            detail="Organização não encontrada",
         )
 
     role = db.get(Role, payload.role_id)
     if not role or role.organization_id != organization_id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Role nao encontrada nesta organizacao",
+            detail="Role não encontrada nesta organização",
         )
 
     invite = OrganizationInvite(
@@ -137,7 +137,7 @@ def get_invite_info(token: str, db: Session) -> InviteInfoResponse:
     if not invite:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Convite nao encontrado",
+            detail="Convite não encontrado",
         )
 
     db.refresh(invite, ["organization", "role", "created_by"])
@@ -174,13 +174,13 @@ def accept_invite(token: str, current_user_id: uuid.UUID, db: Session) -> dict:
     if not invite:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Convite nao encontrado",
+            detail="Convite não encontrado",
         )
 
     if invite.used_at is not None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Convite ja foi utilizado",
+            detail="Convite já foi utilizado",
         )
 
     now = datetime.now(UTC)
@@ -202,7 +202,7 @@ def accept_invite(token: str, current_user_id: uuid.UUID, db: Session) -> dict:
     if existing_member:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Voce ja e membro desta organizacao",
+            detail="Você já é membro desta organização",
         )
 
     # Verificar limite de membros do plano

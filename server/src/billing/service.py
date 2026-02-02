@@ -24,14 +24,14 @@ def create_checkout_session(
     """Cria sessao de checkout do Stripe e retorna URL."""
     org = db.get(Organization, organization_id)
     if not org:
-        raise HTTPException(status_code=404, detail="Organizacao nao encontrada")
+        raise HTTPException(status_code=404, detail="Organização não encontrada")
 
     billing = get_or_create_billing(db, organization_id)
 
     if billing.plan == OrganizationPlan.TEAM:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Organizacao ja possui plano Team",
+            detail="Organização já possui plano Team",
         )
 
     # Cria ou reutiliza customer do Stripe
@@ -106,7 +106,7 @@ def create_portal_session(
     if not billing.stripe_customer_id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Organizacao nao possui assinatura ativa",
+            detail="Organização não possui assinatura ativa",
         )
 
     portal_session = stripe.billing_portal.Session.create(

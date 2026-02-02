@@ -43,7 +43,7 @@ export function useBilling(): UseBillingReturn {
         setUsage(response.data);
       }
     } catch {
-      setError("Erro ao carregar informacoes de billing");
+      setError("Erro ao carregar informações de billing");
     } finally {
       setIsLoading(false);
     }
@@ -54,7 +54,7 @@ export function useBilling(): UseBillingReturn {
   }, [loadUsage]);
 
   const createCheckout = useCallback(async () => {
-    if (!orgId) return { error: "Organizacao nao selecionada" };
+    if (!orgId) return { error: "Organização não selecionada" };
 
     const response = await api.post<{ url: string }>(
       `/organizations/${orgId}/billing/checkout`,
@@ -69,7 +69,7 @@ export function useBilling(): UseBillingReturn {
   }, [orgId]);
 
   const openPortal = useCallback(async () => {
-    if (!orgId) return { error: "Organizacao nao selecionada" };
+    if (!orgId) return { error: "Organização não selecionada" };
 
     const response = await api.post<{ url: string }>(
       `/organizations/${orgId}/billing/portal`,

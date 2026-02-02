@@ -94,14 +94,14 @@ server/src/
 │   ├── env.py             # Environment variables
 │   ├── schemas.py         # CamelCaseModel base class
 │   ├── storage.py         # S3 service
-│   └── embedding.py       # Embedding service
+│   └── email.py           # Email service (Resend)
 ├── database/              # Database layer
 │   ├── connection.py      # Engine, session, checkpointer
 │   ├── entities.py        # SQLModel ORM entities
 │   └── dependencies.py    # DatabaseDependency
 ├── auth/                  # Authentication module
-│   ├── router.py          # /auth/* endpoints
-│   ├── service.py         # Auth business logic, JWT
+│   ├── router.py          # /auth/* endpoints (login, register, verify, reset password)
+│   ├── service.py         # Auth business logic, JWT, email verification, password reset
 │   ├── schemas.py         # Auth request/response models
 │   └── dependencies.py    # CurrentUserDependency, CurrentMembershipDependency
 ├── organization/          # Organization module
@@ -119,10 +119,23 @@ server/src/
 ├── providers/             # LLM/API provider configuration
 ├── models/                # Available AI models
 ├── configs/               # Tool configurations
+├── billing/               # Monetization with Stripe
+│   ├── router.py          # Billing endpoints + Stripe webhook
+│   ├── service.py         # Stripe integration
+│   ├── schemas.py         # Billing models
+│   └── limits.py          # Usage limits per plan
 ├── knowledge/             # Document collections + RAG
 │   ├── router.py          # Collections + documents endpoints
 │   ├── service.py         # Upload, processing logic
-│   └── document_processor.py
+│   ├── config.py          # Chunking and retrieval config
+│   ├── pipeline.py        # ETL pipeline for documents
+│   ├── search.py          # RAG search tool
+│   └── services/          # Specialized services
+│       ├── chunking.py    # Multiple chunking strategies
+│       ├── embedding.py   # Embedding generation
+│       ├── extraction.py  # Document content extraction
+│       ├── retrieval.py   # Hybrid search with RRF
+│       └── storage.py     # Document storage
 ├── agent/                 # AI agent core
 │   ├── agent.py           # build_agent, AgentContext
 │   └── common.py          # get_model, tool display names
@@ -138,7 +151,17 @@ server/src/
 
 All API routes are served by the Python backend at `localhost:8888`:
 
-- `/auth/*` - Login, register, current user (me)
+**Authentication:**
+- `/auth/login` - Login, returns JWT
+- `/auth/register` - User registration with email verification
+- `/auth/me` - Current user and memberships
+- `/auth/verify-email` - Verify email with token
+- `/auth/resend-verification` - Resend verification email
+- `/auth/forgot-password` - Request password reset
+- `/auth/reset-password` - Reset password with token
+- `/auth/change-password` - Change password (authenticated)
+
+**Organizations:**
 - `/organizations` - Create organization
 - `/organizations/{org_id}` - Organization CRUD
 - `/organizations/{org_id}/threads` - Conversation threads
@@ -150,6 +173,16 @@ All API routes are served by the Python backend at `localhost:8888`:
 - `/organizations/{org_id}/models` - Available AI models
 - `/organizations/{org_id}/providers` - Provider configuration (LLM, Web Search, etc.)
 - `/organizations/{org_id}/configs` - Tool configurations per organization
+- `/organizations/{org_id}/collections` - Knowledge collections
+- `/organizations/{org_id}/collections/{col_id}/documents` - Collection documents
+
+**Billing:**
+- `/organizations/{org_id}/billing` - Billing status and usage
+- `/organizations/{org_id}/billing/checkout` - Create Stripe checkout session
+- `/organizations/{org_id}/billing/portal` - Stripe customer portal
+- `/stripe/webhook` - Stripe webhook endpoint
+
+**Public:**
 - `/invites/{token}` - Public invite info and accept
 
 ### UI Components
@@ -160,11 +193,32 @@ All API routes are served by the Python backend at `localhost:8888`:
 
 ### Page Flow
 
-1. `/login`, `/signup` - Public auth pages
-2. `/onboarding` - Organization creation (requires auth, no org)
-3. `/invite/[token]` - Accept organization invites
-4. `/` - Main chat interface (requires auth + active org)
-5. `/settings`, `/settings/members`, `/settings/providers`, `/settings/tools` - Organization management
+**Public pages:**
+- `/` - Landing page
+- `/privacy` - Privacy policy
+- `/terms` - Terms of use
+
+**Authentication:**
+- `/auth/login`, `/auth/signup` - Auth pages
+- `/auth/verify-pending` - Waiting for email verification
+- `/auth/verify-email` - Email verification with token
+- `/auth/forgot-password` - Request password reset
+- `/auth/reset-password` - Reset password with token
+
+**Authenticated (no org):**
+- `/chat/onboarding` - Organization creation wizard (multi-step)
+- `/invite/[token]` - Accept organization invites
+
+**Authenticated (with org):**
+- `/chat` - Main chat interface
+- `/chat/collections`, `/chat/collections/[id]` - Knowledge collections
+- `/chat/account` - User account settings
+- `/chat/settings` - Organization settings
+- `/chat/settings/members` - Member management
+- `/chat/settings/providers` - Provider configuration
+- `/chat/settings/tools` - Tool configurations
+- `/chat/settings/knowledge` - Knowledge base settings
+- `/chat/settings/billing` - Billing and subscription
 
 ## Code Conventions
 
@@ -182,6 +236,33 @@ NEXT_PUBLIC_API_URL=http://localhost:8888
 
 **Backend (server/.env):**
 ```
+# Core
+ENVIRONMENT=development
 DATABASE_URL=postgresql://...
-JWT_SECRET=...
+CHECKPOINT_SAVER_URL=postgresql://...
+
+# OpenRouter (API keys per organization in DB)
+OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+
+# JWT
+JWT_SECRET=your-secret-key
+JWT_ALGORITHM=HS256
+JWT_EXPIRATION_HOURS=24
+
+# Email (Resend)
+RESEND_API_KEY=re_...
+RESEND_FROM_EMAIL=PineAI <noreply@pine.net.br>
+APP_URL=http://localhost:3000
+
+# Email verification
+EMAIL_VERIFICATION_TOKEN_EXPIRATION_HOURS=24
+EMAIL_VERIFICATION_RATE_LIMIT_SECONDS=60
+
+# Password reset
+PASSWORD_RESET_TOKEN_EXPIRATION_HOURS=1
+
+# Stripe
+STRIPE_SECRET_KEY=sk_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+STRIPE_TEAM_PRICE_ID=price_...
 ```

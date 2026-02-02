@@ -33,7 +33,7 @@ def _check_permission(db, user_id, organization_id, permission):
     if not check_permission(db, user_id, organization_id, permission):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"Permissao {permission.value} necessaria",
+            detail=f"Permissão {permission.value} necessária",
         )
 
 

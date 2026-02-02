@@ -49,19 +49,19 @@ def remove_member(
     if not member or member.organization_id != organization_id:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Membro nao encontrado",
+            detail="Membro não encontrado",
         )
 
     if member.is_owner:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Nao e possivel remover o owner da organizacao",
+            detail="Não é possível remover o owner da organização",
         )
 
     if member.user_id == current_user_id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Nao e possivel remover a si mesmo",
+            detail="Não é possível remover a si mesmo",
         )
 
     db.delete(member)
@@ -76,14 +76,14 @@ def update_member_role(
     if not member or member.organization_id != organization_id:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Membro nao encontrado",
+            detail="Membro não encontrado",
         )
 
     role = db.get(Role, role_id)
     if not role or role.organization_id != organization_id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Role nao encontrada nesta organizacao",
+            detail="Role não encontrada nesta organização",
         )
 
     member.role_id = role_id

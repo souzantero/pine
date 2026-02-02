@@ -40,12 +40,12 @@ export default function AccountPage() {
 
     // Validacoes
     if (!validation.isValid) {
-      setError("A senha nao atende aos requisitos minimos");
+      setError("A senha não atende aos requisitos mínimos");
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setError("As senhas nao coincidem");
+      setError("As senhas não coincidem");
       return;
     }
 
@@ -88,7 +88,7 @@ export default function AccountPage() {
           <div>
             <h1 className="text-lg font-semibold">Minha Conta</h1>
             <p className="text-sm text-muted-foreground">
-              Gerencie suas informacoes pessoais
+              Gerencie suas informações pessoais
             </p>
           </div>
         </div>
@@ -99,7 +99,7 @@ export default function AccountPage() {
         {/* Informacoes do usuario */}
         <Card>
           <CardHeader>
-            <CardTitle>Informacoes</CardTitle>
+            <CardTitle>Informações</CardTitle>
             <CardDescription>Seus dados de conta</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

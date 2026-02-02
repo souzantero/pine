@@ -58,13 +58,13 @@ def validate_password_strength(password: str) -> None:
     errors = []
 
     if len(password) < 8:
-        errors.append("minimo 8 caracteres")
+        errors.append("mínimo 8 caracteres")
 
     if not re.search(r"\d", password):
-        errors.append("pelo menos 1 numero")
+        errors.append("pelo menos 1 número")
 
     if not re.search(r"[!@#$%^&*()_+\-=\[\]{};':\"\\|,.<>\/?~`]", password):
-        errors.append("pelo menos 1 simbolo (!@#$%^&*...)")
+        errors.append("pelo menos 1 símbolo (!@#$%^&*...)")
 
     if errors:
         raise HTTPException(
@@ -112,11 +112,11 @@ def register_user(payload: RegisterRequest, db: Session) -> RegisterResponse:
         if not existing_user.email_verified:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Email ja cadastrado. Verifique sua caixa de entrada ou solicite reenvio.",
+                detail="E-mail já cadastrado. Verifique sua caixa de entrada ou solicite reenvio.",
             )
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email ja cadastrado",
+            detail="E-mail já cadastrado",
         )
 
     # Gerar token de verificacao
@@ -154,7 +154,7 @@ def login_user(payload: LoginRequest, db: Session) -> TokenResponse:
     if not user or not verify_password(payload.password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Email ou senha incorretos",
+            detail="E-mail ou senha incorretos",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -162,7 +162,7 @@ def login_user(payload: LoginRequest, db: Session) -> TokenResponse:
     if not user.email_verified:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Email nao verificado. Verifique sua caixa de entrada.",
+            detail="E-mail não verificado. Verifique sua caixa de entrada.",
         )
 
     access_token = create_access_token(str(user.id))
@@ -223,7 +223,7 @@ def verify_email(token: str, db: Session) -> TokenResponse:
     if not user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Token de verificacao invalido",
+            detail="Token de verificação inválido",
         )
 
     # Verificar se token expirou
@@ -237,7 +237,7 @@ def verify_email(token: str, db: Session) -> TokenResponse:
         if expires_at < now:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Token de verificacao expirado. Solicite um novo.",
+                detail="Token de verificação expirado. Solicite um novo.",
             )
 
     # Marcar email como verificado
@@ -360,7 +360,7 @@ def reset_password(token: str, new_password: str, db: Session) -> MessageRespons
     if not user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Token de recuperacao invalido",
+            detail="Token de recuperação inválido",
         )
 
     # Verificar se token expirou
@@ -373,7 +373,7 @@ def reset_password(token: str, new_password: str, db: Session) -> MessageRespons
         if expires_at < now:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Token de recuperacao expirado. Solicite um novo.",
+                detail="Token de recuperação expirado. Solicite um novo.",
             )
 
     # Validar nova senha

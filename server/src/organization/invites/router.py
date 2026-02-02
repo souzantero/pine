@@ -31,7 +31,7 @@ def list_invites(
     if not check_permission(db, current_user.id, organization_id, Permission.MEMBERS_INVITE):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Permissao MEMBERS_INVITE necessaria",
+            detail="Permissão MEMBERS_INVITE necessária",
         )
     return list_invites_service(organization_id, db)
 
@@ -51,7 +51,7 @@ def create_invite(
     if not check_permission(db, current_user.id, organization_id, Permission.MEMBERS_INVITE):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Permissao MEMBERS_INVITE necessaria",
+            detail="Permissão MEMBERS_INVITE necessária",
         )
     return create_invite_service(organization_id, payload, current_user.id, db)
 

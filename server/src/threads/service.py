@@ -31,7 +31,7 @@ def _get_thread(db: Session, thread_id: uuid.UUID, organization_id: uuid.UUID) -
     if not thread or thread.organization_id != organization_id:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Thread nao encontrada",
+            detail="Thread não encontrada",
         )
     return thread
 
@@ -47,13 +47,13 @@ def get_provider_api_key(
     except ValueError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Provedor invalido: {provider_str}",
+            detail=f"Provedor inválido: {provider_str}",
         )
 
     if provider not in [Provider.OPENAI, Provider.OPENROUTER]:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Provedor {provider_str} nao suportado. Use OPENAI ou OPENROUTER.",
+            detail=f"Provedor {provider_str} não suportado. Use OPENAI ou OPENROUTER.",
         )
 
     statement = select(OrganizationProvider).where(
@@ -67,7 +67,7 @@ def get_provider_api_key(
     if not org_provider:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Provedor {provider_str} nao configurado para esta organizacao",
+            detail=f"Provedor {provider_str} não configurado para esta organização",
         )
 
     return provider, org_provider.credentials.get("apiKey", "")
@@ -166,7 +166,7 @@ def prepare_stream_run(
     if not organization:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Organizacao nao encontrada",
+            detail="Organização não encontrada",
         )
 
     agent_context = AgentContext(

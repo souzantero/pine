@@ -29,13 +29,13 @@ export function validatePassword(password: string): PasswordValidation {
   const errors: string[] = [];
 
   if (!checks.minLength) {
-    errors.push("Minimo 8 caracteres");
+    errors.push("Mínimo 8 caracteres");
   }
   if (!checks.hasNumber) {
-    errors.push("Pelo menos 1 numero");
+    errors.push("Pelo menos 1 número");
   }
   if (!checks.hasSymbol) {
-    errors.push("Pelo menos 1 simbolo (!@#$%^&*...)");
+    errors.push("Pelo menos 1 símbolo (!@#$%^&*...)");
   }
 
   // Requisitos obrigatorios: minLength, hasNumber, hasSymbol
@@ -76,7 +76,7 @@ export function getStrengthLabel(strength: "weak" | "medium" | "strong"): string
     case "strong":
       return "Forte";
     case "medium":
-      return "Media";
+      return "Média";
     case "weak":
     default:
       return "Fraca";

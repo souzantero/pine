@@ -40,7 +40,7 @@ def validate_provider_type(type_str: str) -> ProviderType:
     except ValueError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Tipo invalido: {type_str}. Valores aceitos: {[t.value for t in ProviderType]}",
+            detail=f"Tipo inválido: {type_str}. Valores aceitos: {[t.value for t in ProviderType]}",
         )
 
 
@@ -51,15 +51,15 @@ def validate_provider(provider_str: str, provider_type: ProviderType) -> Provide
     except ValueError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Provedor invalido: {provider_str}. Valores aceitos: {[p.value for p in Provider]}",
+            detail=f"Provedor inválido: {provider_str}. Valores aceitos: {[p.value for p in Provider]}",
         )
 
     valid_providers = PROVIDERS_BY_TYPE.get(provider_type, [])
     if provider not in valid_providers:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Provedor {provider_str} nao e compativel com tipo {provider_type.value}. "
-            f"Provedores validos para {provider_type.value}: {[p.value for p in valid_providers]}",
+            detail=f"Provedor {provider_str} não é compatível com tipo {provider_type.value}. "
+            f"Provedores válidos para {provider_type.value}: {[p.value for p in valid_providers]}",
         )
 
     return provider
@@ -104,7 +104,7 @@ def create_or_update_provider(
     if not credentials:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Credenciais sao obrigatorias",
+            detail="Credenciais são obrigatórias",
         )
 
     statement = select(OrganizationProvider).where(
@@ -142,7 +142,7 @@ def delete_provider(organization_id: uuid.UUID, provider_id: uuid.UUID, db: Sess
     if not provider or provider.organization_id != organization_id:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Provedor nao encontrado",
+            detail="Provedor não encontrado",
         )
 
     db.delete(provider)

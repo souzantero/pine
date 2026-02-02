@@ -27,7 +27,7 @@ def list_members(
     if not check_permission(db, current_user.id, organization_id, Permission.MEMBERS_READ):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Permissao MEMBERS_READ necessaria",
+            detail="Permissão MEMBERS_READ necessária",
         )
     return list_members_service(organization_id, db)
 
@@ -43,7 +43,7 @@ def remove_member(
     if not check_permission(db, current_user.id, organization_id, Permission.MEMBERS_MANAGE):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Permissao MEMBERS_MANAGE necessaria",
+            detail="Permissão MEMBERS_MANAGE necessária",
         )
     remove_member_service(organization_id, member_id, current_user.id, db)
 
@@ -60,6 +60,6 @@ def update_member_role(
     if not check_permission(db, current_user.id, organization_id, Permission.MEMBERS_MANAGE):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Permissao MEMBERS_MANAGE necessaria",
+            detail="Permissão MEMBERS_MANAGE necessária",
         )
     return update_member_role_service(organization_id, member_id, payload.role_id, db)

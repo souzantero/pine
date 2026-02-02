@@ -51,7 +51,7 @@ def list_collections(
     if not check_permission(db, current_user.id, organization_id, Permission.COLLECTIONS_READ):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Permissao COLLECTIONS_READ necessaria",
+            detail="Permissão COLLECTIONS_READ necessária",
         )
     return list_collections_service(organization_id, db)
 
@@ -67,7 +67,7 @@ def get_collection(
     if not check_permission(db, current_user.id, organization_id, Permission.COLLECTIONS_READ):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Permissao COLLECTIONS_READ necessaria",
+            detail="Permissão COLLECTIONS_READ necessária",
         )
     return get_collection_service(organization_id, collection_id, db)
 
@@ -83,7 +83,7 @@ def create_collection(
     if not check_permission(db, current_user.id, organization_id, Permission.COLLECTIONS_CREATE):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Permissao COLLECTIONS_CREATE necessaria",
+            detail="Permissão COLLECTIONS_CREATE necessária",
         )
     return create_collection_service(organization_id, payload.name, payload.description, db)
 
@@ -100,7 +100,7 @@ def update_collection(
     if not check_permission(db, current_user.id, organization_id, Permission.COLLECTIONS_UPDATE):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Permissao COLLECTIONS_UPDATE necessaria",
+            detail="Permissão COLLECTIONS_UPDATE necessária",
         )
     return update_collection_service(organization_id, collection_id, payload.name, payload.description, db)
 
@@ -116,7 +116,7 @@ def delete_collection(
     if not check_permission(db, current_user.id, organization_id, Permission.COLLECTIONS_DELETE):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Permissao COLLECTIONS_DELETE necessaria",
+            detail="Permissão COLLECTIONS_DELETE necessária",
         )
     delete_collection_service(organization_id, collection_id, db)
 
@@ -142,7 +142,7 @@ def list_documents(
     if not check_permission(db, current_user.id, organization_id, Permission.DOCUMENTS_READ):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Permissao DOCUMENTS_READ necessaria",
+            detail="Permissão DOCUMENTS_READ necessária",
         )
     return list_documents_service(organization_id, collection_id, db)
 
@@ -159,7 +159,7 @@ def get_document(
     if not check_permission(db, current_user.id, organization_id, Permission.DOCUMENTS_READ):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Permissao DOCUMENTS_READ necessaria",
+            detail="Permissão DOCUMENTS_READ necessária",
         )
     return get_document_service(organization_id, collection_id, document_id, db)
 
@@ -176,7 +176,7 @@ async def upload_document(
     if not check_permission(db, current_user.id, organization_id, Permission.DOCUMENTS_CREATE):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Permissao DOCUMENTS_CREATE necessaria",
+            detail="Permissão DOCUMENTS_CREATE necessária",
         )
     return await upload_document_service(organization_id, collection_id, file, db)
 
@@ -193,6 +193,6 @@ def delete_document(
     if not check_permission(db, current_user.id, organization_id, Permission.DOCUMENTS_DELETE):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Permissao DOCUMENTS_DELETE necessaria",
+            detail="Permissão DOCUMENTS_DELETE necessária",
         )
     delete_document_service(organization_id, collection_id, document_id, db)

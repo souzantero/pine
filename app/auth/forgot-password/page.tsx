@@ -103,7 +103,7 @@ export default function ForgotPasswordPage() {
             Recuperar Senha
           </CardTitle>
           <CardDescription className="text-center">
-            Digite seu email para receber um link de recuperacao
+            Digite seu e-mail para receber um link de recuperação
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>

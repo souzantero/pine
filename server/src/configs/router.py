@@ -27,7 +27,7 @@ def _check_org_manage(db, user_id, organization_id):
     if not check_permission(db, user_id, organization_id, Permission.ORGANIZATION_MANAGE):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Permissao ORGANIZATION_MANAGE necessaria",
+            detail="Permissão ORGANIZATION_MANAGE necessária",
         )
 
 

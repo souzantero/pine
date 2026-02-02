@@ -60,7 +60,7 @@ def get_available_models(
     if not organization:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Organizacao nao encontrada",
+            detail="Organização não encontrada",
         )
 
     statement = (

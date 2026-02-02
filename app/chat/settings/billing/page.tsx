@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "@/lib/session";
 import { useBilling } from "@/lib/hooks";
@@ -36,6 +36,14 @@ function formatBytes(bytes: number): string {
 }
 
 export default function BillingPage() {
+  return (
+    <Suspense fallback={null}>
+      <BillingContent />
+    </Suspense>
+  );
+}
+
+function BillingContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isLoading: authLoading, hasPermission } = useSession();

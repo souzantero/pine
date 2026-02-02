@@ -74,16 +74,17 @@ pineai/
 ├── server/                 # Backend Python (arquitetura modular)
 │   ├── src/
 │   │   ├── api.py          # FastAPI app
-│   │   ├── core/           # Base compartilhada (env, schemas, storage, embedding)
+│   │   ├── core/           # Base compartilhada (env, schemas, storage, email)
 │   │   ├── database/       # Conexao, entities, dependencies
-│   │   ├── auth/           # Autenticacao, JWT, dependencies
+│   │   ├── auth/           # Autenticacao, JWT, verificacao email, reset senha
 │   │   ├── organization/   # Organizacoes, members, invites
 │   │   ├── roles/          # Gestao de roles
 │   │   ├── threads/        # Threads de chat, streaming SSE
 │   │   ├── providers/      # Configuracao de provedores LLM
 │   │   ├── models/         # Modelos de IA disponiveis
 │   │   ├── configs/        # Configuracoes de ferramentas
-│   │   ├── knowledge/      # Collections e documentos (RAG)
+│   │   ├── billing/        # Monetizacao com Stripe
+│   │   ├── knowledge/      # Collections, documentos e RAG (pipeline ETL)
 │   │   ├── agent/          # Agente de IA (LangGraph)
 │   │   └── web/            # Ferramentas web (search, fetch)
 │   └── db/                 # Alembic migrations
@@ -92,17 +93,41 @@ pineai/
 
 ## Funcionalidades
 
+**Autenticacao e Usuarios:**
 - Autenticacao com JWT (login, registro)
+- Verificacao de email no registro (Resend)
+- Recuperacao e alteracao de senha
+- Gestao de conta do usuario
+
+**Organizacoes:**
 - Gestao de organizacoes multi-tenant
 - Sistema de permissoes RBAC
 - Convites para organizacoes
 - Gestao de membros e roles
+- Wizard de onboarding multi-step
+
+**Chat e IA:**
 - Threads de conversacao com streaming em tempo real
 - Renderizacao de Markdown nas mensagens
-- Agente de IA com ferramentas (web_search, web_fetch)
+- Agente de IA com ferramentas (web_search, web_fetch, knowledge_search)
 - Configuracao de ferramentas por organizacao
 - Prompts de sistema
 - Configuracao de provedores (LLM: OpenAI, OpenRouter, Anthropic, Google; Web Search: Tavily)
+
+**Base de Conhecimento (RAG):**
+- Upload e processamento de documentos
+- Multiplas estrategias de chunking
+- Busca hibrida (semantica + keywords) com RRF
+- Ferramenta de busca RAG integrada ao agente
+
+**Monetizacao:**
+- Integracao com Stripe (checkout, portal, webhooks)
+- Planos e limites de uso
+- Pagina de billing e assinaturas
+
+**Outros:**
+- Landing page profissional
+- Paginas de Politica de Privacidade e Termos de Uso
 
 ## Scripts
 
@@ -131,8 +156,12 @@ O backend expoe os seguintes endpoints:
 | Endpoint | Descricao |
 |----------|-----------|
 | `POST /auth/login` | Login, retorna JWT |
-| `POST /auth/register` | Registro de usuario |
+| `POST /auth/register` | Registro de usuario com verificacao de email |
 | `GET /auth/me` | Usuario atual e memberships |
+| `POST /auth/verify-email` | Verificar email com token |
+| `POST /auth/forgot-password` | Solicitar reset de senha |
+| `POST /auth/reset-password` | Resetar senha com token |
+| `POST /auth/change-password` | Alterar senha (autenticado) |
 | `GET /organizations/{id}/threads` | Listar threads |
 | `GET /organizations/{id}/prompts` | Listar prompts |
 | `GET /organizations/{id}/members` | Listar membros |
@@ -140,5 +169,8 @@ O backend expoe os seguintes endpoints:
 | `GET /organizations/{id}/models` | Modelos disponiveis |
 | `GET /organizations/{id}/providers` | Provedores configurados (LLM, Web Search) |
 | `GET /organizations/{id}/configs` | Configuracoes de ferramentas |
+| `GET /organizations/{id}/collections` | Collections de conhecimento |
+| `GET /organizations/{id}/billing` | Status e uso do billing |
+| `POST /organizations/{id}/billing/checkout` | Criar sessao de checkout Stripe |
 
 Documentacao completa da API em: `http://localhost:8888/docs`

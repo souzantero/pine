@@ -28,7 +28,7 @@ def list_roles(
     if not check_permission(db, current_user.id, organization_id, Permission.ROLES_READ):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Permissao ROLES_READ necessaria",
+            detail="Permissão ROLES_READ necessária",
         )
     return list_roles_service(organization_id, db)
 
@@ -44,7 +44,7 @@ def create_role(
     if not check_permission(db, current_user.id, organization_id, Permission.ROLES_MANAGE):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Permissao ROLES_MANAGE necessaria",
+            detail="Permissão ROLES_MANAGE necessária",
         )
     return create_role_service(organization_id, payload.name, payload.description, payload.permissions, db)
 
@@ -61,7 +61,7 @@ def update_role(
     if not check_permission(db, current_user.id, organization_id, Permission.ROLES_MANAGE):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Permissao ROLES_MANAGE necessaria",
+            detail="Permissão ROLES_MANAGE necessária",
         )
     return update_role_service(organization_id, role_id, payload.name, payload.description, payload.permissions, db)
 
@@ -77,6 +77,6 @@ def delete_role(
     if not check_permission(db, current_user.id, organization_id, Permission.ROLES_MANAGE):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Permissao ROLES_MANAGE necessaria",
+            detail="Permissão ROLES_MANAGE necessária",
         )
     delete_role_service(organization_id, role_id, db)

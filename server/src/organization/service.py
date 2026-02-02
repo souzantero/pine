@@ -78,7 +78,7 @@ def create_member_role(db: Session, organization_id: uuid.UUID) -> Role:
         organization_id=organization_id,
         scope=RoleScope.ORGANIZATION,
         name="Membro",
-        description="Membro com acesso basico",
+        description="Membro com acesso básico",
         is_system_role=True,
     )
     db.add(role)
@@ -109,7 +109,7 @@ def create_organization(
     if existing_org:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Slug ja esta em uso",
+            detail="Slug já está em uso",
         )
 
     organization = Organization(
@@ -147,7 +147,7 @@ def get_organization(organization_id: uuid.UUID, db: Session) -> OrganizationDet
     if not organization:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Organizacao nao encontrada",
+            detail="Organização não encontrada",
         )
 
     return OrganizationDetailResponse(
@@ -167,7 +167,7 @@ def update_organization(
     if not organization:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Organizacao nao encontrada",
+            detail="Organização não encontrada",
         )
 
     if payload.name is not None:
@@ -182,7 +182,7 @@ def update_organization(
         if existing:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Slug ja esta em uso",
+                detail="Slug já está em uso",
             )
         organization.slug = payload.slug
 

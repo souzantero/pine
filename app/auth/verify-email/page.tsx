@@ -31,7 +31,7 @@ function VerifyEmailContent() {
   const verifyToken = useCallback(async () => {
     if (!token) {
       setStatus("error");
-      setError("Token de verificacao nao encontrado");
+      setError("Token de verificação não encontrado");
       return;
     }
 
@@ -60,7 +60,7 @@ function VerifyEmailContent() {
       }
     } catch {
       setStatus("error");
-      setError("Erro ao verificar email");
+      setError("Erro ao verificar e-mail");
     }
   }, [token, refreshSession, router]);
 
@@ -75,7 +75,7 @@ function VerifyEmailContent() {
           <CardContent className="pt-6">
             <div className="flex flex-col items-center gap-4">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              <p className="text-muted-foreground">Verificando seu email...</p>
+              <p className="text-muted-foreground">Verificando seu e-mail...</p>
             </div>
           </CardContent>
         </Card>
@@ -100,7 +100,7 @@ function VerifyEmailContent() {
               </div>
             </div>
             <CardTitle className="text-2xl font-bold text-center">
-              Verificacao Falhou
+              Verificação Falhou
             </CardTitle>
             <CardDescription className="text-center">{error}</CardDescription>
           </CardHeader>

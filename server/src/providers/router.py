@@ -27,7 +27,7 @@ def list_providers(
     if not check_permission(db, current_user.id, organization_id, Permission.ORGANIZATION_MANAGE):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Permissao ORGANIZATION_MANAGE necessaria",
+            detail="Permissão ORGANIZATION_MANAGE necessária",
         )
     return list_providers_service(organization_id, db, type)
 
@@ -43,7 +43,7 @@ def create_or_update_provider(
     if not check_permission(db, current_user.id, organization_id, Permission.ORGANIZATION_MANAGE):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Permissao ORGANIZATION_MANAGE necessaria",
+            detail="Permissão ORGANIZATION_MANAGE necessária",
         )
     return create_or_update_provider_service(
         organization_id, payload.type, payload.provider, payload.credentials, db
@@ -61,6 +61,6 @@ def delete_provider(
     if not check_permission(db, current_user.id, organization_id, Permission.ORGANIZATION_MANAGE):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Permissao ORGANIZATION_MANAGE necessaria",
+            detail="Permissão ORGANIZATION_MANAGE necessária",
         )
     delete_provider_service(organization_id, provider_id, db)

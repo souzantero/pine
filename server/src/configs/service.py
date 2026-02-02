@@ -24,7 +24,7 @@ def validate_config_type(type_str: str) -> ConfigType:
     except ValueError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Tipo de configuracao invalido: {type_str}. Valores aceitos: {[t.value for t in ConfigType]}",
+            detail=f"Tipo de configuração inválido: {type_str}. Valores aceitos: {[t.value for t in ConfigType]}",
         )
 
 
@@ -35,7 +35,7 @@ def validate_config_key(key_str: str) -> ConfigKey:
     except ValueError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Chave de configuracao invalida: {key_str}. Valores aceitos: {[k.value for k in ConfigKey]}",
+            detail=f"Chave de configuração inválida: {key_str}. Valores aceitos: {[k.value for k in ConfigKey]}",
         )
 
 
@@ -46,15 +46,15 @@ def validate_tool_provider(provider_str: str, key: ConfigKey) -> Provider:
     except ValueError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Provedor invalido: {provider_str}",
+            detail=f"Provedor inválido: {provider_str}",
         )
 
     valid_providers = PROVIDERS_BY_TOOL_KEY.get(key, [])
     if provider not in valid_providers:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Provedor {provider_str} nao e compativel com ferramenta {key.value}. "
-            f"Provedores validos: {[p.value for p in valid_providers]}",
+            detail=f"Provedor {provider_str} não é compatível com ferramenta {key.value}. "
+            f"Provedores válidos: {[p.value for p in valid_providers]}",
         )
 
     return provider
@@ -70,14 +70,14 @@ def validate_llm_provider(provider_str: str | None) -> Provider | None:
     except ValueError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Provedor LLM invalido: {provider_str}",
+            detail=f"Provedor LLM inválido: {provider_str}",
         )
 
     if provider not in LLM_PROVIDERS:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Provedor {provider_str} nao e um provedor LLM valido. "
-            f"Provedores validos: {[p.value for p in LLM_PROVIDERS]}",
+            detail=f"Provedor {provider_str} não é um provedor LLM válido. "
+            f"Provedores válidos: {[p.value for p in LLM_PROVIDERS]}",
         )
 
     return provider
@@ -96,7 +96,7 @@ def check_provider_configured(
     if not db.exec(statement).first():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Provedor {provider.value} nao esta configurado para esta organizacao. Configure em Provedores primeiro.",
+            detail=f"Provedor {provider.value} não está configurado para esta organização. Configure em Provedores primeiro.",
         )
 
 
@@ -168,7 +168,7 @@ def get_config(
     if not config:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Configuracao {type_str}/{key_str} nao encontrada",
+            detail=f"Configuracao {type_str}/{key_str} não encontrada",
         )
 
     return _to_response(config)
@@ -192,7 +192,7 @@ def create_config(
     if db.exec(statement).first():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Ja existe configuracao {config_type.value}/{config_key.value}. Use PUT para atualizar.",
+            detail=f"Já existe configuração {config_type.value}/{config_key.value}. Use PUT para atualizar.",
         )
 
     config = OrganizationConfig(
@@ -227,7 +227,7 @@ def update_config(
     if not config:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Configuracao {type_str}/{key_str} nao encontrada",
+            detail=f"Configuracao {type_str}/{key_str} não encontrada",
         )
 
     if config_data is not None:
@@ -259,7 +259,7 @@ def delete_config(organization_id: uuid.UUID, type_str: str, key_str: str, db: S
     if not config:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Configuracao {type_str}/{key_str} nao encontrada",
+            detail=f"Configuracao {type_str}/{key_str} não encontrada",
         )
 
     db.delete(config)

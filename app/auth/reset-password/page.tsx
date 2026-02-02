@@ -37,17 +37,17 @@ function ResetPasswordContent() {
     setError(null);
 
     if (!token) {
-      setError("Token de recuperacao nao encontrado");
+      setError("Token de recuperação não encontrado");
       return;
     }
 
     if (!validation.isValid) {
-      setError("A senha nao atende aos requisitos minimos");
+      setError("A senha não atende aos requisitos mínimos");
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setError("As senhas nao coincidem");
+      setError("As senhas não coincidem");
       return;
     }
 
@@ -87,10 +87,10 @@ function ResetPasswordContent() {
               </div>
             </div>
             <CardTitle className="text-2xl font-bold text-center">
-              Link Invalido
+              Link Inválido
             </CardTitle>
             <CardDescription className="text-center">
-              O link de recuperacao de senha e invalido ou expirou.
+              O link de recuperação de senha é inválido ou expirou.
             </CardDescription>
           </CardHeader>
           <CardFooter className="flex flex-col space-y-4 pt-2">

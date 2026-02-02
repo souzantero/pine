@@ -73,7 +73,7 @@ def get_collection_or_404(
     if not collection:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Colecao nao encontrada",
+            detail="Coleção não encontrada",
         )
 
     return collection
@@ -129,7 +129,7 @@ def get_collection(
     if not result:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Colecao nao encontrada",
+            detail="Coleção não encontrada",
         )
 
     collection, document_count = result
@@ -154,7 +154,7 @@ def create_collection(
     if not name or not name.strip():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Nome da colecao e obrigatorio",
+            detail="Nome da coleção é obrigatório",
         )
 
     collection = DocumentCollection(
@@ -184,14 +184,14 @@ def update_collection(
     if not collection:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Colecao nao encontrada",
+            detail="Coleção não encontrada",
         )
 
     if name is not None:
         if not name.strip():
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Nome da colecao nao pode ser vazio",
+                detail="Nome da coleção não pode ser vazio",
             )
         collection.name = name.strip()
 
@@ -219,7 +219,7 @@ def delete_collection(organization_id: uuid.UUID, collection_id: uuid.UUID, db: 
     if not collection:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Colecao nao encontrada",
+            detail="Coleção não encontrada",
         )
 
     # Remove arquivos do S3 para cada documento
@@ -273,7 +273,7 @@ def get_document(
     if not document:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Documento nao encontrado",
+            detail="Documento não encontrado",
         )
 
     download_url = None
@@ -306,7 +306,7 @@ async def upload_document(
     if file.content_type not in ALLOWED_MIME_TYPES:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Tipo de arquivo nao suportado: {file.content_type}. Apenas PDF e aceito.",
+            detail=f"Tipo de arquivo não suportado: {file.content_type}. Apenas PDF é aceito.",
         )
 
     content = await file.read()
@@ -315,7 +315,7 @@ async def upload_document(
     if file_size > MAX_FILE_SIZE:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Arquivo muito grande. Tamanho maximo: {MAX_FILE_SIZE // (1024*1024)} MB",
+            detail=f"Arquivo muito grande. Tamanho máximo: {MAX_FILE_SIZE // (1024*1024)} MB",
         )
 
     if file_size == 0:
@@ -393,7 +393,7 @@ def delete_document(
     if not document:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Documento nao encontrado",
+            detail="Documento não encontrado",
         )
 
     file_size = document.file_size

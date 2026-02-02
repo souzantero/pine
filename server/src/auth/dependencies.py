@@ -30,7 +30,7 @@ async def get_current_user(
     """Dependency que retorna o usuario autenticado ou 401."""
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Token invalido ou expirado",
+        detail="Token inválido ou expirado",
         headers={"WWW-Authenticate": "Bearer"},
     )
 
@@ -68,7 +68,7 @@ async def get_current_membership(
     if not membership:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Voce nao e membro desta organizacao",
+            detail="Você não é membro desta organização",
         )
 
     return membership
@@ -120,7 +120,7 @@ def require_permission(required_permission: Permission):
         if not check_permission(db, current_user.id, organization_id, required_permission):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Permissao {required_permission.value} necessaria",
+                detail=f"Permissão {required_permission.value} necessária",
             )
         return current_user
 

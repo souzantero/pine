@@ -49,6 +49,6 @@ def update_organization(
         from fastapi import HTTPException
         raise HTTPException(
             status_code=403,
-            detail="Permissao ORGANIZATION_MANAGE necessaria",
+            detail="Permissão ORGANIZATION_MANAGE necessária",
         )
     return update_organization_service(organization_id, payload, db)

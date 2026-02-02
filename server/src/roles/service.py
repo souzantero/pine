@@ -25,7 +25,7 @@ def validate_permissions(permissions: List[str]) -> List[Permission]:
         except ValueError:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Permissao invalida: {perm_str}. Valores aceitos: {[p.value for p in Permission]}",
+                detail=f"Permissão inválida: {perm_str}. Valores aceitos: {[p.value for p in Permission]}",
             )
     return valid_permissions
 
@@ -67,7 +67,7 @@ def create_role(
     if existing:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Ja existe uma role com este nome",
+            detail="Já existe uma role com este nome",
         )
 
     role = Role(
@@ -109,13 +109,13 @@ def update_role(
     if not role or role.organization_id != organization_id:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Role nao encontrada",
+            detail="Role não encontrada",
         )
 
     if role.is_system_role:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Nao e possivel editar roles do sistema",
+            detail="Não é possível editar roles do sistema",
         )
 
     if name is not None:
@@ -128,7 +128,7 @@ def update_role(
         if existing:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Ja existe uma role com este nome",
+                detail="Já existe uma role com este nome",
             )
         role.name = name
 
@@ -172,13 +172,13 @@ def delete_role(organization_id: uuid.UUID, role_id: uuid.UUID, db: Session) -> 
     if not role or role.organization_id != organization_id:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Role nao encontrada",
+            detail="Role não encontrada",
         )
 
     if role.is_system_role:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Nao e possivel deletar roles do sistema",
+            detail="Não é possível deletar roles do sistema",
         )
 
     statement = select(OrganizationMember).where(OrganizationMember.role_id == role_id)
@@ -186,7 +186,7 @@ def delete_role(organization_id: uuid.UUID, role_id: uuid.UUID, db: Session) -> 
     if members_using:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Nao e possivel deletar role que esta sendo usada por membros",
+            detail="Não é possível deletar role que está sendo usada por membros",
         )
 
     statement = select(RolePermission).where(RolePermission.role_id == role_id)
