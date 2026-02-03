@@ -25,6 +25,8 @@ import {
   HardDrive,
   Loader2,
   Shield,
+  Clock,
+  AlertTriangle,
 } from "lucide-react";
 
 function formatBytes(bytes: number): string {
@@ -33,6 +35,15 @@ function formatBytes(bytes: number): string {
   const sizes = ["B", "KB", "MB", "GB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
+}
+
+function getTrialDaysRemaining(endsAt: string | null): number | null {
+  if (!endsAt) return null;
+  const end = new Date(endsAt);
+  const now = new Date();
+  const diffMs = end.getTime() - now.getTime();
+  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+  return Math.max(0, diffDays);
 }
 
 export default function BillingPage() {
@@ -134,6 +145,69 @@ function BillingContent() {
             </div>
           </div>
         )}
+
+        {/* Banner de Trial */}
+        {usage?.trial && !isPro && (() => {
+          const daysRemaining = getTrialDaysRemaining(usage.trial.endsAt);
+          const isExpired = usage.trial.expired;
+
+          if (isExpired) {
+            return (
+              <div className="mb-6 p-4 bg-red-50 dark:bg-red-950/50 rounded-lg border border-red-200 dark:border-red-800">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-red-700 dark:text-red-300">
+                    <AlertTriangle className="h-5 w-5" />
+                    <span className="font-medium">
+                      Seu período de teste expirou
+                    </span>
+                  </div>
+                  <Button
+                    size="sm"
+                    onClick={handleUpgrade}
+                    disabled={upgradeLoading}
+                    className="cursor-pointer"
+                  >
+                    {upgradeLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Fazer upgrade
+                  </Button>
+                </div>
+                <p className="mt-2 text-sm text-red-600 dark:text-red-400">
+                  Faça upgrade para o plano Team para continuar usando o Pineai.
+                </p>
+              </div>
+            );
+          }
+
+          if (daysRemaining !== null && daysRemaining <= 3) {
+            return (
+              <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-950/50 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-yellow-700 dark:text-yellow-300">
+                    <Clock className="h-5 w-5" />
+                    <span className="font-medium">
+                      {daysRemaining === 0
+                        ? "Último dia de teste"
+                        : daysRemaining === 1
+                          ? "1 dia restante de teste"
+                          : `${daysRemaining} dias restantes de teste`}
+                    </span>
+                  </div>
+                  <Button
+                    size="sm"
+                    onClick={handleUpgrade}
+                    disabled={upgradeLoading}
+                    className="cursor-pointer"
+                  >
+                    {upgradeLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Fazer upgrade
+                  </Button>
+                </div>
+              </div>
+            );
+          }
+
+          return null;
+        })()}
 
         {/* Plano Atual */}
         <Card className="mb-6">
@@ -331,6 +405,7 @@ function BillingContent() {
             <div className="grid grid-cols-3 gap-4">
               <div className="p-4 border rounded-lg">
                 <h3 className="font-semibold mb-3">Free</h3>
+                <p className="text-xs text-muted-foreground mb-3">7 dias de teste</p>
                 <ul className="space-y-2 text-sm text-muted-foreground">
                   <li>1 membro</li>
                   <li>1 coleção de conhecimento</li>

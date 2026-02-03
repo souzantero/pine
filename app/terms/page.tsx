@@ -110,9 +110,10 @@ export default function TermsPage() {
             </p>
             <ul className="list-disc pl-6 space-y-2">
               <li>
-                <strong>Free:</strong> Gratuito, com limites de uso (1 membro,
+                <strong>Free:</strong> Gratuito por 7 dias, com limites de uso (1 membro,
                 1 coleção, 50 conversas, 200 chamadas de ferramentas/mês, 100MB
-                de armazenamento).
+                de armazenamento). Após o período de teste, é necessário fazer
+                upgrade para continuar usando.
               </li>
               <li>
                 <strong>Team:</strong> R$149/mês, com limites expandidos (10 membros,

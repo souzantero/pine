@@ -7,6 +7,7 @@ from fastapi.responses import StreamingResponse
 
 from src.agent.common import get_tool_display_name
 from src.auth import CurrentMembershipDependency, CurrentUserDependency, check_permission
+from src.billing.limits import check_trial_expired
 from src.database import DatabaseDependency
 from src.database.entities import Permission
 from .helpers import agent_messages_to_list, chunk_to_text, is_tool_call_chunk
@@ -58,6 +59,7 @@ def create_thread(
 ):
     """Cria uma nova thread (requer THREADS_WRITE)."""
     _check_permission(db, current_user.id, organization_id, Permission.THREADS_WRITE)
+    check_trial_expired(db, organization_id)
     return create_thread_service(organization_id, membership.id, payload.title, db)
 
 
@@ -120,6 +122,7 @@ async def stream_run(
 ):
     """Executa com streaming SSE (requer THREADS_WRITE)."""
     _check_permission(db, current_user.id, organization_id, Permission.THREADS_WRITE)
+    check_trial_expired(db, organization_id)
 
     agent, thread_config, messages, agent_context = prepare_stream_run(
         organization_id, thread_id, payload, current_user, db,

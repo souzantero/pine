@@ -227,6 +227,11 @@ export interface StorageUsage {
   limit: number | null;
 }
 
+export interface TrialInfo {
+  endsAt: string | null;
+  expired: boolean;
+}
+
 export interface BillingUsage {
   plan: PlanType;
   members: UsageItem;
@@ -234,4 +239,5 @@ export interface BillingUsage {
   threads: UsageItem;
   toolCalls: ToolCallsUsage;
   storage: StorageUsage;
+  trial: TrialInfo;
 }

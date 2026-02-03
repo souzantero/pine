@@ -515,12 +515,12 @@ export default function LandingPage() {
               <div>
                 <h3 className="text-2xl font-bold">Free</h3>
                 <p className="text-muted-foreground mt-2">
-                  Perfeito para experimentar a plataforma
+                  7 dias para experimentar a plataforma
                 </p>
               </div>
               <div className="flex items-baseline gap-1">
-                <span className="text-4xl font-bold">$0</span>
-                <span className="text-muted-foreground">/mês</span>
+                <span className="text-4xl font-bold">R$0</span>
+                <span className="text-muted-foreground">/7 dias</span>
               </div>
               <ul className="space-y-3">
                 <li className="flex items-center gap-3">

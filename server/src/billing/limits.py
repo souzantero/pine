@@ -17,6 +17,9 @@ from src.database.entities import (
 )
 
 
+# Duracao do trial do plano Free em dias
+FREE_TRIAL_DAYS = 7
+
 # Limites por plano
 PLAN_LIMITS = {
     OrganizationPlan.FREE: {
@@ -55,6 +58,38 @@ def get_or_create_billing(db: Session, organization_id: uuid.UUID) -> Organizati
         db.refresh(billing)
 
     return billing
+
+
+def get_trial_end_date(billing: OrganizationBilling) -> datetime | None:
+    """Retorna a data de fim do trial para planos Free, ou None para planos pagos."""
+    if billing.plan != OrganizationPlan.FREE:
+        return None
+
+    created_at = billing.created_at
+    if created_at.tzinfo is None:
+        created_at = created_at.replace(tzinfo=UTC)
+
+    return created_at + relativedelta(days=FREE_TRIAL_DAYS)
+
+
+def is_trial_expired(billing: OrganizationBilling) -> bool:
+    """Verifica se o trial do plano Free expirou."""
+    trial_end = get_trial_end_date(billing)
+    if trial_end is None:
+        return False
+
+    return datetime.now(UTC) >= trial_end
+
+
+def check_trial_expired(db: Session, organization_id: uuid.UUID) -> None:
+    """Verifica se o trial expirou e bloqueia o uso."""
+    billing = get_or_create_billing(db, organization_id)
+
+    if is_trial_expired(billing):
+        raise HTTPException(
+            status_code=status.HTTP_402_PAYMENT_REQUIRED,
+            detail="Seu período de teste de 7 dias expirou. Faça upgrade para o plano Team para continuar usando.",
+        )
 
 
 def check_member_limit(db: Session, organization_id: uuid.UUID) -> None:
@@ -213,6 +248,10 @@ def get_usage(db: Session, organization_id: uuid.UUID) -> dict:
         select(func.count(Thread.id)).where(Thread.organization_id == organization_id)
     ).one()
 
+    # Info do trial para plano Free
+    trial_end = get_trial_end_date(billing)
+    trial_expired = is_trial_expired(billing)
+
     return {
         "plan": billing.plan.value,
         "members": {"current": members_count, "limit": limits["members"]},
@@ -226,5 +265,9 @@ def get_usage(db: Session, organization_id: uuid.UUID) -> dict:
         "storage": {
             "current": billing.storage_used_bytes,
             "limit": limits["storage_bytes"],
+        },
+        "trial": {
+            "endsAt": trial_end.isoformat() if trial_end else None,
+            "expired": trial_expired,
         },
     }
