@@ -28,9 +28,9 @@ PLAN_LIMITS = {
     },
     OrganizationPlan.TEAM: {
         "members": 10,
-        "collections": None,  # Ilimitado
-        "threads": None,  # Ilimitado
-        "tool_calls_per_month": None,  # Ilimitado
+        "collections": 10,
+        "threads": 1000,  # Por mês
+        "tool_calls_per_month": 5000,
         "storage_bytes": 5 * 1024 * 1024 * 1024,  # 5GB
     },
 }
@@ -73,10 +73,11 @@ def check_member_limit(db: Session, organization_id: uuid.UUID) -> None:
     ).one()
 
     if count >= max_members:
-        raise HTTPException(
-            status_code=status.HTTP_402_PAYMENT_REQUIRED,
-            detail=f"Limite de {max_members} membro(s) atingido. Faça upgrade para o plano Team para adicionar mais membros.",
-        )
+        if billing.plan == OrganizationPlan.FREE:
+            msg = f"Limite de {max_members} membro(s) atingido. Faça upgrade para o plano Team para adicionar mais membros."
+        else:
+            msg = f"Limite de {max_members} membro(s) do plano {billing.plan.value} atingido."
+        raise HTTPException(status_code=status.HTTP_402_PAYMENT_REQUIRED, detail=msg)
 
 
 def check_collection_limit(db: Session, organization_id: uuid.UUID) -> None:
@@ -95,10 +96,11 @@ def check_collection_limit(db: Session, organization_id: uuid.UUID) -> None:
     ).one()
 
     if count >= max_collections:
-        raise HTTPException(
-            status_code=status.HTTP_402_PAYMENT_REQUIRED,
-            detail=f"Limite de {max_collections} coleção(ões) atingido. Faça upgrade para o plano Team para criar mais coleções.",
-        )
+        if billing.plan == OrganizationPlan.FREE:
+            msg = f"Limite de {max_collections} coleção(ões) atingido. Faça upgrade para o plano Team para criar mais coleções."
+        else:
+            msg = f"Limite de {max_collections} coleções do plano {billing.plan.value} atingido."
+        raise HTTPException(status_code=status.HTTP_402_PAYMENT_REQUIRED, detail=msg)
 
 
 def check_thread_limit(db: Session, organization_id: uuid.UUID) -> None:
@@ -115,10 +117,11 @@ def check_thread_limit(db: Session, organization_id: uuid.UUID) -> None:
     ).one()
 
     if count >= max_threads:
-        raise HTTPException(
-            status_code=status.HTTP_402_PAYMENT_REQUIRED,
-            detail=f"Limite de {max_threads} conversas atingido. Faça upgrade para o plano Team para conversas ilimitadas.",
-        )
+        if billing.plan == OrganizationPlan.FREE:
+            msg = f"Limite de {max_threads} conversas atingido. Faça upgrade para o plano Team para mais conversas."
+        else:
+            msg = f"Limite de {max_threads} conversas/mês do plano {billing.plan.value} atingido."
+        raise HTTPException(status_code=status.HTTP_402_PAYMENT_REQUIRED, detail=msg)
 
 
 def check_storage_limit(db: Session, organization_id: uuid.UUID, file_size: int) -> None:
@@ -135,10 +138,12 @@ def check_storage_limit(db: Session, organization_id: uuid.UUID, file_size: int)
     if new_total > max_storage:
         max_mb = max_storage / (1024 * 1024)
         used_mb = billing.storage_used_bytes / (1024 * 1024)
-        raise HTTPException(
-            status_code=status.HTTP_402_PAYMENT_REQUIRED,
-            detail=f"Limite de armazenamento de {max_mb:.0f}MB atingido (usado: {used_mb:.1f}MB). Faça upgrade para o plano Team para 5GB de armazenamento.",
-        )
+        if billing.plan == OrganizationPlan.FREE:
+            msg = f"Limite de armazenamento de {max_mb:.0f}MB atingido (usado: {used_mb:.1f}MB). Faça upgrade para o plano Team para 5GB de armazenamento."
+        else:
+            max_gb = max_storage / (1024 * 1024 * 1024)
+            msg = f"Limite de armazenamento de {max_gb:.0f}GB do plano {billing.plan.value} atingido (usado: {used_mb:.1f}MB)."
+        raise HTTPException(status_code=status.HTTP_402_PAYMENT_REQUIRED, detail=msg)
 
 
 def check_tool_calls_limit(db: Session, organization_id: uuid.UUID) -> None:
@@ -164,10 +169,11 @@ def check_tool_calls_limit(db: Session, organization_id: uuid.UUID) -> None:
         db.refresh(billing)
 
     if billing.tool_calls_count >= max_calls:
-        raise HTTPException(
-            status_code=status.HTTP_402_PAYMENT_REQUIRED,
-            detail=f"Limite de {max_calls} chamadas de ferramentas/mês atingido. Faça upgrade para o plano Team para chamadas ilimitadas.",
-        )
+        if billing.plan == OrganizationPlan.FREE:
+            msg = f"Limite de {max_calls} chamadas de ferramentas/mês atingido. Faça upgrade para o plano Team para mais chamadas."
+        else:
+            msg = f"Limite de {max_calls} chamadas de ferramentas/mês do plano {billing.plan.value} atingido."
+        raise HTTPException(status_code=status.HTTP_402_PAYMENT_REQUIRED, detail=msg)
 
 
 def increment_tool_calls(db: Session, organization_id: uuid.UUID, count: int = 1) -> None:

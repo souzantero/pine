@@ -115,8 +115,8 @@ export default function TermsPage() {
                 de armazenamento).
               </li>
               <li>
-                <strong>Team:</strong> $29/mês, com limites expandidos (10 membros,
-                coleções e conversas ilimitadas, chamadas de ferramentas ilimitadas,
+                <strong>Team:</strong> R$149/mês, com limites expandidos (10 membros,
+                10 coleções, 1.000 conversas/mês, 5.000 chamadas de ferramentas/mês,
                 5GB de armazenamento).
               </li>
               <li>

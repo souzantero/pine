@@ -177,7 +177,7 @@ function BillingContent() {
                   {upgradeLoading && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
-                  Upgrade para Team - $29/mês
+                  Upgrade para Team - R$149/mês
                 </Button>
               )}
             </div>
@@ -341,7 +341,7 @@ function BillingContent() {
               </div>
               <div className={`p-4 rounded-lg ${isPro ? "border-2 border-primary" : "border"}`}>
                 <h3 className="font-semibold mb-3 flex items-center gap-2">
-                  Team <span className="text-primary text-sm">$29/mês</span>
+                  Team <span className="text-primary text-sm">R$149/mês</span>
                 </h3>
                 <ul className="space-y-2 text-sm">
                   <li className="flex items-center gap-2">
@@ -350,15 +350,15 @@ function BillingContent() {
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="h-4 w-4 text-green-500" />
-                    Coleções ilimitadas
+                    10 coleções de conhecimento
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="h-4 w-4 text-green-500" />
-                    Conversas ilimitadas
+                    1.000 conversas/mês
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="h-4 w-4 text-green-500" />
-                    Chamadas ilimitadas
+                    5.000 chamadas de ferramentas/mês
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="h-4 w-4 text-green-500" />

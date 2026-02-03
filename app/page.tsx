@@ -566,7 +566,7 @@ export default function LandingPage() {
                 </p>
               </div>
               <div className="flex items-baseline gap-1">
-                <span className="text-4xl font-bold">$29</span>
+                <span className="text-4xl font-bold">R$149</span>
                 <span className="text-muted-foreground">/mês</span>
               </div>
               <ul className="space-y-3">
@@ -576,15 +576,15 @@ export default function LandingPage() {
                 </li>
                 <li className="flex items-center gap-3">
                   <Check className="h-5 w-5 text-primary flex-shrink-0" />
-                  <span>Coleções ilimitadas</span>
+                  <span>10 coleções de conhecimento</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <Check className="h-5 w-5 text-primary flex-shrink-0" />
-                  <span>Conversas ilimitadas</span>
+                  <span>1.000 conversas/mês</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <Check className="h-5 w-5 text-primary flex-shrink-0" />
-                  <span>Chamadas de ferramentas ilimitadas</span>
+                  <span>5.000 chamadas de ferramentas/mês</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <Check className="h-5 w-5 text-primary flex-shrink-0" />
