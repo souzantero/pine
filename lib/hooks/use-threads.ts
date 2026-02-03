@@ -21,7 +21,7 @@ interface UseThreadsReturn {
   isLoading: boolean;
   error: string | null;
   selectThread: (id: string | null) => void;
-  createThread: (title?: string) => Promise<ThreadWithMessages | null>;
+  createThread: (title?: string) => Promise<{ thread: ThreadWithMessages | null; error: string | null }>;
   addMessage: (threadId: string, message: Message) => void;
   updateMessage: (threadId: string, messageId: string, content: string) => void;
   updateThreadTitle: (threadId: string, title: string) => void;
@@ -149,9 +149,9 @@ export function useThreads(): UseThreadsReturn {
   }, []);
 
   const createThread = useCallback(
-    async (title?: string): Promise<ThreadWithMessages | null> => {
+    async (title?: string): Promise<{ thread: ThreadWithMessages | null; error: string | null }> => {
       if (!orgId) {
-        return null;
+        return { thread: null, error: "Organização não selecionada" };
       }
 
       try {
@@ -161,8 +161,7 @@ export function useThreads(): UseThreadsReturn {
         );
 
         if (response.error || !response.data) {
-          console.error("Erro ao criar thread");
-          return null;
+          return { thread: null, error: response.error || "Erro ao criar conversa" };
         }
 
         const newThread = mapApiThreadToThread(response.data);
@@ -170,10 +169,10 @@ export function useThreads(): UseThreadsReturn {
         setThreads((prev) => [newThread, ...prev]);
         setSelectedId(newThread.id);
 
-        return newThread;
+        return { thread: newThread, error: null };
       } catch (err) {
         console.error("Erro ao criar thread:", err);
-        return null;
+        return { thread: null, error: "Erro ao criar conversa" };
       }
     },
     [orgId]

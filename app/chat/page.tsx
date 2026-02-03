@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { useSession } from "@/lib/session";
 import { useThreads, useModels, useConfigs, useProviders } from "@/lib/hooks";
 import { Header, Sidebar, MobileSidebar, MobileThreadsDrawer } from "@/components/layout";
@@ -116,7 +117,10 @@ export default function Home() {
   }, [selectedThread, availableModels, modelsProvider, updateConfigMultiple]);
 
   const handleNewChat = useCallback(async () => {
-    await createThread();
+    const { error } = await createThread();
+    if (error) {
+      toast.error(error);
+    }
   }, [createThread]);
 
   const handleConfigChange = useCallback(
@@ -237,7 +241,12 @@ export default function Home() {
       if (!selectedId) {
         // Criar nova thread quando nao houver thread selecionada
         const title = content.slice(0, 30) + (content.length > 30 ? "..." : "");
-        const newThread = await createThread(title);
+        const { thread: newThread, error } = await createThread(title);
+
+        if (error) {
+          toast.error(error);
+          return;
+        }
 
         if (newThread) {
           const userMessage: Message = {
