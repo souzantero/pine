@@ -144,12 +144,13 @@ export default function CollectionsPage() {
 
   const isLoading = authLoading || collectionsLoading;
 
-  if (isLoading || !canRead) {
+  // Redireciona se sem permissao (apos loading)
+  if (!authLoading && !canRead) {
     return null;
   }
 
   return (
-    <AppLayout>
+    <AppLayout loading={isLoading}>
       <div className="max-w-4xl mx-auto py-6 px-4">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">

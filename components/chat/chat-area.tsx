@@ -5,6 +5,7 @@ import { Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Skeleton } from "@/components/ui/skeleton";
 import { MarkdownContent } from "./markdown-content";
 
 export interface Message {
@@ -18,10 +19,11 @@ interface ChatAreaProps {
   messages: Message[];
   onSendMessage: (content: string) => void;
   isLoading?: boolean;
+  loadingMessages?: boolean;
   disabled?: boolean;
 }
 
-export function ChatArea({ messages, onSendMessage, isLoading, disabled }: ChatAreaProps) {
+export function ChatArea({ messages, onSendMessage, isLoading, loadingMessages, disabled }: ChatAreaProps) {
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -50,7 +52,23 @@ export function ChatArea({ messages, onSendMessage, isLoading, disabled }: ChatA
     <div className="flex flex-col h-full overflow-hidden">
       <div className="flex-1 overflow-y-auto p-2 md:p-4" ref={scrollRef}>
         <div className="max-w-3xl mx-auto space-y-3 md:space-y-4">
-          {messages.length === 0 ? (
+          {loadingMessages ? (
+            // Skeleton enquanto carrega mensagens
+            <div className="space-y-4">
+              <div className="flex justify-end">
+                <Skeleton className="h-12 w-2/3 rounded-lg" />
+              </div>
+              <div className="flex justify-start">
+                <Skeleton className="h-24 w-3/4 rounded-lg" />
+              </div>
+              <div className="flex justify-end">
+                <Skeleton className="h-10 w-1/2 rounded-lg" />
+              </div>
+              <div className="flex justify-start">
+                <Skeleton className="h-32 w-2/3 rounded-lg" />
+              </div>
+            </div>
+          ) : messages.length === 0 ? (
             <div className="flex items-center justify-center h-full min-h-[200px] text-muted-foreground text-center px-4">
               <p className="text-sm md:text-base">
                 {disabled

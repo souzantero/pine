@@ -14,6 +14,7 @@ import {
   Wrench,
   Brain,
   CreditCard,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -32,6 +33,7 @@ function SidebarContent({
   showMenuToggle = true,
   isMobile = false,
   hasProviders = true,
+  creatingThread = false,
 }: SidebarProps & { onItemClick?: () => void; showMenuToggle?: boolean; isMobile?: boolean }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -212,10 +214,14 @@ function SidebarContent({
               onClick={handleNewChat}
               title={hasProviders ? "Nova conversa" : "Configure um provedor primeiro"}
               className="w-full"
-              disabled={!hasProviders}
+              disabled={!hasProviders || creatingThread}
             >
-              <Plus className="h-4 w-4" />
-              <span className="ml-2">Nova conversa</span>
+              {creatingThread ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Plus className="h-4 w-4" />
+              )}
+              <span className="ml-2">{creatingThread ? "Criando..." : "Nova conversa"}</span>
             </Button>
             {!hasProviders && (
               <p className="text-xs text-muted-foreground mt-2 px-1">

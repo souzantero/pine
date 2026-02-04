@@ -16,6 +16,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Logo } from "@/components/logo";
+import { Loader2 } from "lucide-react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -31,6 +32,20 @@ export default function LoginPage() {
       router.push(hasOrganization ? "/chat" : "/chat/onboarding");
     }
   }, [isLoading, isLoggedIn, hasOrganization, router]);
+
+  // Mostra loading enquanto verifica autenticacao
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  // Não renderiza se já está logado (aguarda redirect)
+  if (isLoggedIn) {
+    return null;
+  }
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -153,11 +153,12 @@ export default function CollectionDetailPage() {
 
   const isLoading = authLoading || collectionsLoading || documentsLoading;
 
-  if (isLoading || !canRead) {
+  // Redireciona se sem permissao (apos loading)
+  if (!authLoading && !canRead) {
     return null;
   }
 
-  if (!collection) {
+  if (!collection && !isLoading) {
     return (
       <AppLayout>
         <div className="max-w-4xl mx-auto py-6 px-4">
@@ -177,7 +178,7 @@ export default function CollectionDetailPage() {
   }
 
   return (
-    <AppLayout>
+    <AppLayout loading={isLoading}>
       <div className="max-w-4xl mx-auto py-6 px-4">
         {/* Header */}
         <div className="flex items-center gap-4 mb-6">
@@ -185,8 +186,8 @@ export default function CollectionDetailPage() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="flex-1">
-            <h1 className="text-2xl font-bold">{collection.name}</h1>
-            {collection.description && (
+            <h1 className="text-2xl font-bold">{collection?.name}</h1>
+            {collection?.description && (
               <p className="text-muted-foreground">{collection.description}</p>
             )}
           </div>

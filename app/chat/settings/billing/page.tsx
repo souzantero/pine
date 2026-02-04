@@ -99,7 +99,10 @@ function BillingContent() {
     }
   };
 
-  if (authLoading || isLoading || !canManage) {
+  const pageLoading = authLoading || isLoading;
+
+  // Redireciona se sem permissao (apos loading)
+  if (!authLoading && !canManage) {
     return null;
   }
 
@@ -121,7 +124,7 @@ function BillingContent() {
   };
 
   return (
-    <AppLayout>
+    <AppLayout loading={pageLoading}>
       <div className="max-w-3xl mx-auto py-6 px-4">
         <div className="flex items-center gap-3 mb-6">
           <div className="p-2 bg-primary/10 rounded-lg">

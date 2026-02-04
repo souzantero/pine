@@ -75,12 +75,13 @@ export default function SettingsPage() {
 
   const isLoading = authLoading || orgLoading;
 
-  if (isLoading || !canManage) {
+  // Redireciona se sem permissao (apos loading)
+  if (!authLoading && !canManage) {
     return null;
   }
 
   return (
-    <AppLayout>
+    <AppLayout loading={isLoading}>
       <div className="max-w-2xl mx-auto py-6 px-4">
         <div className="flex items-center gap-3 mb-6">
           <div className="p-2 bg-primary/10 rounded-lg">

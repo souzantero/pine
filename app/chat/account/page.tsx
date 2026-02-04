@@ -17,6 +17,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { PasswordStrength } from "@/components/ui/password-strength";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, Check } from "lucide-react";
 
 export default function AccountPage() {
@@ -69,10 +70,6 @@ export default function AccountPage() {
     setSaving(false);
   };
 
-  if (authLoading) {
-    return null;
-  }
-
   return (
     <div className="min-h-screen bg-background">
       {/* Header simples */}
@@ -94,8 +91,13 @@ export default function AccountPage() {
         </div>
       </header>
 
-      {/* Conteudo */}
-      <div className="max-w-2xl mx-auto p-4 space-y-6">
+      {authLoading ? (
+        <main className="max-w-2xl mx-auto px-4 py-6 space-y-6">
+          <Skeleton className="h-48 w-full rounded-lg" />
+          <Skeleton className="h-64 w-full rounded-lg" />
+        </main>
+      ) : (
+        <div className="max-w-2xl mx-auto p-4 space-y-6">
         {/* Informacoes do usuario */}
         <Card>
           <CardHeader>
@@ -184,6 +186,7 @@ export default function AccountPage() {
           </form>
         </Card>
       </div>
+      )}
     </div>
   );
 }

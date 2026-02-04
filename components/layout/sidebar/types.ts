@@ -10,6 +10,7 @@ export interface SidebarProps {
   onSelect: (id: string) => void;
   onNewChat: () => void;
   hasProviders?: boolean;
+  creatingThread?: boolean;
 }
 
 export interface MobileSidebarProps {
@@ -32,4 +33,5 @@ export interface MobileThreadsDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   hasProviders?: boolean;
+  creatingThread?: boolean;
 }

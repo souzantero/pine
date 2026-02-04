@@ -1,19 +1,17 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useSession } from "@/lib/session";
 import { useThreads, useModels, useConfigs, useProviders } from "@/lib/hooks";
-import { Header, Sidebar, MobileSidebar, MobileThreadsDrawer } from "@/components/layout";
+import { AppLayout } from "@/components/layout";
 import { ChatArea, ChatSettings, MobileChatSettings } from "@/components/chat";
 import { streamRun } from "@/lib/api";
 import { generateId } from "@/lib/utils";
 import type { Message, ToolKey } from "@/lib/types";
 
 export default function Home() {
-  const router = useRouter();
-  const { isLoggedIn, isLoading: authLoading, hasOrganization, currentMembership } = useSession();
+  const { isLoading: authLoading, currentMembership } = useSession();
 
   // Hooks
   const {
@@ -21,6 +19,7 @@ export default function Home() {
     selectedThread,
     selectedId,
     isLoading: threadsLoading,
+    loadingMessages,
     selectThread,
     createThread,
     addMessage,
@@ -70,22 +69,10 @@ export default function Home() {
   }, [getToolConfig, getFeatureConfig, getProvidersByType]);
 
   // Estados de UI
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [mobileThreadsOpen, setMobileThreadsOpen] = useState(false);
   const [mobileSettingsOpen, setMobileSettingsOpen] = useState(false);
   const [settingsExpanded, setSettingsExpanded] = useState(false);
   const [isInvoking, setIsInvoking] = useState(false);
-
-  // Redirect se não autenticado
-  useEffect(() => {
-    if (!authLoading) {
-      if (!isLoggedIn) {
-        router.push("/auth/login");
-      } else if (!hasOrganization) {
-        router.push("/chat/onboarding");
-      }
-    }
-  }, [authLoading, isLoggedIn, hasOrganization, router]);
+  const [creatingThread, setCreatingThread] = useState(false);
 
   // Carregar modelos do provider configurado ou auto-selecionar primeiro disponivel
   useEffect(() => {
@@ -117,13 +104,6 @@ export default function Home() {
       updateConfigMultiple(selectedThread.id, { model: availableModels[0].id });
     }
   }, [selectedThread, availableModels, modelsProvider, updateConfigMultiple]);
-
-  const handleNewChat = useCallback(async () => {
-    const { error } = await createThread();
-    if (error) {
-      toast.error(error);
-    }
-  }, [createThread]);
 
   const handleConfigChange = useCallback(
     (key: string, value: unknown) => {
@@ -278,59 +258,37 @@ export default function Home() {
 
   const isLoading = authLoading || threadsLoading;
 
-  if (isLoading || !isLoggedIn || !hasOrganization) {
-    return null;
-  }
-
-  const hasProviders = configuredProviders.length > 0;
-
-  const sidebarProps = {
-    threads,
-    selectedId,
-    onSelect: selectThread,
-    onNewChat: handleNewChat,
-    hasProviders,
-  };
+  // Callback para criar nova conversa (usado no AppLayout)
+  const handleNewChat = useCallback(async () => {
+    setCreatingThread(true);
+    const { error } = await createThread();
+    if (error) {
+      toast.error(error);
+    }
+    setCreatingThread(false);
+  }, [createThread]);
 
   return (
-    <div className="h-screen flex flex-col">
-      <Header
-        onMenuClick={() => setMobileMenuOpen(true)}
-        onSettingsClick={() => setMobileSettingsOpen(true)}
-        showSettingsButton={!!selectedThread}
-      />
-
-      {/* Mobile Menu */}
-      <MobileSidebar
-        open={mobileMenuOpen}
-        onOpenChange={setMobileMenuOpen}
-        onThreadsClick={() => setMobileThreadsOpen(true)}
-        onSettingsClick={() => setMobileSettingsOpen(true)}
-      />
-
-      {/* Mobile Threads Drawer */}
-      <MobileThreadsDrawer
-        threads={threads}
-        selectedId={selectedId}
-        onSelect={selectThread}
-        onNewChat={handleNewChat}
-        open={mobileThreadsOpen}
-        onOpenChange={setMobileThreadsOpen}
-        hasProviders={hasProviders}
-      />
-
-      <div className="flex flex-1 overflow-hidden">
-        {/* Desktop Sidebar */}
-        <Sidebar {...sidebarProps} />
-
-        <main className="flex-1 overflow-hidden">
+    <AppLayout
+      loading={isLoading}
+      showSettingsButton={!!selectedThread}
+      onSettingsClick={() => setMobileSettingsOpen(true)}
+      threads={threads}
+      selectedThreadId={selectedId}
+      onSelectThread={selectThread}
+      onNewChat={handleNewChat}
+      creatingThread={creatingThread}
+    >
+      <div className="flex h-full">
+        <div className="flex-1 overflow-hidden">
           <ChatArea
             messages={selectedThread?.messages ?? []}
             onSendMessage={handleSendMessage}
             isLoading={isInvoking}
+            loadingMessages={loadingMessages}
             disabled={!selectedThread}
           />
-        </main>
+        </div>
 
         {/* Settings Panel - Desktop only */}
         {selectedThread && (
@@ -364,6 +322,6 @@ export default function Home() {
           onOpenChange={setMobileSettingsOpen}
         />
       )}
-    </div>
+    </AppLayout>
   );
 }

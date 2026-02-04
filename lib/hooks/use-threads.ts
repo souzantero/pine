@@ -5,7 +5,6 @@ import { useSession } from "@/lib/session";
 import { api, getThreadMessages } from "@/lib/api";
 import { getThreadConfig, setThreadConfig } from "@/lib/storage";
 import type {
-  Thread,
   ThreadWithMessages,
   Message,
   ChatConfig,
@@ -19,6 +18,7 @@ interface UseThreadsReturn {
   selectedThread: ThreadWithMessages | null;
   selectedId: string | null;
   isLoading: boolean;
+  loadingMessages: boolean;
   error: string | null;
   selectThread: (id: string | null) => void;
   createThread: (title?: string) => Promise<{ thread: ThreadWithMessages | null; error: string | null }>;
@@ -81,6 +81,7 @@ export function useThreads(): UseThreadsReturn {
   const [threads, setThreads] = useState<ThreadWithMessages[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadingMessages, setLoadingMessages] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const loadedThreadsRef = useRef<Set<string>>(new Set());
 
@@ -122,8 +123,13 @@ export function useThreads(): UseThreadsReturn {
     if (loadedThreadsRef.current.has(selectedId)) return;
 
     const loadMessages = async () => {
+      setLoadingMessages(true);
       const response = await getThreadMessages(orgId, selectedId);
-      if (response.error || !response.data) return;
+
+      if (response.error || !response.data) {
+        setLoadingMessages(false);
+        return;
+      }
 
       // Filtra apenas mensagens human e ai (ignora tool e mensagens com toolCalls)
       const messages = response.data.messages
@@ -139,6 +145,7 @@ export function useThreads(): UseThreadsReturn {
         )
       );
       loadedThreadsRef.current.add(selectedId);
+      setLoadingMessages(false);
     };
 
     loadMessages();
@@ -272,6 +279,7 @@ export function useThreads(): UseThreadsReturn {
     selectedThread,
     selectedId,
     isLoading,
+    loadingMessages,
     error,
     selectThread,
     createThread,
@@ -284,50 +292,3 @@ export function useThreads(): UseThreadsReturn {
   };
 }
 
-// Hook para uso na sidebar (threads apenas para navegação)
-interface UseSidebarThreadsReturn {
-  threads: Thread[];
-  isLoading: boolean;
-}
-
-export function useSidebarThreads(): UseSidebarThreadsReturn {
-  const { currentMembership } = useSession();
-  const orgId = currentMembership?.organizationId;
-
-  const [threads, setThreads] = useState<Thread[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const loadThreads = useCallback(async () => {
-    if (!orgId) {
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      const response = await api.get<ApiThread[]>(`/organizations/${orgId}/threads`);
-
-      if (response.error || !response.data) return;
-
-      const loadedThreads: Thread[] = response.data.map((t) => ({
-        id: t.id,
-        title: t.title || "Nova conversa",
-        updatedAt: new Date(t.updatedAt),
-      }));
-
-      setThreads(loadedThreads);
-    } catch (err) {
-      console.error("Erro ao carregar threads:", err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [orgId]);
-
-  useEffect(() => {
-    loadThreads();
-  }, [loadThreads]);
-
-  return {
-    threads,
-    isLoading,
-  };
-}

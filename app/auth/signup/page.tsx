@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/card";
 import { PasswordStrength } from "@/components/ui/password-strength";
 import { Logo } from "@/components/logo";
+import { Loader2 } from "lucide-react";
 
 export default function SignupPage() {
   const [name, setName] = useState("");
@@ -37,6 +38,20 @@ export default function SignupPage() {
   }, [isLoading, isLoggedIn, hasOrganization, router]);
 
   const validation = validatePassword(password);
+
+  // Mostra loading enquanto verifica autenticacao
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  // Não renderiza se já está logado (aguarda redirect)
+  if (isLoggedIn) {
+    return null;
+  }
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
