@@ -112,13 +112,13 @@ export default function TermsPage() {
               <li>
                 <strong>Free:</strong> Gratuito por 7 dias, com limites de uso (1 membro,
                 1 coleção, 50 conversas, 200 chamadas de ferramentas/mês, 100MB
-                de armazenamento). Após o período de teste, é necessário fazer
+                de armazenamento, arquivos até 10MB). Após o período de teste, é necessário fazer
                 upgrade para continuar usando.
               </li>
               <li>
                 <strong>Team:</strong> R$149/mês, com limites expandidos (10 membros,
                 10 coleções, 1.000 conversas/mês, 5.000 chamadas de ferramentas/mês,
-                5GB de armazenamento).
+                5GB de armazenamento, arquivos até 50MB).
               </li>
               <li>
                 <strong>Enterprise:</strong> Preço personalizado, para grandes

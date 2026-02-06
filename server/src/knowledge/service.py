@@ -7,7 +7,7 @@ from typing import List
 from fastapi import HTTPException, UploadFile, status
 from sqlmodel import Session, func, select
 
-from src.billing.limits import check_collection_limit, check_storage_limit, update_storage_used
+from src.billing.limits import check_collection_limit, check_file_size_limit, check_storage_limit, update_storage_used
 from src.database.entities import Document, DocumentCollection, DocumentStatus
 from .pipeline import DocumentPipeline, PipelineError
 from .config import ConfigurationError, get_storage_service
@@ -23,8 +23,6 @@ from .schemas import (
 
 logger = logging.getLogger(__name__)
 
-# Limite de tamanho de arquivo: 50 MB
-MAX_FILE_SIZE = 50 * 1024 * 1024
 ALLOWED_MIME_TYPES = ["application/pdf"]
 
 
@@ -312,17 +310,14 @@ async def upload_document(
     content = await file.read()
     file_size = len(content)
 
-    if file_size > MAX_FILE_SIZE:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Arquivo muito grande. Tamanho máximo: {MAX_FILE_SIZE // (1024*1024)} MB",
-        )
-
     if file_size == 0:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Arquivo vazio",
         )
+
+    # Verificar limite de tamanho de arquivo do plano
+    check_file_size_limit(db, organization_id, file_size)
 
     # Verificar limite de storage do plano
     check_storage_limit(db, organization_id, file_size)

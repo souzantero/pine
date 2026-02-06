@@ -28,6 +28,7 @@ PLAN_LIMITS = {
         "threads": 50,
         "tool_calls_per_month": 200,
         "storage_bytes": 100 * 1024 * 1024,  # 100MB
+        "max_file_size": 10 * 1024 * 1024,  # 10MB
     },
     OrganizationPlan.TEAM: {
         "members": 10,
@@ -35,6 +36,7 @@ PLAN_LIMITS = {
         "threads": 1000,  # Por mês
         "tool_calls_per_month": 5000,
         "storage_bytes": 5 * 1024 * 1024 * 1024,  # 5GB
+        "max_file_size": 50 * 1024 * 1024,  # 50MB
     },
 }
 
@@ -179,6 +181,24 @@ def check_storage_limit(db: Session, organization_id: uuid.UUID, file_size: int)
             max_gb = max_storage / (1024 * 1024 * 1024)
             msg = f"Limite de armazenamento de {max_gb:.0f}GB do plano {billing.plan.value} atingido (usado: {used_mb:.1f}MB)."
         raise HTTPException(status_code=status.HTTP_402_PAYMENT_REQUIRED, detail=msg)
+
+
+def check_file_size_limit(db: Session, organization_id: uuid.UUID, file_size: int) -> None:
+    """Verifica se o arquivo excede o tamanho maximo permitido pelo plano."""
+    billing = get_or_create_billing(db, organization_id)
+    limits = get_limits(billing.plan)
+    max_file_size = limits["max_file_size"]
+
+    if max_file_size is None:
+        return
+
+    if file_size > max_file_size:
+        max_mb = max_file_size // (1024 * 1024)
+        if billing.plan == OrganizationPlan.FREE:
+            msg = f"Arquivo muito grande. Tamanho máximo no plano Free: {max_mb}MB. Faça upgrade para o plano Team para enviar arquivos maiores."
+        else:
+            msg = f"Arquivo muito grande. Tamanho máximo: {max_mb}MB."
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=msg)
 
 
 def check_tool_calls_limit(db: Session, organization_id: uuid.UUID) -> None:

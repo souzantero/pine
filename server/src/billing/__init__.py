@@ -3,6 +3,7 @@
 from .limits import (
     PLAN_LIMITS,
     check_collection_limit,
+    check_file_size_limit,
     check_member_limit,
     check_storage_limit,
     check_thread_limit,
@@ -18,6 +19,7 @@ from .router import router, webhook_router
 __all__ = [
     "PLAN_LIMITS",
     "check_collection_limit",
+    "check_file_size_limit",
     "check_member_limit",
     "check_storage_limit",
     "check_thread_limit",

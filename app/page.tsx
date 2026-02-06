@@ -543,6 +543,10 @@ export default function LandingPage() {
                   <Check className="h-5 w-5 text-primary flex-shrink-0" />
                   <span>100MB de armazenamento</span>
                 </li>
+                <li className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                  <span>Arquivos até 10MB</span>
+                </li>
               </ul>
               <Button variant="outline" size="lg" className="w-full" asChild>
                 <Link href="/auth/signup">Começar grátis</Link>
@@ -589,6 +593,10 @@ export default function LandingPage() {
                 <li className="flex items-center gap-3">
                   <Check className="h-5 w-5 text-primary flex-shrink-0" />
                   <span>5GB de armazenamento</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                  <span>Arquivos até 50MB</span>
                 </li>
               </ul>
               <Button size="lg" className="w-full" asChild>

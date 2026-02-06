@@ -415,6 +415,7 @@ function BillingContent() {
                   <li>50 conversas</li>
                   <li>200 chamadas de ferramentas/mês</li>
                   <li>100MB de armazenamento</li>
+                  <li>Arquivos até 10MB</li>
                 </ul>
               </div>
               <div className={`p-4 rounded-lg ${isPro ? "border-2 border-primary" : "border"}`}>
@@ -441,6 +442,10 @@ function BillingContent() {
                   <li className="flex items-center gap-2">
                     <Check className="h-4 w-4 text-green-500" />
                     5GB de armazenamento
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-green-500" />
+                    Arquivos até 50MB
                   </li>
                 </ul>
               </div>
