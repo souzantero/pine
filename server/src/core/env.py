@@ -27,7 +27,3 @@ email_verification_rate_limit_seconds = int(getenv("EMAIL_VERIFICATION_RATE_LIMI
 # Reset de senha
 password_reset_token_expiration_hours = int(getenv("PASSWORD_RESET_TOKEN_EXPIRATION_HOURS", "1"))
 
-# Stripe
-stripe_secret_key = getenv("STRIPE_SECRET_KEY", "")
-stripe_webhook_secret = getenv("STRIPE_WEBHOOK_SECRET", "")
-stripe_team_price_id = getenv("STRIPE_TEAM_PRICE_ID", "")

@@ -209,7 +209,7 @@ export interface DocumentDetail extends Document {
 // Billing
 // ============================================
 
-export type PlanType = "FREE" | "TEAM";
+export type PlanType = "FREE" | "ENTERPRISE";
 
 export interface UsageItem {
   current: number;
@@ -227,11 +227,6 @@ export interface StorageUsage {
   limit: number | null;
 }
 
-export interface TrialInfo {
-  endsAt: string | null;
-  expired: boolean;
-}
-
 export interface BillingUsage {
   plan: PlanType;
   members: UsageItem;
@@ -239,5 +234,4 @@ export interface BillingUsage {
   threads: UsageItem;
   toolCalls: ToolCallsUsage;
   storage: StorageUsage;
-  trial: TrialInfo;
 }

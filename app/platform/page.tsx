@@ -511,18 +511,17 @@ export default function PlatformPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {/* Free Plan */}
             <div className="bg-background border rounded-2xl p-8 space-y-6">
               <div>
                 <h3 className="text-2xl font-bold">Free</h3>
                 <p className="text-muted-foreground mt-2">
-                  7 dias para experimentar a plataforma
+                  Para explorar a plataforma
                 </p>
               </div>
               <div className="flex items-baseline gap-1">
                 <span className="text-4xl font-bold">R$0</span>
-                <span className="text-muted-foreground">/7 dias</span>
               </div>
               <ul className="space-y-3">
                 <li className="flex items-center gap-3">
@@ -555,66 +554,20 @@ export default function PlatformPage() {
               </Button>
             </div>
 
-            {/* Team Plan */}
+            {/* Enterprise Plan */}
             <div className="bg-background border-2 border-primary rounded-2xl p-8 space-y-6 relative">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                 <span className="bg-primary text-primary-foreground text-sm font-medium px-3 py-1 rounded-full">
-                  Mais popular
+                  Recomendado
                 </span>
               </div>
-              <div>
-                <h3 className="text-2xl font-bold flex items-center gap-2">
-                  Team
-                  <Zap className="h-5 w-5 text-yellow-500" />
-                </h3>
-                <p className="text-muted-foreground mt-2">
-                  Para equipes que precisam de mais poder
-                </p>
-              </div>
-              <div className="flex items-baseline gap-1">
-                <span className="text-4xl font-bold">R$149</span>
-                <span className="text-muted-foreground">/mês</span>
-              </div>
-              <ul className="space-y-3">
-                <li className="flex items-center gap-3">
-                  <Check className="h-5 w-5 text-primary flex-shrink-0" />
-                  <span>10 membros</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <Check className="h-5 w-5 text-primary flex-shrink-0" />
-                  <span>10 coleções de conhecimento</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <Check className="h-5 w-5 text-primary flex-shrink-0" />
-                  <span>1.000 conversas/mês</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <Check className="h-5 w-5 text-primary flex-shrink-0" />
-                  <span>5.000 chamadas de ferramentas/mês</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <Check className="h-5 w-5 text-primary flex-shrink-0" />
-                  <span>5GB de armazenamento</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <Check className="h-5 w-5 text-primary flex-shrink-0" />
-                  <span>Arquivos até 50MB</span>
-                </li>
-              </ul>
-              <Button size="lg" className="w-full" asChild>
-                <Link href="/auth/signup">Começar agora</Link>
-              </Button>
-            </div>
-
-            {/* Enterprise Plan */}
-            <div className="bg-background border rounded-2xl p-8 space-y-6">
               <div>
                 <h3 className="text-2xl font-bold flex items-center gap-2">
                   Enterprise
                   <Shield className="h-5 w-5 text-blue-500" />
                 </h3>
                 <p className="text-muted-foreground mt-2">
-                  Para grandes organizações com necessidades específicas
+                  Para organizações que precisam de resultado
                 </p>
               </div>
               <div className="flex items-baseline gap-1">
@@ -623,15 +576,19 @@ export default function PlatformPage() {
               <ul className="space-y-3">
                 <li className="flex items-center gap-3">
                   <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                  <span>Todos os recursos ilimitados</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <Check className="h-5 w-5 text-primary flex-shrink-0" />
                   <span>Membros ilimitados</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <Check className="h-5 w-5 text-primary flex-shrink-0" />
-                  <span>Todos os recursos do Team</span>
+                  <span>Armazenamento ilimitado</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <Check className="h-5 w-5 text-primary flex-shrink-0" />
-                  <span>Armazenamento personalizado</span>
+                  <span>Consultoria de implantação</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <Check className="h-5 w-5 text-primary flex-shrink-0" />
@@ -642,8 +599,14 @@ export default function PlatformPage() {
                   <span>SLA garantido</span>
                 </li>
               </ul>
-              <Button variant="outline" size="lg" className="w-full" asChild>
-                <a href="mailto:ai@pine.net.br">Falar com vendas</a>
+              <Button size="lg" className="w-full" asChild>
+                <a
+                  href="https://wa.me/5541992413811?text=Olá! Tenho interesse no plano Enterprise do Pineai."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Falar com especialista
+                </a>
               </Button>
             </div>
           </div>

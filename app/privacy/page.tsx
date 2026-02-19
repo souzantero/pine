@@ -23,7 +23,7 @@ export default function PrivacyPage() {
 
         <div className="prose prose-neutral dark:prose-invert max-w-none space-y-6">
           <p className="text-muted-foreground">
-            Última atualização: Fevereiro de 2025
+            Última atualização: Fevereiro de 2026
           </p>
 
           <section className="space-y-4">
@@ -62,11 +62,10 @@ export default function PrivacyPage() {
                 automaticamente pelos servidores durante o acesso à plataforma.
               </li>
               <li>
-                <strong>Dados de pagamento:</strong> para planos pagos, os dados
-                de pagamento (cartão de crédito, endereço de cobrança) são
-                coletados e processados diretamente pelo Stripe, nosso
-                processador de pagamentos. A Pine Software NÃO armazena dados
-                completos de cartão de crédito em seus servidores.
+                <strong>Dados de contratação:</strong> para o plano Enterprise,
+                dados necessários à formalização do contrato (nome, e-mail,
+                dados da empresa) são coletados diretamente pela equipe
+                comercial da Pine Software.
               </li>
             </ul>
           </section>
@@ -102,19 +101,9 @@ export default function PrivacyPage() {
                 de nuvem para hospedar e processar dados.
               </li>
               <li>
-                <strong>Processador de pagamentos:</strong> utilizamos o Stripe
-                para processar pagamentos de planos pagos. Ao realizar uma
-                assinatura, seus dados de pagamento são enviados diretamente ao
-                Stripe e estão sujeitos à{" "}
-                <a
-                  href="https://stripe.com/privacy"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary hover:underline"
-                >
-                  Política de Privacidade do Stripe
-                </a>
-                .
+                <strong>Parceiros comerciais:</strong> para clientes do plano
+                Enterprise, podemos compartilhar informações necessárias à
+                prestação dos serviços de consultoria e implantação.
               </li>
               <li>
                 <strong>Obrigações legais:</strong> quando exigido por lei ou

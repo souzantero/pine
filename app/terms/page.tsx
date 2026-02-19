@@ -23,7 +23,7 @@ export default function TermsPage() {
 
         <div className="prose prose-neutral dark:prose-invert max-w-none space-y-6">
           <p className="text-muted-foreground">
-            Última atualização: Fevereiro de 2025
+            Última atualização: Fevereiro de 2026
           </p>
 
           <section className="space-y-4">
@@ -104,94 +104,74 @@ export default function TermsPage() {
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-xl font-semibold">7. Planos e Preços</h2>
+            <h2 className="text-xl font-semibold">7. Planos e Contratação</h2>
             <p>
-              O Pineai oferece diferentes planos de assinatura:
+              O Pineai oferece dois planos:
             </p>
             <ul className="list-disc pl-6 space-y-2">
               <li>
-                <strong>Free:</strong> Gratuito por 7 dias, com limites de uso (1 membro,
-                1 coleção, 50 conversas, 200 chamadas de ferramentas/mês, 100MB
-                de armazenamento, arquivos até 10MB). Após o período de teste, é necessário fazer
-                upgrade para continuar usando.
+                <strong>Free:</strong> Gratuito e permanente, com limites de uso
+                (1 membro, 1 coleção, 50 conversas, 200 chamadas de ferramentas/mês,
+                100MB de armazenamento, arquivos até 10MB).
               </li>
               <li>
-                <strong>Team:</strong> R$149/mês, com limites expandidos (10 membros,
-                10 coleções, 1.000 conversas/mês, 5.000 chamadas de ferramentas/mês,
-                5GB de armazenamento, arquivos até 50MB).
-              </li>
-              <li>
-                <strong>Enterprise:</strong> Preço personalizado, para grandes
-                organizações com necessidades específicas.
+                <strong>Enterprise:</strong> Contratação personalizada via
+                consultoria, com todos os recursos ilimitados, suporte
+                prioritário, consultoria de implantação e SLA garantido.
+                A contratação é feita diretamente com a equipe comercial da
+                Pine Software.
               </li>
             </ul>
             <p>
-              Os limites e preços podem ser alterados mediante aviso prévio de
-              30 dias. Usuários ativos serão notificados por e-mail sobre
+              Os limites do plano Free podem ser alterados mediante aviso prévio
+              de 30 dias. Usuários ativos serão notificados por e-mail sobre
               qualquer alteração.
             </p>
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-xl font-semibold">8. Pagamento e Cobrança</h2>
+            <h2 className="text-xl font-semibold">8. Contratação Enterprise</h2>
             <p>
-              Para planos pagos, as seguintes condições se aplicam:
+              Para o plano Enterprise, as seguintes condições se aplicam:
             </p>
             <ul className="list-disc pl-6 space-y-2">
               <li>
-                <strong>Ciclo de cobrança:</strong> A cobrança é mensal, realizada
-                na data de contratação do plano.
+                <strong>Formalização:</strong> A contratação do plano Enterprise
+                é realizada mediante proposta comercial e contrato específico
+                acordado entre as partes.
               </li>
               <li>
-                <strong>Renovação automática:</strong> Assinaturas são renovadas
-                automaticamente a cada mês até o cancelamento.
+                <strong>Condições comerciais:</strong> Preços, forma de
+                pagamento, vigência e escopo dos serviços são definidos
+                individualmente no contrato de cada cliente.
               </li>
               <li>
-                <strong>Processamento de pagamento:</strong> Os pagamentos são
-                processados pelo Stripe, um provedor terceiro de pagamentos.
-                Ao fornecer dados de pagamento, você concorda com os{" "}
-                <a
-                  href="https://stripe.com/legal"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary hover:underline"
-                >
-                  Termos de Serviço do Stripe
-                </a>
-                .
-              </li>
-              <li>
-                <strong>Falha no pagamento:</strong> Em caso de falha na cobrança,
-                tentaremos novamente nos dias seguintes. Após falhas repetidas,
-                o plano pode ser rebaixado para Free.
+                <strong>Consultoria e implantação:</strong> O plano Enterprise
+                inclui serviços de consultoria para configuração, integração
+                e implantação da plataforma conforme as necessidades da
+                organização.
               </li>
             </ul>
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-xl font-semibold">9. Cancelamento e Reembolso</h2>
+            <h2 className="text-xl font-semibold">9. Cancelamento</h2>
             <p>
-              Você pode cancelar sua assinatura a qualquer momento através das
-              configurações de billing da plataforma ou entrando em contato
-              conosco. Ao cancelar:
+              As condições de cancelamento dependem do plano:
             </p>
             <ul className="list-disc pl-6 space-y-2">
               <li>
-                Você manterá acesso ao plano pago até o final do período já pago.
+                <strong>Free:</strong> Você pode encerrar sua conta a qualquer
+                momento entrando em contato conosco.
               </li>
               <li>
-                Após o término do período, sua organização será rebaixada para
-                o plano Free.
-              </li>
-              <li>
-                Não oferecemos reembolso proporcional por dias não utilizados,
-                exceto em casos excepcionais a nosso critério.
+                <strong>Enterprise:</strong> O cancelamento segue as condições
+                estabelecidas no contrato firmado entre as partes.
               </li>
             </ul>
             <p>
-              Se você exceder os limites do plano Free após o rebaixamento,
-              algumas funcionalidades podem ficar indisponíveis até que você
-              faça upgrade ou remova o excedente.
+              Ao encerrar sua conta, seus dados serão tratados conforme
+              nossa Política de Privacidade.
             </p>
           </section>
 

@@ -139,7 +139,7 @@ def create_web_fetch_tool(db: Database, organization_id: uuid.UUID):
                 update={
                     "messages": [
                         ToolMessage(
-                            "Limite de chamadas de ferramentas atingido. Faca upgrade para o plano Team para continuar usando ferramentas.",
+                            "Limite de chamadas de ferramentas atingido. Entre em contato para o plano Enterprise para continuar usando ferramentas.",
                             tool_call_id=tool_call_id,
                         )
                     ]

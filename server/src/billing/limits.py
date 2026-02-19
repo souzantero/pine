@@ -17,9 +17,6 @@ from src.database.entities import (
 )
 
 
-# Duracao do trial do plano Free em dias
-FREE_TRIAL_DAYS = 7
-
 # Limites por plano
 PLAN_LIMITS = {
     OrganizationPlan.FREE: {
@@ -30,13 +27,13 @@ PLAN_LIMITS = {
         "storage_bytes": 100 * 1024 * 1024,  # 100MB
         "max_file_size": 10 * 1024 * 1024,  # 10MB
     },
-    OrganizationPlan.TEAM: {
-        "members": 10,
-        "collections": 10,
-        "threads": 1000,  # Por mês
-        "tool_calls_per_month": 5000,
-        "storage_bytes": 5 * 1024 * 1024 * 1024,  # 5GB
-        "max_file_size": 50 * 1024 * 1024,  # 50MB
+    OrganizationPlan.ENTERPRISE: {
+        "members": None,
+        "collections": None,
+        "threads": None,
+        "tool_calls_per_month": None,
+        "storage_bytes": None,
+        "max_file_size": None,
     },
 }
 
@@ -62,38 +59,6 @@ def get_or_create_billing(db: Session, organization_id: uuid.UUID) -> Organizati
     return billing
 
 
-def get_trial_end_date(billing: OrganizationBilling) -> datetime | None:
-    """Retorna a data de fim do trial para planos Free, ou None para planos pagos."""
-    if billing.plan != OrganizationPlan.FREE:
-        return None
-
-    created_at = billing.created_at
-    if created_at.tzinfo is None:
-        created_at = created_at.replace(tzinfo=UTC)
-
-    return created_at + relativedelta(days=FREE_TRIAL_DAYS)
-
-
-def is_trial_expired(billing: OrganizationBilling) -> bool:
-    """Verifica se o trial do plano Free expirou."""
-    trial_end = get_trial_end_date(billing)
-    if trial_end is None:
-        return False
-
-    return datetime.now(UTC) >= trial_end
-
-
-def check_trial_expired(db: Session, organization_id: uuid.UUID) -> None:
-    """Verifica se o trial expirou e bloqueia o uso."""
-    billing = get_or_create_billing(db, organization_id)
-
-    if is_trial_expired(billing):
-        raise HTTPException(
-            status_code=status.HTTP_402_PAYMENT_REQUIRED,
-            detail="Seu período de teste de 7 dias expirou. Faça upgrade para o plano Team para continuar usando.",
-        )
-
-
 def check_member_limit(db: Session, organization_id: uuid.UUID) -> None:
     """Verifica se pode adicionar mais membros."""
     billing = get_or_create_billing(db, organization_id)
@@ -111,7 +76,7 @@ def check_member_limit(db: Session, organization_id: uuid.UUID) -> None:
 
     if count >= max_members:
         if billing.plan == OrganizationPlan.FREE:
-            msg = f"Limite de {max_members} membro(s) atingido. Faça upgrade para o plano Team para adicionar mais membros."
+            msg = f"Limite de {max_members} membro(s) atingido. Entre em contato para o plano Enterprise para adicionar mais membros."
         else:
             msg = f"Limite de {max_members} membro(s) do plano {billing.plan.value} atingido."
         raise HTTPException(status_code=status.HTTP_402_PAYMENT_REQUIRED, detail=msg)
@@ -134,7 +99,7 @@ def check_collection_limit(db: Session, organization_id: uuid.UUID) -> None:
 
     if count >= max_collections:
         if billing.plan == OrganizationPlan.FREE:
-            msg = f"Limite de {max_collections} coleção(ões) atingido. Faça upgrade para o plano Team para criar mais coleções."
+            msg = f"Limite de {max_collections} coleção(ões) atingido. Entre em contato para o plano Enterprise para criar mais coleções."
         else:
             msg = f"Limite de {max_collections} coleções do plano {billing.plan.value} atingido."
         raise HTTPException(status_code=status.HTTP_402_PAYMENT_REQUIRED, detail=msg)
@@ -155,7 +120,7 @@ def check_thread_limit(db: Session, organization_id: uuid.UUID) -> None:
 
     if count >= max_threads:
         if billing.plan == OrganizationPlan.FREE:
-            msg = f"Limite de {max_threads} conversas atingido. Faça upgrade para o plano Team para mais conversas."
+            msg = f"Limite de {max_threads} conversas atingido. Entre em contato para o plano Enterprise para mais conversas."
         else:
             msg = f"Limite de {max_threads} conversas/mês do plano {billing.plan.value} atingido."
         raise HTTPException(status_code=status.HTTP_402_PAYMENT_REQUIRED, detail=msg)
@@ -176,7 +141,7 @@ def check_storage_limit(db: Session, organization_id: uuid.UUID, file_size: int)
         max_mb = max_storage / (1024 * 1024)
         used_mb = billing.storage_used_bytes / (1024 * 1024)
         if billing.plan == OrganizationPlan.FREE:
-            msg = f"Limite de armazenamento de {max_mb:.0f}MB atingido (usado: {used_mb:.1f}MB). Faça upgrade para o plano Team para 5GB de armazenamento."
+            msg = f"Limite de armazenamento de {max_mb:.0f}MB atingido (usado: {used_mb:.1f}MB). Entre em contato para o plano Enterprise para mais armazenamento."
         else:
             max_gb = max_storage / (1024 * 1024 * 1024)
             msg = f"Limite de armazenamento de {max_gb:.0f}GB do plano {billing.plan.value} atingido (usado: {used_mb:.1f}MB)."
@@ -195,7 +160,7 @@ def check_file_size_limit(db: Session, organization_id: uuid.UUID, file_size: in
     if file_size > max_file_size:
         max_mb = max_file_size // (1024 * 1024)
         if billing.plan == OrganizationPlan.FREE:
-            msg = f"Arquivo muito grande. Tamanho máximo no plano Free: {max_mb}MB. Faça upgrade para o plano Team para enviar arquivos maiores."
+            msg = f"Arquivo muito grande. Tamanho máximo no plano Free: {max_mb}MB. Entre em contato para o plano Enterprise para enviar arquivos maiores."
         else:
             msg = f"Arquivo muito grande. Tamanho máximo: {max_mb}MB."
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=msg)
@@ -225,7 +190,7 @@ def check_tool_calls_limit(db: Session, organization_id: uuid.UUID) -> None:
 
     if billing.tool_calls_count >= max_calls:
         if billing.plan == OrganizationPlan.FREE:
-            msg = f"Limite de {max_calls} chamadas de ferramentas/mês atingido. Faça upgrade para o plano Team para mais chamadas."
+            msg = f"Limite de {max_calls} chamadas de ferramentas/mês atingido. Entre em contato para o plano Enterprise para mais chamadas."
         else:
             msg = f"Limite de {max_calls} chamadas de ferramentas/mês do plano {billing.plan.value} atingido."
         raise HTTPException(status_code=status.HTTP_402_PAYMENT_REQUIRED, detail=msg)
@@ -268,10 +233,6 @@ def get_usage(db: Session, organization_id: uuid.UUID) -> dict:
         select(func.count(Thread.id)).where(Thread.organization_id == organization_id)
     ).one()
 
-    # Info do trial para plano Free
-    trial_end = get_trial_end_date(billing)
-    trial_expired = is_trial_expired(billing)
-
     return {
         "plan": billing.plan.value,
         "members": {"current": members_count, "limit": limits["members"]},
@@ -285,9 +246,5 @@ def get_usage(db: Session, organization_id: uuid.UUID) -> dict:
         "storage": {
             "current": billing.storage_used_bytes,
             "limit": limits["storage_bytes"],
-        },
-        "trial": {
-            "endsAt": trial_end.isoformat() if trial_end else None,
-            "expired": trial_expired,
         },
     }

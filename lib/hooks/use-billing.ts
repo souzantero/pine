@@ -9,8 +9,6 @@ interface UseBillingReturn {
   usage: BillingUsage | null;
   isLoading: boolean;
   error: string | null;
-  createCheckout: () => Promise<{ url?: string; error?: string }>;
-  openPortal: () => Promise<{ url?: string; error?: string }>;
   refresh: () => Promise<void>;
 }
 
@@ -53,41 +51,10 @@ export function useBilling(): UseBillingReturn {
     loadUsage();
   }, [loadUsage]);
 
-  const createCheckout = useCallback(async () => {
-    if (!orgId) return { error: "Organização não selecionada" };
-
-    const response = await api.post<{ url: string }>(
-      `/organizations/${orgId}/billing/checkout`,
-      {
-        successUrl: `${window.location.origin}/chat/settings/billing?success=true`,
-        cancelUrl: `${window.location.origin}/chat/settings/billing?canceled=true`,
-      }
-    );
-
-    if (response.error) return { error: response.error };
-    return { url: response.data?.url };
-  }, [orgId]);
-
-  const openPortal = useCallback(async () => {
-    if (!orgId) return { error: "Organização não selecionada" };
-
-    const response = await api.post<{ url: string }>(
-      `/organizations/${orgId}/billing/portal`,
-      {
-        returnUrl: `${window.location.origin}/chat/settings/billing`,
-      }
-    );
-
-    if (response.error) return { error: response.error };
-    return { url: response.data?.url };
-  }, [orgId]);
-
   return {
     usage,
     isLoading,
     error,
-    createCheckout,
-    openPortal,
     refresh: loadUsage,
   };
 }

@@ -1,7 +1,7 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/session";
 import { useBilling } from "@/lib/hooks";
 import { AppLayout } from "@/components/layout";
@@ -17,16 +17,14 @@ import { Progress } from "@/components/ui/progress";
 import {
   CreditCard,
   Check,
-  Zap,
   Users,
   Database,
   MessageSquare,
   Wrench,
   HardDrive,
-  Loader2,
   Shield,
-  Clock,
-  AlertTriangle,
+  MessageCircle,
+  Mail,
 } from "lucide-react";
 
 function formatBytes(bytes: number): string {
@@ -37,35 +35,12 @@ function formatBytes(bytes: number): string {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
 }
 
-function getTrialDaysRemaining(endsAt: string | null): number | null {
-  if (!endsAt) return null;
-  const end = new Date(endsAt);
-  const now = new Date();
-  const diffMs = end.getTime() - now.getTime();
-  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-  return Math.max(0, diffDays);
-}
-
 export default function BillingPage() {
-  return (
-    <Suspense fallback={null}>
-      <BillingContent />
-    </Suspense>
-  );
-}
-
-function BillingContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { isLoading: authLoading, hasPermission } = useSession();
-  const { usage, isLoading, createCheckout, openPortal, refresh } =
-    useBilling();
+  const { usage, isLoading } = useBilling();
 
   const canManage = hasPermission("ORGANIZATION_MANAGE");
-  const success = searchParams.get("success") === "true";
-
-  const [upgradeLoading, setUpgradeLoading] = useState(false);
-  const [manageLoading, setManageLoading] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !canManage) {
@@ -73,40 +48,13 @@ function BillingContent() {
     }
   }, [authLoading, canManage, router]);
 
-  useEffect(() => {
-    if (success) {
-      refresh();
-    }
-  }, [success, refresh]);
-
-  const handleUpgrade = async () => {
-    setUpgradeLoading(true);
-    const result = await createCheckout();
-    if (result.url) {
-      window.location.href = result.url;
-    } else {
-      setUpgradeLoading(false);
-    }
-  };
-
-  const handleManage = async () => {
-    setManageLoading(true);
-    const result = await openPortal();
-    if (result.url) {
-      window.location.href = result.url;
-    } else {
-      setManageLoading(false);
-    }
-  };
-
   const pageLoading = authLoading || isLoading;
 
-  // Redireciona se sem permissao (apos loading)
   if (!authLoading && !canManage) {
     return null;
   }
 
-  const isPro = usage?.plan === "TEAM";
+  const isEnterprise = usage?.plan === "ENTERPRISE";
 
   const formatLimit = (current: number, limit: number | null) => {
     if (limit === null) return `${current} / Ilimitado`;
@@ -138,123 +86,37 @@ function BillingContent() {
           </div>
         </div>
 
-        {success && (
-          <div className="mb-6 p-4 bg-green-50 dark:bg-green-950/50 rounded-lg border border-green-200 dark:border-green-800">
-            <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
-              <Check className="h-5 w-5" />
-              <span className="font-medium">
-                Upgrade realizado com sucesso!
-              </span>
-            </div>
-          </div>
-        )}
-
-        {/* Banner de Trial */}
-        {usage?.trial && !isPro && (() => {
-          const daysRemaining = getTrialDaysRemaining(usage.trial.endsAt);
-          const isExpired = usage.trial.expired;
-
-          if (isExpired) {
-            return (
-              <div className="mb-6 p-4 bg-red-50 dark:bg-red-950/50 rounded-lg border border-red-200 dark:border-red-800">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-red-700 dark:text-red-300">
-                    <AlertTriangle className="h-5 w-5" />
-                    <span className="font-medium">
-                      Seu período de teste expirou
-                    </span>
-                  </div>
-                  <Button
-                    size="sm"
-                    onClick={handleUpgrade}
-                    disabled={upgradeLoading}
-                    className="cursor-pointer"
-                  >
-                    {upgradeLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Fazer upgrade
-                  </Button>
-                </div>
-                <p className="mt-2 text-sm text-red-600 dark:text-red-400">
-                  Faça upgrade para o plano Team para continuar usando o Pineai.
-                </p>
-              </div>
-            );
-          }
-
-          if (daysRemaining !== null && daysRemaining <= 3) {
-            return (
-              <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-950/50 rounded-lg border border-yellow-200 dark:border-yellow-800">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-yellow-700 dark:text-yellow-300">
-                    <Clock className="h-5 w-5" />
-                    <span className="font-medium">
-                      {daysRemaining === 0
-                        ? "Último dia de teste"
-                        : daysRemaining === 1
-                          ? "1 dia restante de teste"
-                          : `${daysRemaining} dias restantes de teste`}
-                    </span>
-                  </div>
-                  <Button
-                    size="sm"
-                    onClick={handleUpgrade}
-                    disabled={upgradeLoading}
-                    className="cursor-pointer"
-                  >
-                    {upgradeLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Fazer upgrade
-                  </Button>
-                </div>
-              </div>
-            );
-          }
-
-          return null;
-        })()}
-
         {/* Plano Atual */}
         <Card className="mb-6">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="flex items-center gap-2">
-                  {isPro ? (
+                  {isEnterprise ? (
                     <>
-                      <Zap className="h-5 w-5 text-yellow-500" />
-                      Plano Team
+                      <Shield className="h-5 w-5 text-blue-500" />
+                      Plano Enterprise
                     </>
                   ) : (
                     "Plano Free"
                   )}
                 </CardTitle>
                 <CardDescription>
-                  {isPro
+                  {isEnterprise
                     ? "Você tem acesso a todos os recursos"
-                    : "Faça upgrade para desbloquear mais recursos"}
+                    : "Entre em contato para desbloquear mais recursos"}
                 </CardDescription>
               </div>
-              {isPro ? (
-                <Button
-                  variant="outline"
-                  onClick={handleManage}
-                  disabled={manageLoading}
-                  className="cursor-pointer"
-                >
-                  {manageLoading && (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  )}
-                  Gerenciar Assinatura
-                </Button>
-              ) : (
-                <Button
-                  onClick={handleUpgrade}
-                  disabled={upgradeLoading}
-                  className="cursor-pointer"
-                >
-                  {upgradeLoading && (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  )}
-                  Upgrade para Team - R$149/mês
+              {!isEnterprise && (
+                <Button asChild className="cursor-pointer">
+                  <a
+                    href="https://wa.me/5541992413811?text=Olá! Tenho interesse no plano Enterprise do Pineai."
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <MessageCircle className="mr-2 h-4 w-4" />
+                    Falar sobre Enterprise
+                  </a>
                 </Button>
               )}
             </div>
@@ -405,10 +267,10 @@ function BillingContent() {
             <CardTitle>Comparação de Planos</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-3 gap-4">
-              <div className="p-4 border rounded-lg">
+            <div className="grid grid-cols-2 gap-4">
+              <div className={`p-4 rounded-lg ${!isEnterprise ? "border-2 border-primary" : "border"}`}>
                 <h3 className="font-semibold mb-3">Free</h3>
-                <p className="text-xs text-muted-foreground mb-3">7 dias de teste</p>
+                <p className="text-xs text-muted-foreground mb-3">Para explorar a plataforma</p>
                 <ul className="space-y-2 text-sm text-muted-foreground">
                   <li>1 membro</li>
                   <li>1 coleção de conhecimento</li>
@@ -418,38 +280,7 @@ function BillingContent() {
                   <li>Arquivos até 10MB</li>
                 </ul>
               </div>
-              <div className={`p-4 rounded-lg ${isPro ? "border-2 border-primary" : "border"}`}>
-                <h3 className="font-semibold mb-3 flex items-center gap-2">
-                  Team <span className="text-primary text-sm">R$149/mês</span>
-                </h3>
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    10 membros
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    10 coleções de conhecimento
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    1.000 conversas/mês
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    5.000 chamadas de ferramentas/mês
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    5GB de armazenamento
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-green-500" />
-                    Arquivos até 50MB
-                  </li>
-                </ul>
-              </div>
-              <div className="p-4 border rounded-lg">
+              <div className={`p-4 rounded-lg ${isEnterprise ? "border-2 border-primary" : "border"}`}>
                 <h3 className="font-semibold mb-3 flex items-center gap-2">
                   Enterprise
                   <Shield className="h-4 w-4 text-blue-500" />
@@ -457,15 +288,19 @@ function BillingContent() {
                 <ul className="space-y-2 text-sm">
                   <li className="flex items-center gap-2">
                     <Check className="h-4 w-4 text-green-500" />
+                    Todos os recursos ilimitados
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-green-500" />
                     Membros ilimitados
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="h-4 w-4 text-green-500" />
-                    Tudo do Team
+                    Armazenamento ilimitado
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="h-4 w-4 text-green-500" />
-                    Armazenamento custom
+                    Consultoria de implantação
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="h-4 w-4 text-green-500" />
@@ -476,12 +311,24 @@ function BillingContent() {
                     SLA garantido
                   </li>
                 </ul>
-                <a
-                  href="mailto:ai@pine.net.br"
-                  className="mt-4 block text-center text-sm text-primary hover:underline"
-                >
-                  Falar com vendas
-                </a>
+                <div className="mt-4 flex flex-col gap-2">
+                  <a
+                    href="https://wa.me/5541992413811?text=Olá! Tenho interesse no plano Enterprise do Pineai."
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-sm text-primary hover:underline"
+                  >
+                    <MessageCircle className="h-4 w-4" />
+                    WhatsApp
+                  </a>
+                  <a
+                    href="mailto:ai@pine.net.br"
+                    className="flex items-center gap-2 text-sm text-primary hover:underline"
+                  >
+                    <Mail className="h-4 w-4" />
+                    ai@pine.net.br
+                  </a>
+                </div>
               </div>
             </div>
           </CardContent>

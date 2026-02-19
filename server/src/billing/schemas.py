@@ -25,13 +25,6 @@ class StorageUsage(CamelCaseModel):
     limit: int | None
 
 
-class TrialInfo(CamelCaseModel):
-    """Informacoes do trial."""
-
-    ends_at: str | None
-    expired: bool
-
-
 class UsageResponse(CamelCaseModel):
     """Resposta com uso atual e limites."""
 
@@ -41,29 +34,3 @@ class UsageResponse(CamelCaseModel):
     threads: UsageItem
     tool_calls: ToolCallsUsage
     storage: StorageUsage
-    trial: TrialInfo
-
-
-class CheckoutRequest(CamelCaseModel):
-    """Request para criar sessao de checkout."""
-
-    success_url: str
-    cancel_url: str
-
-
-class CheckoutResponse(CamelCaseModel):
-    """Resposta com URL do checkout."""
-
-    url: str
-
-
-class PortalRequest(CamelCaseModel):
-    """Request para criar sessao do portal."""
-
-    return_url: str
-
-
-class PortalResponse(CamelCaseModel):
-    """Resposta com URL do portal."""
-
-    url: str

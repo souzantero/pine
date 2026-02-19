@@ -15,7 +15,7 @@ from src.providers.router import router as providers_router
 from src.models.router import router as models_router
 from src.configs.router import router as configs_router
 from src.threads.router import router as threads_router
-from src.billing.router import router as billing_router, webhook_router
+from src.billing.router import router as billing_router
 
 
 @asynccontextmanager
@@ -57,4 +57,3 @@ app.include_router(configs_router)
 app.include_router(collections_router)
 app.include_router(documents_router)
 app.include_router(billing_router)
-app.include_router(webhook_router)

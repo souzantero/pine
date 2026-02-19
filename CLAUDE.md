@@ -177,10 +177,7 @@ All API routes are served by the Python backend at `localhost:8888`:
 - `/organizations/{org_id}/collections/{col_id}/documents` - Collection documents
 
 **Billing:**
-- `/organizations/{org_id}/billing` - Billing status and usage
-- `/organizations/{org_id}/billing/checkout` - Create Stripe checkout session
-- `/organizations/{org_id}/billing/portal` - Stripe customer portal
-- `/stripe/webhook` - Stripe webhook endpoint
+- `/organizations/{org_id}/billing/usage` - Billing status and usage
 
 **Public:**
 - `/invites/{token}` - Public invite info and accept
@@ -261,8 +258,4 @@ EMAIL_VERIFICATION_RATE_LIMIT_SECONDS=60
 # Password reset
 PASSWORD_RESET_TOKEN_EXPIRATION_HOURS=1
 
-# Stripe
-STRIPE_SECRET_KEY=sk_...
-STRIPE_WEBHOOK_SECRET=whsec_...
-STRIPE_TEAM_PRICE_ID=price_...
 ```

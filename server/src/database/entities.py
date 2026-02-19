@@ -110,7 +110,7 @@ class OrganizationPlan(str, Enum):
     """Plano da organizacao"""
 
     FREE = "FREE"
-    TEAM = "TEAM"
+    ENTERPRISE = "ENTERPRISE"
 
 
 # =============================================================================
@@ -179,8 +179,6 @@ class OrganizationBilling(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     organization_id: uuid.UUID = Field(foreign_key="organizations.id", unique=True, index=True)
     plan: OrganizationPlan = Field(default=OrganizationPlan.FREE)
-    stripe_customer_id: str | None = Field(default=None, index=True)
-    stripe_subscription_id: str | None = Field(default=None, index=True)
     tool_calls_count: int = Field(default=0)
     tool_calls_reset_at: datetime = Field(default_factory=get_now)
     storage_used_bytes: int = Field(default=0)
