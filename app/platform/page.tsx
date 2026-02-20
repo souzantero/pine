@@ -601,7 +601,7 @@ export default function PlatformPage() {
               </ul>
               <Button size="lg" className="w-full" asChild>
                 <a
-                  href="https://wa.me/5541992413811?text=Olá! Tenho interesse no plano Enterprise do Pineai."
+                  href="https://wa.me/5541992413811?text=Olá! Tenho interesse no plano Enterprise do PINE."
                   target="_blank"
                   rel="noopener noreferrer"
                 >

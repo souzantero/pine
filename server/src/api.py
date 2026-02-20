@@ -33,7 +33,7 @@ async def lifespan(app: FastAPI):
             pass  # Ignora erros de cancelamento no shutdown
 
 
-app = FastAPI(title="Pineai API", version="1.0.0", lifespan=lifespan)
+app = FastAPI(title="PINE API", version="1.0.0", lifespan=lifespan)
 
 # CORS - permitir frontend Next.js
 app.add_middleware(

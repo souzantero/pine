@@ -1,4 +1,4 @@
-# Dockerfile para Pineai Backend
+# Dockerfile para PINE Backend
 # Imagem mínima para produção
 
 FROM python:3.13-slim

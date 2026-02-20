@@ -29,7 +29,7 @@ export default function TermsPage() {
           <section className="space-y-4">
             <h2 className="text-xl font-semibold">1. Aceitação dos Termos</h2>
             <p>
-              Ao acessar ou usar a plataforma Pineai, operada pela Pine Software
+              Ao acessar ou usar a plataforma PINE, operada pela Pine Software
               (CNPJ 37.100.281/0001-64), você concorda com estes Termos de Uso.
               Se não concordar, não utilize o serviço.
             </p>
@@ -38,7 +38,7 @@ export default function TermsPage() {
           <section className="space-y-4">
             <h2 className="text-xl font-semibold">2. Descrição do Serviço</h2>
             <p>
-              O Pineai é uma plataforma de agentes de inteligência artificial que
+              O PINE é uma plataforma de agentes de inteligência artificial que
               permite:
             </p>
             <ul className="list-disc pl-6 space-y-2">
@@ -52,7 +52,7 @@ export default function TermsPage() {
           <section className="space-y-4">
             <h2 className="text-xl font-semibold">3. Cadastro e Conta</h2>
             <p>
-              Para usar o Pineai, você deve criar uma conta fornecendo
+              Para usar o PINE, você deve criar uma conta fornecendo
               informações verdadeiras e completas. Você é responsável por:
             </p>
             <ul className="list-disc pl-6 space-y-2">
@@ -64,7 +64,7 @@ export default function TermsPage() {
 
           <section className="space-y-4">
             <h2 className="text-xl font-semibold">4. Uso Aceitável</h2>
-            <p>Você concorda em não usar o Pineai para:</p>
+            <p>Você concorda em não usar o PINE para:</p>
             <ul className="list-disc pl-6 space-y-2">
               <li>Violar leis ou regulamentos aplicáveis.</li>
               <li>Enviar conteúdo ilegal, difamatório ou que viole direitos de terceiros.</li>
@@ -78,7 +78,7 @@ export default function TermsPage() {
           <section className="space-y-4">
             <h2 className="text-xl font-semibold">5. Conteúdo do Usuário</h2>
             <p>
-              Você mantém a propriedade de todo conteúdo que envia ao Pineai
+              Você mantém a propriedade de todo conteúdo que envia ao PINE
               (documentos, mensagens, etc.). Ao usar o serviço, você nos concede
               licença para processar esse conteúdo conforme necessário para
               fornecer o serviço.
@@ -92,7 +92,7 @@ export default function TermsPage() {
           <section className="space-y-4">
             <h2 className="text-xl font-semibold">6. Provedores de IA</h2>
             <p>
-              O Pineai integra com provedores terceiros de modelos de linguagem
+              O PINE integra com provedores terceiros de modelos de linguagem
               (OpenAI, Anthropic, Google, etc.). O uso desses serviços está
               sujeito aos termos de cada provedor. Não nos responsabilizamos por:
             </p>
@@ -106,7 +106,7 @@ export default function TermsPage() {
           <section className="space-y-4">
             <h2 className="text-xl font-semibold">7. Planos e Contratação</h2>
             <p>
-              O Pineai oferece dois planos:
+              O PINE oferece dois planos:
             </p>
             <ul className="list-disc pl-6 space-y-2">
               <li>
@@ -178,7 +178,7 @@ export default function TermsPage() {
           <section className="space-y-4">
             <h2 className="text-xl font-semibold">10. Disponibilidade</h2>
             <p>
-              Nos esforçamos para manter o Pineai disponível, mas não garantimos
+              Nos esforçamos para manter o PINE disponível, mas não garantimos
               funcionamento ininterrupto. Podemos realizar manutenções programadas
               ou de emergência que afetem temporariamente o acesso.
             </p>
@@ -187,7 +187,7 @@ export default function TermsPage() {
           <section className="space-y-4">
             <h2 className="text-xl font-semibold">11. Limitação de Responsabilidade</h2>
             <p>
-              O Pineai é fornecido &quot;como está&quot;. Na máxima extensão permitida
+              O PINE é fornecido &quot;como está&quot;. Na máxima extensão permitida
               por lei, não nos responsabilizamos por:
             </p>
             <ul className="list-disc pl-6 space-y-2">
@@ -200,7 +200,7 @@ export default function TermsPage() {
           <section className="space-y-4">
             <h2 className="text-xl font-semibold">12. Propriedade Intelectual</h2>
             <p>
-              O Pineai, incluindo software, design, marcas e conteúdo, é
+              O PINE, incluindo software, design, marcas e conteúdo, é
               propriedade da Pine Software e protegido por leis de propriedade
               intelectual. Estes termos não concedem direitos sobre nossa
               propriedade intelectual além do uso do serviço.

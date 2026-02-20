@@ -122,7 +122,7 @@ export default function LandingPage() {
               </p>
             </div>
 
-            {/* Visual comparativo: Modelo Tradicional vs Modelo Pineai */}
+            {/* Visual comparativo: Modelo Tradicional vs Modelo PINE */}
             <div className="grid md:grid-cols-2 gap-6 mb-20 max-w-4xl mx-auto">
               <div className="bg-background border border-dashed rounded-2xl p-8 space-y-5">
                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
@@ -159,7 +159,7 @@ export default function LandingPage() {
                   </span>
                 </div>
                 <p className="text-xs font-medium text-primary uppercase tracking-wider">
-                  Modelo Pineai
+                  Modelo PINE
                 </p>
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
@@ -185,7 +185,7 @@ export default function LandingPage() {
             {/* A Solução + Fechamento */}
             <div className="max-w-3xl mx-auto space-y-6">
               <p className="text-lg text-muted-foreground leading-relaxed">
-                <strong className="text-foreground">A Pineai não vende software.</strong>{" "}
+                <strong className="text-foreground">A PINE não vende software.</strong>{" "}
                 Nós entramos na sua operação, mapeamos seus processos e instalamos
                 um cérebro digital privado. Nós transformamos seus colaboradores
                 atuais nos orquestradores dessa inteligência. Colocamos a IA no
@@ -406,7 +406,7 @@ export default function LandingPage() {
                   Seus dados protegidos.
                 </h2>
                 <p className="text-lg text-muted-foreground">
-                  Diferente de IAs públicas, a Pineai é instalada no seu
+                  Diferente de IAs públicas, a PINE é instalada no seu
                   ambiente. Suas informações estratégicas são protegidas e
                   nunca usadas para treinar outros modelos.
                 </p>
@@ -485,11 +485,11 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 6. O Jeito Pineai - Passo a Passo */}
+      {/* 6. O Jeito PINE - Passo a Passo */}
       <section className="py-24 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">O Jeito Pineai</h2>
+            <h2 className="text-3xl font-bold mb-4">O Jeito PINE</h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
               Nós cuidamos de tudo. Você só precisa usar.
             </p>

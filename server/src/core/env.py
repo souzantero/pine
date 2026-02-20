@@ -17,7 +17,7 @@ jwt_expiration_hours = int(getenv("JWT_EXPIRATION_HOURS", "24"))
 
 # Email (Resend)
 resend_api_key = getenv("RESEND_API_KEY", "")
-resend_from_email = getenv("RESEND_FROM_EMAIL", "Pineai <noreply@pine.net.br>")
+resend_from_email = getenv("RESEND_FROM_EMAIL", "PINE <noreply@pine.net.br>")
 app_url = getenv("APP_URL", "http://localhost:3000")
 
 # Verificacao de email

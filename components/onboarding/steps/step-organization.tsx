@@ -49,7 +49,7 @@ export function StepOrganization({
         </div>
         <h2 className="text-2xl font-bold">Crie sua Organização</h2>
         <p className="text-muted-foreground">
-          Uma organização é seu espaço de trabalho no Pineai
+          Uma organização é seu espaço de trabalho no PINE
         </p>
       </div>
 

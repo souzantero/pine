@@ -1,17 +1,17 @@
 volumes:
-    pineai-data:
+    pine-data:
         driver: local
 services:
-    pineai-postgres:
+    pine-postgres:
         image: pgvector/pgvector:pg16
         ports:
             - "5432:5432"
         environment:
-            POSTGRES_DB: pineai_db
+            POSTGRES_DB: pine_db
             POSTGRES_USER: postgres
             POSTGRES_PASSWORD: postgres
         volumes:
-            - pineai-data:/var/lib/postgresql/data
+            - pine-data:/var/lib/postgresql/data
         healthcheck:
             test: pg_isready -U postgres
             start_period: 10s

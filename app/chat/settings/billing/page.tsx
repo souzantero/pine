@@ -110,7 +110,7 @@ export default function BillingPage() {
               {!isEnterprise && (
                 <Button asChild className="cursor-pointer">
                   <a
-                    href="https://wa.me/5541992413811?text=Olá! Tenho interesse no plano Enterprise do Pineai."
+                    href="https://wa.me/5541992413811?text=Olá! Tenho interesse no plano Enterprise do PINE."
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -313,7 +313,7 @@ export default function BillingPage() {
                 </ul>
                 <div className="mt-4 flex flex-col gap-2">
                   <a
-                    href="https://wa.me/5541992413811?text=Olá! Tenho interesse no plano Enterprise do Pineai."
+                    href="https://wa.me/5541992413811?text=Olá! Tenho interesse no plano Enterprise do PINE."
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 text-sm text-primary hover:underline"
