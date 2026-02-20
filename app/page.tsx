@@ -165,6 +165,15 @@ export default function LandingPage() {
                 @pine.ia
               </a>
               <span className="hidden sm:inline">|</span>
+              <a
+                href="https://linkedin.com/company/pine-ia"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-black transition-colors"
+              >
+                LinkedIn
+              </a>
+              <span className="hidden sm:inline">|</span>
               <span>PINE — 2025</span>
             </div>
             <div className="flex items-center gap-4 text-xs">
