@@ -14,6 +14,9 @@ export default function PlatformPage() {
           </Link>
           <div className="flex items-center gap-4">
             <Button variant="ghost" asChild>
+              <Link href="/platform/docs">Documentação</Link>
+            </Button>
+            <Button variant="ghost" asChild>
               <Link href="/auth/login">Entrar</Link>
             </Button>
             <Button asChild>
