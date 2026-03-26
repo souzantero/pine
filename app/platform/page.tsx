@@ -1,7 +1,17 @@
+"use client";
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/logo";
-import { Bot, Shield, Users, Zap, ArrowRight, Database, DatabaseZap, Check, FileText, Settings, Plug, Building, Cloud, Target } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetClose,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { Bot, Shield, Users, Zap, ArrowRight, Database, DatabaseZap, Check, FileText, Settings, Plug, Building, Cloud, Target, Menu } from "lucide-react";
 
 export default function PlatformPage() {
   return (
@@ -12,17 +22,51 @@ export default function PlatformPage() {
           <Link href="/platform">
             <Logo size="md" />
           </Link>
-          <div className="flex items-center gap-2 sm:gap-4">
-            <Button variant="ghost" size="sm" asChild className="hidden sm:inline-flex">
+          {/* Desktop */}
+          <div className="hidden sm:flex items-center gap-4">
+            <Button variant="ghost" asChild>
               <Link href="/platform/docs">Como usar</Link>
             </Button>
-            <Button variant="ghost" size="sm" asChild>
+            <Button variant="ghost" asChild>
               <Link href="/auth/login">Entrar</Link>
             </Button>
-            <Button size="sm" asChild>
+            <Button asChild>
               <Link href="/auth/signup">Começar grátis</Link>
             </Button>
           </div>
+
+          {/* Mobile */}
+          <Sheet>
+            <SheetTrigger className="sm:hidden p-2 hover:opacity-60 transition-opacity">
+              <Menu className="h-5 w-5" />
+            </SheetTrigger>
+            <SheetContent side="right" className="w-64 px-6 pt-16" aria-describedby={undefined}>
+              <VisuallyHidden>
+                <SheetTitle>Menu</SheetTitle>
+              </VisuallyHidden>
+              <nav className="flex flex-col gap-4">
+                <SheetClose asChild>
+                  <Link
+                    href="/platform/docs"
+                    className="text-sm font-medium hover:opacity-60 transition-opacity"
+                  >
+                    Como usar
+                  </Link>
+                </SheetClose>
+                <SheetClose asChild>
+                  <Link
+                    href="/auth/login"
+                    className="text-sm font-medium hover:opacity-60 transition-opacity"
+                  >
+                    Entrar
+                  </Link>
+                </SheetClose>
+                <Button asChild>
+                  <Link href="/auth/signup">Começar grátis</Link>
+                </Button>
+              </nav>
+            </SheetContent>
+          </Sheet>
         </div>
       </header>
 

@@ -1,5 +1,17 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
 import { Logo } from "@/components/logo";
+import { Menu, X } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetClose,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 export default function LandingPage() {
   return (
@@ -8,7 +20,8 @@ export default function LandingPage() {
       <header className="border-b border-foreground/10">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Logo size="md" />
-          <div className="flex items-center gap-6">
+          {/* Desktop */}
+          <div className="hidden sm:flex items-center gap-6">
             <Link
               href="/platform"
               className="text-sm font-semibold uppercase tracking-widest hover:opacity-60 transition-opacity"
@@ -24,6 +37,38 @@ export default function LandingPage() {
               Vamos Conversar
             </a>
           </div>
+
+          {/* Mobile */}
+          <Sheet>
+            <SheetTrigger className="sm:hidden p-2 hover:opacity-60 transition-opacity">
+              <Menu className="h-5 w-5" />
+            </SheetTrigger>
+            <SheetContent side="right" className="w-64 px-6 pt-16" aria-describedby={undefined}>
+              <VisuallyHidden>
+                <SheetTitle>Menu</SheetTitle>
+              </VisuallyHidden>
+              <nav className="flex flex-col gap-6">
+                <SheetClose asChild>
+                  <Link
+                    href="/platform"
+                    className="text-sm font-semibold uppercase tracking-widest hover:opacity-60 transition-opacity"
+                  >
+                    Plataforma
+                  </Link>
+                </SheetClose>
+                <SheetClose asChild>
+                  <a
+                    href="https://wa.me/5541992413811?text=Olá! Gostaria de conversar sobre soluções de IA para minha empresa."
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-semibold uppercase tracking-widest hover:opacity-60 transition-opacity"
+                  >
+                    Vamos Conversar
+                  </a>
+                </SheetClose>
+              </nav>
+            </SheetContent>
+          </Sheet>
         </div>
       </header>
 
