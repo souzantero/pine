@@ -20,7 +20,7 @@ export default function LlmProvidersGuidePage() {
       {/* Header */}
       <header className="border-b">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/">
+          <Link href="/platform">
             <Logo size="md" />
           </Link>
           <div className="flex items-center gap-4">

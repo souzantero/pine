@@ -62,7 +62,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4">
-      <Link href="/" className="mb-8 hover:opacity-80 transition-opacity">
+      <Link href="/platform" className="mb-8 hover:opacity-80 transition-opacity">
         <Logo size="lg" />
       </Link>
       <Card className="w-full max-w-md">

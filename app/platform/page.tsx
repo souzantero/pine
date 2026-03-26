@@ -9,17 +9,17 @@ export default function PlatformPage() {
       {/* Header */}
       <header className="border-b">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/">
+          <Link href="/platform">
             <Logo size="md" />
           </Link>
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" asChild>
-              <Link href="/platform/docs">Documentação</Link>
+          <div className="flex items-center gap-2 sm:gap-4">
+            <Button variant="ghost" size="sm" asChild className="hidden sm:inline-flex">
+              <Link href="/platform/docs">Como usar</Link>
             </Button>
-            <Button variant="ghost" asChild>
+            <Button variant="ghost" size="sm" asChild>
               <Link href="/auth/login">Entrar</Link>
             </Button>
-            <Button asChild>
+            <Button size="sm" asChild>
               <Link href="/auth/signup">Começar grátis</Link>
             </Button>
           </div>
@@ -643,7 +643,7 @@ export default function PlatformPage() {
           <div className="grid md:grid-cols-3 gap-8 mb-8">
             {/* Logo e descrição */}
             <div className="space-y-4">
-              <Link href="/">
+              <Link href="/platform">
                 <Logo size="md" />
               </Link>
               <p className="text-sm text-muted-foreground">
