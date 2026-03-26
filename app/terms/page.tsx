@@ -29,7 +29,7 @@ export default function TermsPage() {
           <section className="space-y-4">
             <h2 className="text-xl font-semibold">1. Aceitação dos Termos</h2>
             <p>
-              Ao acessar ou usar a plataforma PINE, operada pela Pine Software
+              Ao acessar ou usar a plataforma PINE, operada pela Pine Technology
               (CNPJ 37.100.281/0001-64), você concorda com estes Termos de Uso.
               Se não concordar, não utilize o serviço.
             </p>
@@ -119,7 +119,7 @@ export default function TermsPage() {
                 consultoria, com todos os recursos ilimitados, suporte
                 prioritário, consultoria de implantação e SLA garantido.
                 A contratação é feita diretamente com a equipe comercial da
-                Pine Software.
+                Pine Technology.
               </li>
             </ul>
             <p>
@@ -201,7 +201,7 @@ export default function TermsPage() {
             <h2 className="text-xl font-semibold">12. Propriedade Intelectual</h2>
             <p>
               O PINE, incluindo software, design, marcas e conteúdo, é
-              propriedade da Pine Software e protegido por leis de propriedade
+              propriedade da Pine Technology e protegido por leis de propriedade
               intelectual. Estes termos não concedem direitos sobre nossa
               propriedade intelectual além do uso do serviço.
             </p>

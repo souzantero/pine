@@ -29,7 +29,7 @@ export default function PrivacyPage() {
           <section className="space-y-4">
             <h2 className="text-xl font-semibold">1. Introdução</h2>
             <p>
-              A Pine Software (&quot;nós&quot;, &quot;nosso&quot; ou &quot;empresa&quot;), inscrita no CNPJ
+              A Pine Technology (&quot;nós&quot;, &quot;nosso&quot; ou &quot;empresa&quot;), inscrita no CNPJ
               37.100.281/0001-64, com sede na Av. Sete de Setembro, 6556,
               Curitiba/PR, é responsável pelo tratamento dos seus dados pessoais
               conforme descrito nesta Política de Privacidade.
@@ -65,7 +65,7 @@ export default function PrivacyPage() {
                 <strong>Dados de contratação:</strong> para o plano Enterprise,
                 dados necessários à formalização do contrato (nome, e-mail,
                 dados da empresa) são coletados diretamente pela equipe
-                comercial da Pine Software.
+                comercial da Pine Technology.
               </li>
             </ul>
           </section>

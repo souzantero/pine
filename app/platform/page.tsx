@@ -687,7 +687,7 @@ export default function PlatformPage() {
           </div>
 
           <div className="border-t pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
-            <span>&copy; 2025 Pine Software. Todos os direitos reservados.</span>
+            <span>&copy; 2025 Pine Technology. Todos os direitos reservados.</span>
             <span>CNPJ: 37.100.281/0001-64</span>
           </div>
         </div>
