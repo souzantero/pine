@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Montserrat, JetBrains_Mono } from "next/font/google";
-import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const montserrat = Montserrat({
@@ -16,7 +15,7 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: "PINE",
-  description: "Seus dados, seus sistemas, sua IA",
+  description: "Você pede. Acontece. Engenharia e IA pra entregar em dias o que antes levava meses.",
   icons: {
     icon: "/favicon.svg",
   },
@@ -33,7 +32,6 @@ export default function RootLayout({
         className={`${montserrat.variable} ${jetbrainsMono.variable} antialiased`}
       >
         {children}
-        <Toaster />
       </body>
     </html>
   );
