@@ -1,5 +1,10 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Termos de Uso | PINE",
+};
 
 export default function TermsPage() {
   return (
@@ -23,216 +28,153 @@ export default function TermsPage() {
 
         <div className="prose prose-neutral dark:prose-invert max-w-none space-y-6">
           <p className="text-muted-foreground">
-            Última atualização: Fevereiro de 2026
+            Última atualização: Outubro de 2026
           </p>
 
           <section className="space-y-4">
             <h2 className="text-xl font-semibold">1. Aceitação dos Termos</h2>
             <p>
-              Ao acessar ou usar a plataforma PINE, operada pela Pine Technology
-              (CNPJ 37.100.281/0001-64), você concorda com estes Termos de Uso.
-              Se não concordar, não utilize o serviço.
+              Ao acessar o site pine.net.br ou entrar em contato com a PINE,
+              operada pela Pine Technology (CNPJ 37.100.281/0001-64), você
+              concorda com estes Termos de Uso. Se não concordar, não utilize o
+              site.
             </p>
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-xl font-semibold">2. Descrição do Serviço</h2>
+            <h2 className="text-xl font-semibold">2. Sobre a PINE</h2>
             <p>
-              O PINE é uma plataforma de agentes de inteligência artificial que
-              permite:
-            </p>
-            <ul className="list-disc pl-6 space-y-2">
-              <li>Criar e gerenciar conversas com agentes de IA.</li>
-              <li>Fazer upload de documentos para criação de base de conhecimento.</li>
-              <li>Configurar diferentes provedores de IA e ferramentas.</li>
-              <li>Gerenciar organizações com múltiplos membros e permissões.</li>
-            </ul>
-          </section>
-
-          <section className="space-y-4">
-            <h2 className="text-xl font-semibold">3. Cadastro e Conta</h2>
-            <p>
-              Para usar o PINE, você deve criar uma conta fornecendo
-              informações verdadeiras e completas. Você é responsável por:
-            </p>
-            <ul className="list-disc pl-6 space-y-2">
-              <li>Manter a confidencialidade da sua senha.</li>
-              <li>Todas as atividades realizadas na sua conta.</li>
-              <li>Notificar imediatamente sobre uso não autorizado.</li>
-            </ul>
-          </section>
-
-          <section className="space-y-4">
-            <h2 className="text-xl font-semibold">4. Uso Aceitável</h2>
-            <p>Você concorda em não usar o PINE para:</p>
-            <ul className="list-disc pl-6 space-y-2">
-              <li>Violar leis ou regulamentos aplicáveis.</li>
-              <li>Enviar conteúdo ilegal, difamatório ou que viole direitos de terceiros.</li>
-              <li>Tentar acessar sistemas ou dados não autorizados.</li>
-              <li>Interferir no funcionamento da plataforma.</li>
-              <li>Fazer engenharia reversa ou copiar o software.</li>
-              <li>Revender ou sublicenciar o acesso ao serviço.</li>
-            </ul>
-          </section>
-
-          <section className="space-y-4">
-            <h2 className="text-xl font-semibold">5. Conteúdo do Usuário</h2>
-            <p>
-              Você mantém a propriedade de todo conteúdo que envia ao PINE
-              (documentos, mensagens, etc.). Ao usar o serviço, você nos concede
-              licença para processar esse conteúdo conforme necessário para
-              fornecer o serviço.
-            </p>
-            <p>
-              Você é responsável por garantir que tem os direitos necessários
-              sobre o conteúdo enviado e que ele não viola direitos de terceiros.
-            </p>
-          </section>
-
-          <section className="space-y-4">
-            <h2 className="text-xl font-semibold">6. Provedores de IA</h2>
-            <p>
-              O PINE integra com provedores terceiros de modelos de linguagem
-              (OpenAI, Anthropic, Google, etc.). O uso desses serviços está
-              sujeito aos termos de cada provedor. Não nos responsabilizamos por:
-            </p>
-            <ul className="list-disc pl-6 space-y-2">
-              <li>Precisão ou adequação das respostas geradas pelos modelos de IA.</li>
-              <li>Indisponibilidade dos provedores terceiros.</li>
-              <li>Mudanças nos termos ou preços dos provedores.</li>
-            </ul>
-          </section>
-
-          <section className="space-y-4">
-            <h2 className="text-xl font-semibold">7. Planos e Contratação</h2>
-            <p>
-              O PINE oferece dois planos:
+              A PINE desenvolve soluções digitais sob demanda usando engenharia e
+              inteligência artificial. Nossos serviços incluem:
             </p>
             <ul className="list-disc pl-6 space-y-2">
               <li>
-                <strong>Free:</strong> Gratuito e permanente, com limites de uso
-                (1 membro, 1 coleção, 50 conversas, 200 chamadas de ferramentas/mês,
-                100MB de armazenamento, arquivos até 10MB).
+                <strong>Entregas:</strong> desenvolvimento de landing pages,
+                sites, aplicativos, automações, agentes de IA, criativos, vídeos
+                e outras soluções digitais.
               </li>
               <li>
-                <strong>Enterprise:</strong> Contratação personalizada via
-                consultoria, com todos os recursos ilimitados, suporte
-                prioritário, consultoria de implantação e SLA garantido.
-                A contratação é feita diretamente com a equipe comercial da
-                Pine Technology.
+                <strong>IA na sua empresa:</strong> diagnóstico da operação,
+                relatório de oportunidades de uso de IA e, opcionalmente,
+                implementação da infraestrutura correspondente.
+              </li>
+              <li>
+                <strong>Treinamento:</strong> capacitação de equipes no uso de
+                agentes de IA.
               </li>
             </ul>
             <p>
-              Os limites do plano Free podem ser alterados mediante aviso prévio
-              de 30 dias. Usuários ativos serão notificados por e-mail sobre
-              qualquer alteração.
+              As informações do site, incluindo exemplos de serviços e prazos,
+              têm caráter ilustrativo e não constituem oferta vinculante.
             </p>
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-xl font-semibold">8. Contratação Enterprise</h2>
+            <h2 className="text-xl font-semibold">3. Propostas e Contratação</h2>
             <p>
-              Para o plano Enterprise, as seguintes condições se aplicam:
+              Cada serviço é contratado a partir de uma proposta específica, que
+              define escopo, prazo, preço e condições de pagamento. Em caso de
+              divergência entre estes termos e a proposta ou contrato aceito, a
+              proposta ou contrato prevalece.
             </p>
+            <p>
+              Os prazos citados no site são referências para serviços típicos.
+              O prazo vinculante é o informado na proposta e começa a contar a
+              partir da aprovação e do recebimento das informações e materiais
+              necessários.
+            </p>
+          </section>
+
+          <section className="space-y-4">
+            <h2 className="text-xl font-semibold">4. Responsabilidades do Cliente</h2>
+            <p>Para que o prazo combinado seja cumprido, o cliente se compromete a:</p>
             <ul className="list-disc pl-6 space-y-2">
+              <li>Fornecer informações verdadeiras, completas e atualizadas.</li>
+              <li>Enviar materiais, conteúdos e acessos necessários em tempo hábil.</li>
+              <li>Responder a dúvidas e aprovações dentro dos prazos combinados.</li>
               <li>
-                <strong>Formalização:</strong> A contratação do plano Enterprise
-                é realizada mediante proposta comercial e contrato específico
-                acordado entre as partes.
-              </li>
-              <li>
-                <strong>Condições comerciais:</strong> Preços, forma de
-                pagamento, vigência e escopo dos serviços são definidos
-                individualmente no contrato de cada cliente.
-              </li>
-              <li>
-                <strong>Consultoria e implantação:</strong> O plano Enterprise
-                inclui serviços de consultoria para configuração, integração
-                e implantação da plataforma conforme as necessidades da
-                organização.
-              </li>
-            </ul>
-          </section>
-
-          <section className="space-y-4">
-            <h2 className="text-xl font-semibold">9. Cancelamento</h2>
-            <p>
-              As condições de cancelamento dependem do plano:
-            </p>
-            <ul className="list-disc pl-6 space-y-2">
-              <li>
-                <strong>Free:</strong> Você pode encerrar sua conta a qualquer
-                momento entrando em contato conosco.
-              </li>
-              <li>
-                <strong>Enterprise:</strong> O cancelamento segue as condições
-                estabelecidas no contrato firmado entre as partes.
+                Garantir que tem os direitos sobre os conteúdos e marcas que
+                fornece para uso nos projetos.
               </li>
             </ul>
             <p>
-              Ao encerrar sua conta, seus dados serão tratados conforme
-              nossa Política de Privacidade.
+              Atrasos causados pela falta desses itens suspendem o prazo de
+              entrega pelo período correspondente.
             </p>
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-xl font-semibold">10. Disponibilidade</h2>
+            <h2 className="text-xl font-semibold">5. Uso de Inteligência Artificial</h2>
             <p>
-              Nos esforçamos para manter o PINE disponível, mas não garantimos
-              funcionamento ininterrupto. Podemos realizar manutenções programadas
-              ou de emergência que afetem temporariamente o acesso.
+              A PINE utiliza ferramentas de inteligência artificial de
+              terceiros na execução dos serviços. Todo resultado entregue passa
+              por revisão da nossa equipe.
+            </p>
+            <p>
+              Quando uma solução é implementada sobre plataformas, agentes ou
+              ferramentas de terceiros, o uso delas pelo cliente está sujeito aos
+              termos e aos custos de cada fornecedor, que não estão incluídos no
+              preço do serviço, salvo indicação expressa na proposta.
             </p>
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-xl font-semibold">11. Limitação de Responsabilidade</h2>
+            <h2 className="text-xl font-semibold">6. Confidencialidade</h2>
             <p>
-              O PINE é fornecido &quot;como está&quot;. Na máxima extensão permitida
-              por lei, não nos responsabilizamos por:
+              Informações, dados e acessos compartilhados pelo cliente são
+              tratados como confidenciais e usados apenas para a execução do
+              serviço contratado, conforme nossa{" "}
+              <Link href="/privacy" className="text-primary hover:underline">
+                Política de Privacidade
+              </Link>
+              .
             </p>
+          </section>
+
+          <section className="space-y-4">
+            <h2 className="text-xl font-semibold">7. Propriedade Intelectual</h2>
+            <p>
+              O site da PINE, incluindo textos, design e marcas, é propriedade
+              da Pine Technology e protegido por leis de propriedade
+              intelectual. A titularidade e o licenciamento do que é entregue em
+              cada projeto são definidos na respectiva proposta ou contrato.
+            </p>
+          </section>
+
+          <section className="space-y-4">
+            <h2 className="text-xl font-semibold">8. Limitação de Responsabilidade</h2>
+            <p>Na máxima extensão permitida por lei, a PINE não se responsabiliza por:</p>
             <ul className="list-disc pl-6 space-y-2">
               <li>Danos indiretos, incidentais ou consequenciais.</li>
-              <li>Perda de dados, lucros ou oportunidades de negócio.</li>
-              <li>Decisões tomadas com base nas respostas dos agentes de IA.</li>
+              <li>Perda de lucros ou oportunidades de negócio.</li>
+              <li>
+                Indisponibilidade, mudanças de termos ou de preços de serviços e
+                ferramentas de terceiros.
+              </li>
+              <li>Decisões tomadas pelo cliente com base nos resultados entregues.</li>
             </ul>
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-xl font-semibold">12. Propriedade Intelectual</h2>
+            <h2 className="text-xl font-semibold">9. Links de Terceiros</h2>
             <p>
-              O PINE, incluindo software, design, marcas e conteúdo, é
-              propriedade da Pine Technology e protegido por leis de propriedade
-              intelectual. Estes termos não concedem direitos sobre nossa
-              propriedade intelectual além do uso do serviço.
+              O site contém links para serviços de terceiros, como WhatsApp,
+              Instagram e LinkedIn. O uso desses serviços é regido pelos termos e
+              políticas de cada um.
             </p>
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-xl font-semibold">13. Encerramento de Conta</h2>
+            <h2 className="text-xl font-semibold">10. Alterações nos Termos</h2>
             <p>
-              Para cancelar sua conta, entre em contato pelo e-mail{" "}
-              <a
-                href="mailto:ai@pine.net.br"
-                className="text-primary hover:underline"
-              >
-                ai@pine.net.br
-              </a>
-              . Podemos suspender ou encerrar seu acesso por violação destes
-              termos, mediante aviso prévio quando possível.
+              Podemos modificar estes termos a qualquer momento. A data da
+              última atualização fica sempre no topo desta página. Serviços já
+              contratados seguem as condições da proposta aceita.
             </p>
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-xl font-semibold">14. Alterações nos Termos</h2>
-            <p>
-              Podemos modificar estes termos a qualquer momento. Recomendamos
-              que você revise esta página regularmente. O uso continuado da
-              plataforma após alterações constitui aceitação dos novos termos.
-            </p>
-          </section>
-
-          <section className="space-y-4">
-            <h2 className="text-xl font-semibold">15. Legislação Aplicável</h2>
+            <h2 className="text-xl font-semibold">11. Legislação Aplicável</h2>
             <p>
               Estes termos são regidos pelas leis brasileiras. Qualquer disputa
               será resolvida no foro da comarca de Curitiba/PR.
@@ -240,10 +182,8 @@ export default function TermsPage() {
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-xl font-semibold">16. Contato</h2>
-            <p>
-              Para dúvidas sobre estes termos, entre em contato:
-            </p>
+            <h2 className="text-xl font-semibold">12. Contato</h2>
+            <p>Para dúvidas sobre estes termos, entre em contato:</p>
             <ul className="list-none space-y-1">
               <li>
                 <strong>E-mail:</strong>{" "}
@@ -255,7 +195,7 @@ export default function TermsPage() {
                 </a>
               </li>
               <li>
-                <strong>Endereço:</strong> Av. Sete de Setembro, 6556 - Curitiba/PR
+                <strong>Endereço:</strong> Av. Sete de Setembro, 6556, Curitiba/PR
               </li>
             </ul>
           </section>
