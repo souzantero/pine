@@ -3,29 +3,16 @@
 import Link from "next/link";
 import { Logo } from "@/components/logo";
 import { cn } from "@/lib/utils";
-import { LeadFormProvider, useLeadForm, type Frente } from "@/components/landing/lead-form";
+import { LeadFormProvider, useLeadForm } from "@/components/landing/lead-form";
 import { TimeBars } from "@/components/landing/time-bars";
 
-function Cta({
-  children,
-  frente,
-  variant = "solid",
-}: {
-  children: React.ReactNode;
-  frente?: Frente;
-  variant?: "solid" | "outline";
-}) {
+function Cta({ children }: { children: React.ReactNode }) {
   const { openLeadForm } = useLeadForm();
   return (
     <button
       type="button"
-      onClick={() => openLeadForm(frente)}
-      className={cn(
-        "inline-block text-sm font-semibold uppercase tracking-widest px-8 py-4 transition-opacity hover:opacity-70",
-        variant === "solid"
-          ? "bg-primary text-primary-foreground"
-          : "border border-foreground"
-      )}
+      onClick={openLeadForm}
+      className="inline-block bg-primary text-primary-foreground text-sm font-semibold uppercase tracking-widest px-8 py-4 transition-opacity hover:opacity-70"
     >
       {children}
     </button>
@@ -60,12 +47,6 @@ const ENTREGAS = [
   { title: "Vídeos", text: "Do roteiro à edição, pra anúncio, redes ou apresentação." },
 ];
 
-const TREINAMENTO = [
-  { title: "Entender", text: "O que é um agente de IA e o que ele resolve." },
-  { title: "Conversar", text: "Como pedir, orientar e corrigir pra ter o resultado certo." },
-  { title: "Resolver", text: "Como quebrar um problema real e entregar pra um agente resolver." },
-];
-
 type DetailItem = { title: string; text: string };
 
 // Grade de itens; o "closing" opcional fecha a grade em destaque
@@ -88,16 +69,13 @@ function DetailGrid({ items, closing }: { items: DetailItem[]; closing?: DetailI
   );
 }
 
-function Steps({ items }: { items: { title?: string; text: string }[] }) {
+function Steps({ items }: { items: string[] }) {
   return (
     <ol className="text-lg">
       {items.map((item, i) => (
-        <li key={item.text} className="flex gap-6 py-5 border-t border-foreground/10">
+        <li key={item} className="flex gap-6 py-5 border-t border-foreground/10">
           <span className="font-mono text-foreground/30">{i + 1}</span>
-          <span>
-            {item.title && <strong className="font-bold">{item.title} </strong>}
-            <span className={item.title ? "text-foreground/60" : undefined}>{item.text}</span>
-          </span>
+          <span>{item}</span>
         </li>
       ))}
     </ol>
@@ -112,7 +90,7 @@ function Header() {
         <Logo size="md" />
         <button
           type="button"
-          onClick={() => openLeadForm()}
+          onClick={openLeadForm}
           className="text-sm font-semibold uppercase tracking-widest hover:opacity-60 transition-opacity"
         >
           Vamos Conversar
@@ -140,7 +118,7 @@ export function LandingPage() {
               <p className="text-lg md:text-xl text-foreground/60 max-w-2xl mx-auto leading-relaxed">
                 Landing page em 24 horas. Site em 3 dias. App em 2 semanas.
               </p>
-              <Cta frente="entregas">Me conta o que você precisa</Cta>
+              <Cta>Me conta o que você precisa</Cta>
             </div>
             <div className="mt-20 md:mt-28">
               <TimeBars />
@@ -164,22 +142,22 @@ export function LandingPage() {
               O digital ficou rápido. Quem entrega pra você, não.
             </h2>
             <p className="text-lg text-foreground/60 leading-relaxed">
-              Na PINE, engenharia e IA trabalham juntas pra entregar em dias o
+              Na PINE, tecnologia e IA trabalham juntas pra entregar em dias o
               que antes levava meses.
             </p>
           </div>
         </Section>
 
-        {/* Frente 1: Entregas */}
+        {/* Entregas */}
         <Section>
           <div className="space-y-12">
             <div className="space-y-4">
-              <SectionLabel>01. Entregas</SectionLabel>
+              <SectionLabel>Entregas</SectionLabel>
               <h2 className="text-2xl md:text-3xl font-bold uppercase tracking-tight">
                 Se é digital, acontece.
               </h2>
               <p className="text-lg text-foreground/60 leading-relaxed">
-                A gente vive uma revolução. O que dá pra construir com engenharia
+                A gente vive uma revolução. O que dá pra construir com tecnologia
                 e IA muda toda semana, e a PINE acompanha cada mudança de perto.
                 Por isso a pergunta não é o que a gente faz. É o que você precisa.
               </p>
@@ -190,7 +168,7 @@ export function LandingPage() {
                 items={ENTREGAS}
                 closing={{
                   title: "E o que mais você precisar",
-                  text: "Conta o problema. Se der pra resolver, a gente resolve. Se não der, você fica sabendo em 24 horas.",
+                  text: "Conta o que você precisa. A gente entrega.",
                 }}
               />
             </div>
@@ -198,68 +176,15 @@ export function LandingPage() {
               <SectionLabel>Como funciona</SectionLabel>
               <Steps
                 items={[
-                  { text: "Você conta o que precisa." },
-                  { text: "Em 24 horas, recebe escopo, prazo e preço fechado." },
-                  { text: "Acontece." },
+                  "Você conta o que precisa.",
+                  "Em 24 horas, recebe escopo, prazo e preço fechado.",
+                  "Acontece.",
                 ]}
               />
             </div>
             <div>
-              <Cta frente="entregas">Me conta o que você precisa</Cta>
+              <Cta>Me conta o que você precisa</Cta>
             </div>
-          </div>
-        </Section>
-
-        {/* Frente 2: IA na sua empresa */}
-        <Section>
-          <div className="space-y-12">
-            <div className="space-y-8">
-              <div className="space-y-4">
-                <SectionLabel>02. IA na sua empresa</SectionLabel>
-                <h2 className="text-2xl md:text-3xl font-bold uppercase tracking-tight">
-                  Seu time ainda trabalha como sempre trabalhou.
-                </h2>
-              </div>
-              <p className="text-lg text-foreground/60 leading-relaxed">
-                Administrativo, operacional, vendas. As mesmas tarefas, do mesmo
-                jeito, no mesmo tempo. E boa parte delas já poderia estar rodando
-                sozinha.
-              </p>
-            </div>
-            <Steps
-              items={[
-                {
-                  title: "Diagnóstico.",
-                  text: "A gente entra na sua operação e mapeia, área por área, onde a IA faz diferença.",
-                },
-                {
-                  title: "Relatório.",
-                  text: "Você recebe o que dá pra otimizar e por onde começar.",
-                },
-                {
-                  title: "Implementação.",
-                  text: "Se quiser, a gente monta tudo em cima dos agentes de IA que já existem no mercado: instruções, skills, sub-agentes, ferramentas e conexões MCP com os seus sistemas.",
-                },
-              ]}
-            />
-            <Cta frente="ia" variant="outline">Quero um diagnóstico</Cta>
-          </div>
-        </Section>
-
-        {/* Frente 3: Treinamento */}
-        <Section>
-          <div className="space-y-12">
-            <div className="space-y-4">
-              <SectionLabel>03. Treinamento</SectionLabel>
-              <h2 className="text-2xl md:text-3xl font-bold uppercase tracking-tight">
-                Não é curso. É o seu time trabalhando com IA a partir de amanhã.
-              </h2>
-            </div>
-            <DetailGrid items={TREINAMENTO} />
-            <p className="text-lg text-foreground/60 leading-relaxed">
-              Tudo em cima dos processos reais da sua empresa.
-            </p>
-            <Cta frente="treinamento" variant="outline">Quero treinar meu time</Cta>
           </div>
         </Section>
 

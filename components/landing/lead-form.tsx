@@ -10,20 +10,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
 
 const WHATSAPP_NUMBER = "5541992413811";
 
-export const FRENTES = [
-  { id: "entregas", label: "Entregas" },
-  { id: "ia", label: "IA na empresa" },
-  { id: "treinamento", label: "Treinamento" },
-] as const;
-
-export type Frente = (typeof FRENTES)[number]["id"];
-
 interface LeadFormContextValue {
-  openLeadForm: (frente?: Frente) => void;
+  openLeadForm: () => void;
 }
 
 const LeadFormContext = createContext<LeadFormContextValue | null>(null);
@@ -40,29 +31,21 @@ function buildWhatsappUrl(data: {
   empresa: string;
   contato: string;
   necessidade: string;
-  frente: Frente | null;
 }) {
-  const frenteLabel = FRENTES.find((f) => f.id === data.frente)?.label;
   const lines = [
     `Olá! Sou ${data.nome}${data.empresa ? `, da ${data.empresa}` : ""}.`,
-    frenteLabel ? `Interesse: ${frenteLabel}` : null,
     "",
     `O que eu preciso: ${data.necessidade}`,
     "",
     `Contato: ${data.contato}`,
-  ].filter((line) => line !== null);
+  ];
 
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join("\n"))}`;
 }
 
 export function LeadFormProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
-  const [frente, setFrente] = useState<Frente | null>(null);
-
-  const openLeadForm = useCallback((initial?: Frente) => {
-    setFrente(initial ?? null);
-    setOpen(true);
-  }, []);
+  const openLeadForm = useCallback(() => setOpen(true), []);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -72,7 +55,6 @@ export function LeadFormProvider({ children }: { children: React.ReactNode }) {
       empresa: String(form.get("empresa") ?? "").trim(),
       contato: String(form.get("contato") ?? "").trim(),
       necessidade: String(form.get("necessidade") ?? "").trim(),
-      frente,
     });
     window.open(url, "_blank", "noopener,noreferrer");
     setOpen(false);
@@ -109,27 +91,6 @@ export function LeadFormProvider({ children }: { children: React.ReactNode }) {
               <Label htmlFor="lead-necessidade">O que você precisa?</Label>
               <Textarea id="lead-necessidade" name="necessidade" required rows={4} className="min-h-24 rounded-none" />
             </div>
-            <fieldset className="space-y-2">
-              <legend className="text-sm font-medium mb-2">Interesse (opcional)</legend>
-              <div className="flex flex-wrap gap-2">
-                {FRENTES.map((f) => (
-                  <button
-                    key={f.id}
-                    type="button"
-                    aria-pressed={frente === f.id}
-                    onClick={() => setFrente(frente === f.id ? null : f.id)}
-                    className={cn(
-                      "border border-foreground/20 px-3 py-2 text-xs font-semibold uppercase tracking-widest transition-colors",
-                      frente === f.id
-                        ? "bg-primary text-primary-foreground border-primary"
-                        : "hover:border-foreground/50"
-                    )}
-                  >
-                    {f.label}
-                  </button>
-                ))}
-              </div>
-            </fieldset>
             <button
               type="submit"
               className="w-full bg-primary text-primary-foreground text-sm font-semibold uppercase tracking-widest px-8 py-4 hover:opacity-80 transition-opacity"

@@ -30,8 +30,8 @@ npm run deploy   # OpenNext build + deploy to Cloudflare (requires `npx wrangler
 
 ### Key Files
 
-- `components/landing/landing-page.tsx` - All LP sections (hero, dor, virada, frentes Entregas / IA na sua empresa / Treinamento, fechamento, footer)
-- `components/landing/lead-form.tsx` - `LeadFormProvider` + `useLeadForm()`: side sheet form that opens WhatsApp with a prefilled message; `openLeadForm(frente)` preselects the area of interest
+- `components/landing/landing-page.tsx` - All LP sections (hero, dor, virada, Entregas, santo precisa bater, fechamento, footer)
+- `components/landing/lead-form.tsx` - `LeadFormProvider` + `useLeadForm()`: side sheet form that opens WhatsApp with a prefilled message
 - `components/landing/time-bars.tsx` - Animated "O jeito de sempre vs PINE" comparison
 - `components/ui/` - shadcn/ui primitives (new-york style; add with `npx shadcn@latest add <component>`)
 

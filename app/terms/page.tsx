@@ -44,25 +44,11 @@ export default function TermsPage() {
           <section className="space-y-4">
             <h2 className="text-xl font-semibold">2. Sobre a PINE</h2>
             <p>
-              A PINE desenvolve soluções digitais sob demanda usando engenharia e
-              inteligência artificial. Nossos serviços incluem:
+              A PINE desenvolve soluções digitais sob demanda usando tecnologia e
+              inteligência artificial, como landing pages, sites, aplicativos,
+              automações, agentes de IA, criativos, vídeos e outras soluções
+              digitais.
             </p>
-            <ul className="list-disc pl-6 space-y-2">
-              <li>
-                <strong>Entregas:</strong> desenvolvimento de landing pages,
-                sites, aplicativos, automações, agentes de IA, criativos, vídeos
-                e outras soluções digitais.
-              </li>
-              <li>
-                <strong>IA na sua empresa:</strong> diagnóstico da operação,
-                relatório de oportunidades de uso de IA e, opcionalmente,
-                implementação da infraestrutura correspondente.
-              </li>
-              <li>
-                <strong>Treinamento:</strong> capacitação de equipes no uso de
-                agentes de IA.
-              </li>
-            </ul>
             <p>
               As informações do site, incluindo exemplos de serviços e prazos,
               têm caráter ilustrativo e não constituem oferta vinculante.
