@@ -14,6 +14,7 @@ const jetbrainsMono = JetBrains_Mono({
 
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://pine.net.br"),
   title: "PINE",
   description: "Você pede. Acontece. Engenharia e IA pra entregar em dias o que antes levava meses.",
   icons: {

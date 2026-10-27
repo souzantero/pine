@@ -7,7 +7,6 @@ const description =
 
 // Server component só para exportar metadata; a página em si é client
 export const metadata: Metadata = {
-  metadataBase: new URL("https://pine.net.br"),
   title,
   description,
   openGraph: {
