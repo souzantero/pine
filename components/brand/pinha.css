@@ -1,0 +1,47 @@
+.pinha {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Cada pinhão sai do centro, pequeno e girado, e pousa no lugar na ordem da espiral */
+  .pinha-animada path {
+    transform-box: fill-box;
+    transform-origin: center;
+    opacity: 0;
+    transform: translate(calc(var(--x) * -1), calc(var(--y) * -1)) scale(0.2) rotate(-90deg);
+    animation: pinha-pinhao 0.55s cubic-bezier(0.2, 0.9, 0.3, 1.15) forwards;
+    animation-delay: calc(0.55s + var(--i) * 11ms);
+  }
+
+  /* O pinhão verde pousa por último e brilha */
+  .pinha-animada path.destaque {
+    animation:
+      pinha-pinhao 0.55s cubic-bezier(0.2, 0.9, 0.3, 1.15) forwards,
+      pinha-pulsa 1.2s ease-out forwards;
+    animation-delay: 1.65s, 2.05s;
+  }
+
+  .pinha-girando {
+    animation: pinha-gira 140s linear var(--giro-atraso, 0s) infinite;
+  }
+}
+
+@keyframes pinha-pinhao {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pinha-pulsa {
+  0% { filter: drop-shadow(0 0 0 rgb(91 158 120 / 0)); }
+  30% { filter: drop-shadow(0 0 14px rgb(91 158 120 / 0.9)); }
+  100% { filter: drop-shadow(0 0 4px rgb(91 158 120 / 0.4)); }
+}
+
+@keyframes pinha-gira {
+  to { transform: rotate(360deg); }
+}
