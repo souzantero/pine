@@ -10,7 +10,7 @@ const SERVICOS: { id: ServicoId; prazo: string; nome: string; texto: string }[] 
   {
     id: "sistema",
     prazo: "Sob medida",
-    nome: "Sistemas sob medida",
+    nome: "Sistemas",
     texto: "Gestão, portal do cliente, painel. Conversando com o que você já usa.",
   },
   { id: "automacao", prazo: "Sob medida", nome: "Automações", texto: "Planilha, CRM, email e WhatsApp trabalhando sozinhos." },
