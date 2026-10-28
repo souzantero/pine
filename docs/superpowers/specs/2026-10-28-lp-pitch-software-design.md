@@ -3,6 +3,12 @@
 Data: 2026-10-28
 Base: branch `lp-nova-identidade` (identidade visual nova já aplicada; ver `2026-10-27-lp-nova-identidade-design.md`)
 
+> **Atualização (mesmo dia):** o fundador não se identificou com o pitch da dor ("Fazer software ficou fácil...").
+> A mensagem principal passou a ser a experiência: "Você pede. Acontece." contada como uma jornada
+> (pedido, briefing, protótipos, desenvolvimento, ajustes, no ar), mostrada como o rastreio de um pedido
+> (`components/landing/jornada.tsx`). As seções Dor, Virada, "O que vem junto" e "Como funciona" saíram.
+> Ficaram o hero, a jornada, os serviços com arte, "O santo precisa bater" e o fechamento.
+
 ## Intenção
 
 A PINE passa a se vender só como software: landing pages, sites, apps, sistemas sob medida, automações e agentes de IA. Criativos, vídeos e página de Instagram saem da LP; o fundador oferece esses serviços na negociação.

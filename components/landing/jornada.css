@@ -1,0 +1,156 @@
+/* Estado padrão (sem JS ou com movimento reduzido): etapas em lista, pedido concluído */
+.jornada-palco {
+  display: grid;
+  gap: 56px;
+  align-items: center;
+  padding-block: 112px;
+}
+
+.jornada-passos {
+  margin-top: 24px;
+  display: grid;
+  gap: 40px;
+}
+
+/* Cartão de rastreio, como numa tela de app */
+.jornada-cartao {
+  width: 100%;
+  max-width: 440px;
+  justify-self: center;
+  padding: 28px 28px 20px;
+  border: 1px solid rgb(243 235 221 / 0.15);
+  background: rgb(243 235 221 / 0.03);
+}
+
+.jornada-cartao ol::before {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 26px;
+  bottom: 26px;
+  width: 1px;
+  background: rgb(243 235 221 / 0.15);
+}
+
+.jornada-trilha {
+  position: absolute;
+  left: 7px;
+  top: 26px;
+  width: 1px;
+  height: calc(var(--n) * 52px);
+  background: var(--terracota);
+  transition: height 0.6s cubic-bezier(0.6, 0, 0.2, 1);
+}
+
+.jornada-etapa {
+  display: grid;
+  grid-template-columns: 15px 1fr auto;
+  gap: 18px;
+  align-items: center;
+  height: 52px;
+  color: rgb(243 235 221 / 0.35);
+  transition: color 0.4s;
+}
+
+.jornada-pinhao {
+  position: relative;
+  width: 15px;
+  height: 20px;
+}
+
+.jornada-pinhao path {
+  fill: var(--tinta);
+  stroke: rgb(243 235 221 / 0.35);
+  stroke-width: 1.5;
+  transition: fill 0.4s, stroke 0.4s;
+}
+
+.jornada-etapa.feito { color: rgb(243 235 221 / 0.6); }
+.jornada-etapa.agora { color: var(--creme); }
+
+.jornada-etapa.feito .jornada-pinhao path,
+.jornada-etapa.agora .jornada-pinhao path {
+  fill: var(--terracota);
+  stroke: var(--terracota);
+}
+
+/* No ar: o pinhão verde */
+.jornada-etapa.final.agora .jornada-pinhao path {
+  fill: var(--verde-claro);
+  stroke: var(--verde-claro);
+}
+
+@media (min-width: 768px) {
+  .jornada-palco {
+    grid-template-columns: 1.1fr 1fr;
+    gap: 64px;
+  }
+}
+
+/* Com JS e movimento: a seção fica presa na tela e as frases trocam no mesmo lugar */
+.jornada-rolando {
+  height: 600vh;
+}
+
+.jornada-rolando .jornada-palco {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  padding-block: 0;
+  align-content: center;
+}
+
+.jornada-rolando .jornada-passos {
+  position: relative;
+  display: block;
+  height: 300px;
+}
+
+.jornada-rolando .jornada-passos li {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: translateY(30px);
+  filter: blur(6px);
+  transition: opacity 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.6s;
+}
+
+.jornada-rolando .jornada-passos li.antes {
+  transform: translateY(-30px);
+}
+
+.jornada-rolando .jornada-passos li.agora {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+.jornada-rolando .jornada-etapa.agora .jornada-pinhao path {
+  animation: jornada-pulsa 1.4s ease-in-out infinite;
+}
+
+.jornada-rolando .jornada-etapa.final.agora .jornada-pinhao path {
+  animation: pinha-pulsa 1.2s ease-out forwards;
+}
+
+@keyframes jornada-pulsa {
+  50% { filter: drop-shadow(0 0 6px rgb(156 74 43 / 0.9)); }
+}
+
+@media (max-width: 767px) {
+  .jornada-rolando .jornada-palco { gap: 28px; }
+  .jornada-rolando .jornada-passos { height: 230px; }
+}
+
+/* Na lista (sem rolagem animada), títulos menores e o cartão acompanha a leitura */
+.jornada:not(.jornada-rolando) .jornada-passos h2 {
+  font-size: clamp(32px, 4vw, 48px);
+}
+
+@media (min-width: 768px) {
+  .jornada:not(.jornada-rolando) .jornada-cartao {
+    position: sticky;
+    top: 96px;
+    align-self: start;
+  }
+}

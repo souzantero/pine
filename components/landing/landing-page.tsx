@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { Logo } from "@/components/brand/logo";
-import { Pinha, Pinhao } from "@/components/brand/pinha";
+import { Pinha } from "@/components/brand/pinha";
 import { cn } from "@/lib/utils";
 import { LeadFormProvider, useLeadForm } from "@/components/landing/lead-form";
 import { Cta } from "@/components/landing/cta";
 import { Hero } from "@/components/landing/hero";
 import { Reveal } from "@/components/landing/reveal";
 import { Servicos } from "@/components/landing/servicos";
-import { VemJunto } from "@/components/landing/vem-junto";
+import { Jornada } from "@/components/landing/jornada";
 
 type Tom = "claro" | "escuro";
 
@@ -31,40 +31,6 @@ function Section({ tom, children, className }: { tom: Tom; children: React.React
 
 // Atalho para o atraso da cascata
 const ordem = (n: number) => ({ "--ordem": n }) as React.CSSProperties;
-
-const PASSOS = [
-  "Você conta o que precisa.",
-  "Em 24 horas, recebe escopo, prazo e preço fechado.",
-  "Acontece.",
-];
-
-const VIRADA = "Não somos a ferramenta. Somos o resultado.";
-
-// Como funciona: uma linha liga os passos e o último vira o pinhão verde
-function Passos() {
-  return (
-    <Reveal className="passos">
-      <ol className="relative text-lg">
-        <span aria-hidden="true" className="passos-linha absolute top-8 bottom-8 left-[11px] w-px bg-[var(--linha)]" />
-        {PASSOS.map((passo, i) => {
-          const ultimo = i === PASSOS.length - 1;
-          return (
-            <li key={passo} className="relative flex items-center gap-6 border-t border-[var(--linha)] py-5">
-              <span className="flex w-6 shrink-0 justify-center bg-creme py-1">
-                {ultimo ? (
-                  <Pinhao className="passo-acontece h-5 w-auto text-verde" />
-                ) : (
-                  <span className="font-mono text-sm text-[var(--suave)]">{i + 1}</span>
-                )}
-              </span>
-              <span className={cn(ultimo && "font-titulo text-2xl")}>{passo}</span>
-            </li>
-          );
-        })}
-      </ol>
-    </Reveal>
-  );
-}
 
 function Header() {
   const { openLeadForm } = useLeadForm();
@@ -123,63 +89,12 @@ export function LandingPage() {
 
         <Hero />
 
-        {/* Dor */}
-        <Section tom="claro">
-          <Reveal className="space-y-10 [--passo:250ms]">
-            <h2 data-anima className={titulo}>
-              Fazer software ficou fácil. Fazer funcionar, não.
-            </h2>
-            <div className="space-y-6 font-titulo text-[clamp(22px,2.6vw,30px)] leading-[1.3] text-[var(--suave)]">
-              <p data-anima style={ordem(1)}>Hoje qualquer um gera um app com IA em minutos.</p>
-              <p data-anima style={ordem(2)}>Poucos colocam no ar. Menos ainda sustentam, integram e escalam.</p>
-              <p data-anima style={ordem(3)}>
-                O que sobra é um emaranhado de funcionalidades que não conversam entre si e não resolvem a dor.
-              </p>
-            </div>
-          </Reveal>
-        </Section>
-
-        {/* Virada */}
-        <Section tom="escuro">
-          <Reveal className="space-y-8">
-            <h2 className={cn(titulo, "palavras")}>
-              {VIRADA.split(" ").map((palavra, i) => (
-                <span key={i}>
-                  <span data-anima style={ordem(i)}>
-                    {palavra}
-                  </span>{" "}
-                </span>
-              ))}
-            </h2>
-            <p
-              data-anima
-              style={{ "--ordem": VIRADA.split(" ").length + 4, "--passo": "60ms" } as React.CSSProperties}
-              className="text-lg leading-relaxed text-[var(--suave)]"
-            >
-              A ferramenta te dá mais trabalho. O jeito de sempre te cobra pelo trabalho. A PINE te entrega o
-              resultado: no ar, integrado, testado e preparado pra crescer.
-            </p>
-          </Reveal>
-        </Section>
+        <Jornada />
 
         <Servicos />
 
-        {/* O que vem junto e como funciona */}
-        <Section tom="claro">
-          <div className="space-y-24">
-            <VemJunto />
-            <div className="space-y-5">
-              <p className="etiqueta text-[var(--suave)]">Como funciona</p>
-              <Passos />
-            </div>
-            <div>
-              <Cta>Me conta o que você precisa</Cta>
-            </div>
-          </div>
-        </Section>
-
         {/* O santo precisa bater */}
-        <Section tom="claro" className="border-t border-[var(--linha)] pt-24 md:pt-32">
+        <Section tom="claro">
           <Reveal className="space-y-8">
             <h2 data-anima className={titulo}>
               O santo precisa bater.
