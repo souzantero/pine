@@ -79,7 +79,6 @@ function Rodape() {
   );
 }
 
-const titulo = "font-titulo text-[clamp(36px,5vw,56px)] leading-[1.05]";
 
 export function LandingPage() {
   return (
@@ -92,22 +91,6 @@ export function LandingPage() {
         <Jornada />
 
         <Servicos />
-
-        {/* O santo precisa bater */}
-        <Section tom="claro">
-          <Reveal className="space-y-8">
-            <h2 data-anima className={titulo}>
-              O santo precisa bater.
-            </h2>
-            <div data-anima style={ordem(1)} className="space-y-6 text-lg leading-relaxed text-[var(--suave)]">
-              <p>A PINE não é pra todo mundo. E tudo bem.</p>
-              <p>
-                Trabalhamos com quem decide rápido e quer ver acontecer. Se esse é o seu caso, vamos conversar.
-                Se não, sem ressentimentos.
-              </p>
-            </div>
-          </Reveal>
-        </Section>
 
         {/* Fechamento */}
         <Section tom="escuro" className="relative overflow-hidden md:py-48">

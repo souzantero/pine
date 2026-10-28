@@ -1,4 +1,4 @@
-import { pinhao } from "@/components/brand/pinha";
+import { pinhao } from "@/components/brand/geometria";
 
 // Artes dos serviços, todas feitas de pinhões, num viewBox "-200 -200 400 400".
 // Cada pinhão: posição, ângulo (0 = ponta para cima, sentido horário), comprimento e se é o verde.

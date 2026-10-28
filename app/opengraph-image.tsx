@@ -1,10 +1,14 @@
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
 import { ImageResponse } from "next/og";
+import { PINHOES } from "@/components/brand/geometria";
 
 export const alt = "PINE. Você pede. Acontece.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
+
+// A pinha da marca como SVG, montada da mesma geometria do site (sem ler arquivo: roda no Worker)
+const PINHA_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-310 -310 620 620">${PINHOES.map(
+  (p, i) => `<path d="${p.d}" fill="${i === PINHOES.length - 1 ? "#5B9E78" : "#9C4A2B"}"/>`
+).join("")}</svg>`;
 
 const SUBTITULO = "Apps, sistemas e sites em dias. Com IA.";
 
@@ -22,10 +26,9 @@ async function fonte(familia: string, peso: number, texto: string) {
 
 // Imagem OG gerada no build: headline em Fraunces e a pinha da marca
 export default async function OpengraphImage() {
-  const [fraunces, inter, pinha] = await Promise.all([
+  const [fraunces, inter] = await Promise.all([
     fonte("Fraunces", 400, "Você pede.Acontece."),
     fonte("Inter", 400, SUBTITULO),
-    readFile(join(process.cwd(), "brand/logo/svg/pine-simbolo-cor.svg")),
   ]);
 
   return new ImageResponse(
@@ -50,7 +53,7 @@ export default async function OpengraphImage() {
           </div>
         </div>
         <img
-          src={`data:image/svg+xml;base64,${pinha.toString("base64")}`}
+          src={`data:image/svg+xml;base64,${btoa(PINHA_SVG)}`}
           width={430}
           height={430}
           alt=""
