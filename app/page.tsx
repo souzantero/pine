@@ -3,7 +3,7 @@ import { LandingPage } from "@/components/landing/landing-page";
 
 const title = "PINE | Você pede. Acontece.";
 const description =
-  "Landing page em 24 horas. Site em 3 dias. App em 2 semanas. Tecnologia e IA trabalhando juntas pra entregar em dias o que antes levava meses.";
+  "Apps, sistemas e sites em dias. Com IA. Não somos a ferramenta. Somos o resultado.";
 
 // Server component só para exportar metadata; a página em si é client
 export const metadata: Metadata = {

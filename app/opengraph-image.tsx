@@ -6,7 +6,7 @@ export const alt = "PINE. Você pede. Acontece.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-const SUBTITULO = "Landing page em 24 horas. Site em 3 dias. App em 2 semanas.";
+const SUBTITULO = "Apps, sistemas e sites em dias. Com IA.";
 
 // Baixa do Google Fonts só os glifos usados (o ImageResponse precisa de TTF/OTF)
 async function fonte(familia: string, peso: number, texto: string) {
@@ -45,7 +45,7 @@ export default async function OpengraphImage() {
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div style={{ fontFamily: "Fraunces", fontSize: 112, lineHeight: 1 }}>Você pede.</div>
           <div style={{ fontFamily: "Fraunces", fontSize: 112, lineHeight: 1 }}>Acontece.</div>
-          <div style={{ fontFamily: "Inter", fontSize: 24, marginTop: 40, color: "rgb(243 235 221 / 0.6)" }}>
+          <div style={{ fontFamily: "Inter", fontSize: 28, marginTop: 40, color: "rgb(243 235 221 / 0.6)" }}>
             {SUBTITULO}
           </div>
         </div>

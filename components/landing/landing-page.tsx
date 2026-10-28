@@ -8,6 +8,8 @@ import { LeadFormProvider, useLeadForm } from "@/components/landing/lead-form";
 import { Cta } from "@/components/landing/cta";
 import { Hero } from "@/components/landing/hero";
 import { Reveal } from "@/components/landing/reveal";
+import { Servicos } from "@/components/landing/servicos";
+import { VemJunto } from "@/components/landing/vem-junto";
 
 type Tom = "claro" | "escuro";
 
@@ -27,26 +29,8 @@ function Section({ tom, children, className }: { tom: Tom; children: React.React
   );
 }
 
-function Etiqueta({ children }: { children: React.ReactNode }) {
-  return (
-    <p data-anima className="etiqueta text-[var(--suave)]">
-      {children}
-    </p>
-  );
-}
-
 // Atalho para o atraso da cascata
 const ordem = (n: number) => ({ "--ordem": n }) as React.CSSProperties;
-
-const ENTREGAS = [
-  { title: "Landing pages", text: "Pronta pra campanha, rápida e medindo tudo. Em 24 horas." },
-  { title: "Sites", text: "Institucional, blog ou multilíngue, com SEO desde o primeiro dia. Em 3 dias." },
-  { title: "Aplicativos", text: "Web ou mobile, do protótipo à loja. Em 2 semanas." },
-  { title: "Automações", text: "Planilha, CRM, email e WhatsApp conversando sozinhos." },
-  { title: "Agentes de IA", text: "Atendimento, vendas e suporte respondendo a qualquer hora." },
-  { title: "Criativos", text: "Peças pra anúncio, redes e campanha, no volume que você precisa." },
-  { title: "Vídeos", text: "Do roteiro à edição, pra anúncio, redes ou apresentação." },
-];
 
 const PASSOS = [
   "Você conta o que precisa.",
@@ -54,36 +38,7 @@ const PASSOS = [
   "Acontece.",
 ];
 
-const VIRADA = "O digital ficou rápido. Quem entrega pra você, não.";
-
-// Grade de entregas: cascata ao aparecer e um pinhão que surge no hover
-function Entregas() {
-  return (
-    <Reveal className="grid gap-x-12 sm:grid-cols-2">
-      {ENTREGAS.map((item, i) => (
-        <div
-          key={item.title}
-          data-anima
-          style={ordem(i)}
-          className="group space-y-2 border-t border-[var(--linha)] py-6"
-        >
-          <h3 className="relative font-semibold">
-            <Pinhao className="absolute top-1/2 -left-5 h-3 w-auto -translate-y-1/2 text-terracota opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-            {item.title}
-          </h3>
-          <p className="leading-relaxed text-[var(--suave)]">{item.text}</p>
-        </div>
-      ))}
-      <div data-anima style={ordem(ENTREGAS.length)} className="space-y-2 bg-tinta p-6 text-creme">
-        <h3 className="flex items-center gap-3 font-semibold">
-          <Pinhao className="h-3.5 w-auto text-terracota" />
-          E o que mais você precisar
-        </h3>
-        <p className="leading-relaxed text-creme/60">Conta o que você precisa. A gente entrega.</p>
-      </div>
-    </Reveal>
-  );
-}
+const VIRADA = "Não somos a ferramenta. Somos o resultado.";
 
 // Como funciona: uma linha liga os passos e o último vira o pinhão verde
 function Passos() {
@@ -170,10 +125,17 @@ export function LandingPage() {
 
         {/* Dor */}
         <Section tom="claro">
-          <Reveal className="space-y-8 font-titulo text-[clamp(28px,4vw,44px)] leading-[1.15] [--passo:250ms]">
-            <p data-anima style={ordem(0)}>Você já esperou semanas por um orçamento?</p>
-            <p data-anima style={ordem(1)}>Já viu um projeto de 30 dias virar 6 meses?</p>
-            <p data-anima style={ordem(2)}>Já perdeu o timing de uma ideia porque ela não saiu a tempo?</p>
+          <Reveal className="space-y-10 [--passo:250ms]">
+            <h2 data-anima className={titulo}>
+              Fazer software ficou fácil. Fazer funcionar, não.
+            </h2>
+            <div className="space-y-6 font-titulo text-[clamp(22px,2.6vw,30px)] leading-[1.3] text-[var(--suave)]">
+              <p data-anima style={ordem(1)}>Hoje qualquer um gera um app com IA em minutos.</p>
+              <p data-anima style={ordem(2)}>Poucos colocam no ar. Menos ainda sustentam, integram e escalam.</p>
+              <p data-anima style={ordem(3)}>
+                O que sobra é um emaranhado de funcionalidades que não conversam entre si e não resolvem a dor.
+              </p>
+            </div>
           </Reveal>
         </Section>
 
@@ -194,29 +156,18 @@ export function LandingPage() {
               style={{ "--ordem": VIRADA.split(" ").length + 4, "--passo": "60ms" } as React.CSSProperties}
               className="text-lg leading-relaxed text-[var(--suave)]"
             >
-              Na PINE, tecnologia e IA trabalham juntas pra entregar em dias o que antes levava meses.
+              A ferramenta te dá mais trabalho. O jeito de sempre te cobra pelo trabalho. A PINE te entrega o
+              resultado: no ar, integrado, testado e preparado pra crescer.
             </p>
           </Reveal>
         </Section>
 
-        {/* Entregas */}
+        <Servicos />
+
+        {/* O que vem junto e como funciona */}
         <Section tom="claro">
-          <div className="space-y-16">
-            <Reveal className="space-y-5">
-              <Etiqueta>Entregas</Etiqueta>
-              <h2 data-anima style={ordem(1)} className={titulo}>
-                Se é digital, acontece.
-              </h2>
-              <p data-anima style={ordem(2)} className="text-lg leading-relaxed text-[var(--suave)]">
-                A gente vive uma revolução. O que dá pra construir com tecnologia e IA muda toda semana, e a
-                PINE acompanha cada mudança de perto. Por isso a pergunta não é o que a gente faz. É o que
-                você precisa.
-              </p>
-            </Reveal>
-            <div className="space-y-5">
-              <p className="etiqueta text-[var(--suave)]">Alguns exemplos</p>
-              <Entregas />
-            </div>
+          <div className="space-y-24">
+            <VemJunto />
             <div className="space-y-5">
               <p className="etiqueta text-[var(--suave)]">Como funciona</p>
               <Passos />

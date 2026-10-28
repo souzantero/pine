@@ -26,7 +26,7 @@ const SCRIPT_JS =
 export const metadata: Metadata = {
   metadataBase: new URL("https://pine.net.br"),
   title: "PINE",
-  description: "Você pede. Acontece. Tecnologia e IA pra entregar em dias o que antes levava meses.",
+  description: "Você pede. Acontece. Apps, sistemas e sites em dias. Com IA.",
 };
 
 export default function RootLayout({

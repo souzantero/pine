@@ -9,7 +9,7 @@ const ANGULO_AUREO = (137.508 * Math.PI) / 180;
 const f = (n: number) => n.toFixed(2);
 
 // Gota pontuda com a ponta apontando para `ang` (0 = para cima, sentido horário)
-function pinhao(cx: number, cy: number, ang: number, comp: number) {
+export function pinhao(cx: number, cy: number, ang: number, comp: number) {
   const larg = comp * 0.6;
   const pts = [
     [0, -comp / 2], [larg / 2, -comp / 4], [larg / 2, comp / 2], [0, comp / 2],

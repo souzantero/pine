@@ -15,7 +15,7 @@ export function Hero() {
               <span className="hero-l2 block">Acontece.</span>
             </h1>
             <p className="hero-sub text-[19px] text-creme/60 mb-9">
-              Landing page em 24 horas. Site em 3 dias. App em 2 semanas.
+              Apps, sistemas e sites em dias. Com IA.
             </p>
             <Cta tom="escuro" destaque className="hero-cta">
               Me conta o que você precisa
