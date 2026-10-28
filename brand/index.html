@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brandkit PINE</title>
+<link rel="icon" href="favicon/favicon.svg">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400&family=Inter:wght@400;600&family=JetBrains+Mono&display=swap">
+<link rel="stylesheet" href="tokens.css">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--pine-creme); color: var(--pine-tinta); font: 400 16px/1.6 var(--pine-fonte-texto); }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+  header { background: var(--pine-tinta); color: var(--pine-creme); }
+  header .mono { color: var(--pine-creme-60); }
+  header .wrap { height: 72px; display: flex; align-items: center; justify-content: space-between; }
+  header img { height: 32px; display: block; }
+  .mono { font: 400 12px var(--pine-fonte-etiqueta); letter-spacing: .12em; text-transform: uppercase; color: var(--pine-tinta-60); }
+  section { padding: 88px 0; border-bottom: 1px solid var(--pine-tinta-15); }
+  h1, h2 { font-family: var(--pine-fonte-titulo); font-weight: 400; line-height: 1.05; margin: 0; }
+  h1 { font-size: clamp(48px, 8vw, 96px); }
+  h2 { font-size: clamp(36px, 5vw, 56px); margin: 12px 0 32px; }
+  h3 { font: 600 15px var(--pine-fonte-texto); margin: 0 0 6px; }
+  p { margin: 0 0 16px; max-width: 680px; }
+  .lead { font-size: 20px; color: var(--pine-tinta-60); margin-top: 24px; }
+  .grid { display: grid; gap: 16px; }
+  .g2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+  .g3 { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .g4 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+  .tile { border: 1px solid var(--pine-tinta-15); display: flex; flex-direction: column; }
+  .tile .art { flex: 1; min-height: 220px; display: flex; align-items: center; justify-content: center; padding: 32px; }
+  .tile .art img { max-width: 100%; max-height: 180px; }
+  .tile .cap { padding: 12px 16px; border-top: 1px solid var(--pine-tinta-15); background: var(--pine-creme); }
+  .claro { background: var(--pine-creme); }
+  .branco { background: #fff; }
+  .escuro { background: var(--pine-tinta); }
+  .terra { background: var(--pine-terracota); }
+  .swatch { height: 160px; border: 1px solid var(--pine-tinta-15); display: flex; align-items: flex-end; padding: 14px; }
+  .swatch span { font: 400 12px var(--pine-fonte-etiqueta); letter-spacing: .08em; }
+  .type { border-top: 1px solid var(--pine-tinta-15); padding: 28px 0; display: grid; grid-template-columns: 220px 1fr; gap: 24px; align-items: baseline; }
+  .tt { font-family: var(--pine-fonte-titulo); font-size: 64px; line-height: 1; }
+  .tn { font: 600 40px var(--pine-fonte-texto); letter-spacing: .16em; }
+  .tm { font: 400 14px var(--pine-fonte-etiqueta); letter-spacing: .12em; text-transform: uppercase; }
+  table { width: 100%; border-collapse: collapse; }
+  td { border-top: 1px solid var(--pine-tinta-15); padding: 14px 12px 14px 0; vertical-align: top; }
+  td:first-child { width: 40%; font-weight: 600; }
+  .sim::before { content: ""; display: inline-block; width: 7px; height: 11px; margin-right: 10px; background: var(--pine-verde); border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; }
+  .nao { color: var(--pine-tinta-60); text-decoration: line-through; }
+  ul.files { list-style: none; padding: 0; margin: 0; font: 400 13px var(--pine-fonte-etiqueta); }
+  ul.files li { border-top: 1px solid var(--pine-tinta-15); padding: 10px 0; }
+  a { color: inherit; }
+  footer { padding: 48px 0; }
+  @media (max-width: 640px) { .type { grid-template-columns: 1fr; gap: 8px; } }
+</style>
+</head>
+<body>
+<header><div class="wrap"><img src="logo/svg/pine-horizontal-cor.svg" alt="PINE"><span class="mono">Brandkit</span></div></header>
+
+<section><div class="wrap">
+  <p class="mono">Conceito</p>
+  <h1>Você pede.<br>Acontece.</h1>
+  <p class="lead">A PINE entrega soluções digitais em dias, usando tecnologia e IA. A marca passa duas coisas ao mesmo tempo: a precisão da tecnologia e a confiança de quem tem raiz.</p>
+  <div class="grid g3" style="margin-top:48px">
+    <div><h3>A pinha</h3><p>Uma pinha de araucária, a árvore de Curitiba, onde a PINE nasceu. Origem, semente, crescimento.</p></div>
+    <div><h3>A espiral</h3><p>89 pinhões no ângulo áureo (137,5°), a mesma regra que a natureza usa numa pinha de verdade. Orgânica por fora, cálculo por dentro.</p></div>
+    <div><h3>O pinhão verde</h3><p>Um único pinhão é diferente: é o que acontece. Na comunicação, o verde aparece pouco e sempre com intenção.</p></div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <p class="mono">Logo</p>
+  <h2>Três formatos</h2>
+  <div class="grid g3">
+    <div class="tile"><div class="art escuro"><img src="logo/svg/pine-horizontal-cor.svg" alt=""></div><div class="cap"><h3>Horizontal</h3><span class="mono">Padrão</span></div></div>
+    <div class="tile"><div class="art escuro"><img src="logo/svg/pine-vertical-cor.svg" alt=""></div><div class="cap"><h3>Vertical</h3><span class="mono">Capas e aberturas</span></div></div>
+    <div class="tile"><div class="art escuro"><img src="logo/svg/pine-simbolo-cor.svg" alt=""></div><div class="cap"><h3>Símbolo</h3><span class="mono">Avatar, selo, favicon</span></div></div>
+  </div>
+
+  <h2 style="margin-top:72px">Quatro versões</h2>
+  <div class="grid g4">
+    <div class="tile"><div class="art escuro"><img src="logo/svg/pine-horizontal-cor.svg" alt=""></div><div class="cap"><h3>Cor</h3><span class="mono">Principal · fundo escuro</span></div></div>
+    <div class="tile"><div class="art claro"><img src="logo/svg/pine-horizontal-negativo.svg" alt=""></div><div class="cap"><h3>Negativo</h3><span class="mono">Fundo claro</span></div></div>
+    <div class="tile"><div class="art branco"><img src="logo/svg/pine-horizontal-mono-escuro.svg" alt=""></div><div class="cap"><h3>Mono escuro</h3><span class="mono">Uma cor, fundo claro</span></div></div>
+    <div class="tile"><div class="art terra"><img src="logo/svg/pine-horizontal-mono-claro.svg" alt=""></div><div class="cap"><h3>Mono claro</h3><span class="mono">Uma cor, fundo escuro</span></div></div>
+  </div>
+
+  <h2 style="margin-top:72px">Escuro e claro</h2>
+  <div class="grid g2">
+    <div class="tile"><div class="art escuro" style="min-height:360px"><img src="logo/svg/pine-vertical-cor.svg" alt="" style="max-height:280px"></div></div>
+    <div class="tile"><div class="art claro" style="min-height:360px"><img src="logo/svg/pine-vertical-negativo.svg" alt="" style="max-height:280px"></div></div>
+  </div>
+  <p style="margin-top:24px">Na versão horizontal, a pinha tem 1,8 vez a altura das maiúsculas. Respiro mínimo: a altura do "P". Não gire a pinha, não recolora pinhões e não mova o pinhão verde.</p>
+</div></section>
+
+<section><div class="wrap">
+  <p class="mono">Cores</p>
+  <h2>Muita tinta, verde quase nunca</h2>
+  <div class="grid g4">
+    <div><div class="swatch" style="background:var(--pine-tinta);color:var(--pine-creme)"><span>#1B1410</span></div><h3 style="margin-top:12px">Tinta</h3><p>Fundo principal.</p></div>
+    <div><div class="swatch" style="background:var(--pine-creme)"><span>#F3EBDD</span></div><h3 style="margin-top:12px">Creme</h3><p>Texto sobre o escuro e fundo claro.</p></div>
+    <div><div class="swatch" style="background:var(--pine-terracota);color:var(--pine-creme)"><span>#9C4A2B</span></div><h3 style="margin-top:12px">Terracota</h3><p>A pinha e destaques pontuais.</p></div>
+    <div><div class="swatch" style="background:var(--pine-verde);color:var(--pine-creme)"><span>#2F6B4F</span></div><h3 style="margin-top:12px">Verde-pinho</h3><p>Acento. Um por tela. Sobre escuro: <code>#5B9E78</code>.</p></div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <p class="mono">Tipografia</p>
+  <h2>Três vozes</h2>
+  <div class="type"><span class="mono">Títulos · Fraunces 400</span><span class="tt">Se é digital, acontece.</span></div>
+  <div class="type"><span class="mono">Nome · Inter 600</span><span class="tn">PINE</span></div>
+  <div class="type"><span class="mono">Texto · Inter 400</span><span>Tecnologia e IA trabalhando juntas pra entregar em dias o que antes levava meses.</span></div>
+  <div class="type"><span class="mono">Etiquetas · JetBrains Mono</span><span class="tm">Entregas · Como funciona · Vamos conversar</span></div>
+</div></section>
+
+<section><div class="wrap">
+  <p class="mono">Tom de voz</p>
+  <h2>Fala como quem já fez</h2>
+  <p>Direta, confiante e curta, sem precisar convencer ninguém. Provoca curiosidade em vez de explicar.</p>
+  <table style="margin-top:32px">
+    <tr><td>Diretos</td><td>Uma ideia por frase. Nada de jargão.</td></tr>
+    <tr><td>Confiantes</td><td>Afirmamos. Sem arrogância.</td></tr>
+    <tr><td>Elegantes</td><td>Menos é mais. Sem urgência falsa, sem "imperdível".</td></tr>
+    <tr><td>Seletivos</td><td>O santo precisa bater. A PINE não é pra todo mundo.</td></tr>
+  </table>
+  <div class="grid g2" style="margin-top:40px">
+    <div>
+      <p class="sim">Você pede. Acontece.</p>
+      <p class="sim">Se é digital, acontece.</p>
+      <p class="sim">A PINE não é pra todo mundo. E tudo bem.</p>
+    </div>
+    <div>
+      <p class="nao">Somos uma agência completa de soluções inovadoras!</p>
+      <p class="nao">Aproveite nossas condições especiais!</p>
+      <p class="nao">Pine, a sua software house.</p>
+    </div>
+  </div>
+  <p style="margin-top:24px">PINE sempre em maiúsculas. Sem "agência", "software house" ou "service as software". Sem travessões. Sem preços.</p>
+</div></section>
+
+<section><div class="wrap">
+  <p class="mono">Arquivos</p>
+  <h2>Para baixar</h2>
+  <ul class="files">
+    <li>logo/svg/ e logo/png/ · pine-{simbolo, horizontal, vertical}-{cor, negativo, mono-escuro, mono-claro}</li>
+    <li><a href="favicon/favicon.svg">favicon/</a> · favicon.svg, favicon.ico, apple-touch-icon.png, icon-192.png, icon-512.png</li>
+    <li><a href="social/avatar-claro.png">social/</a> · avatar-claro.png, avatar-escuro.png (1080×1080)</li>
+    <li><a href="tokens.css">tokens.css</a> · cores e fontes em CSS</li>
+  </ul>
+</div></section>
+
+<footer><div class="wrap"><span class="mono">PINE · Curitiba</span></div></footer>
+</body>
+</html>

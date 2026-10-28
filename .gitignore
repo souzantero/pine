@@ -44,3 +44,6 @@ yarn-error.log*
 next-env.d.ts
 
 .superpowers/
+
+# Fonte baixada pelo gerador do brandkit
+brand/_gerador/*.ttf

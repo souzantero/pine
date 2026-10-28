@@ -4,63 +4,68 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  /* Paleta da marca (brand/tokens.css) */
+  --color-tinta: var(--tinta);
+  --color-creme: var(--creme);
+  --color-terracota: var(--terracota);
+  --color-verde: var(--verde);
+  --color-verde-claro: var(--verde-claro);
+
+  --font-titulo: var(--font-fraunces);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+
+  /* Tokens usados pelos componentes shadcn (sheet e campos do formulário) */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-montserrat);
-  --font-mono: var(--font-jetbrains-mono);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
   --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
+  --color-secondary: var(--secondary);
+  --color-destructive: var(--destructive);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 12px);
-  --radius-4xl: calc(var(--radius) + 16px);
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(0.975 0.005 80);
-  --foreground: oklch(0.148 0.011 145);
-  --card: oklch(0.975 0.005 80);
-  --card-foreground: oklch(0.148 0.011 145);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.148 0.011 145);
-  --primary: oklch(0.148 0.011 145);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0.011 145);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0.007 145);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0.011 145);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0.005 145);
-}
+  --tinta: #1b1410;
+  --creme: #f3ebdd;
+  --terracota: #9c4a2b;
+  --verde: #2f6b4f;
+  --verde-claro: #5b9e78;
 
+  --radius: 0;
+  --background: var(--creme);
+  --foreground: var(--tinta);
+  --primary: var(--tinta);
+  --primary-foreground: var(--creme);
+  --muted-foreground: rgb(27 20 16 / 0.6);
+  --border: rgb(27 20 16 / 0.15);
+  --input: rgb(27 20 16 / 0.15);
+  --ring: var(--terracota);
+  --secondary: rgb(27 20 16 / 0.06);
+  --destructive: var(--terracota);
+}
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+  }
+}
+
+@layer components {
+  /* Etiquetas, menu e rótulos: JetBrains Mono em caixa alta */
+  .etiqueta {
+    font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
   }
 }

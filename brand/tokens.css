@@ -1,0 +1,20 @@
+/* Tokens da marca PINE. Fonte da verdade para cores e tipografia. */
+:root {
+  /* Paleta principal */
+  --pine-tinta: #1B1410;       /* fundo principal */
+  --pine-creme: #F3EBDD;       /* texto sobre o escuro e fundo claro */
+  --pine-terracota: #9C4A2B;   /* a pinha, destaques */
+  --pine-verde: #2F6B4F;       /* o pinhão diferente: acento, uma vez por composição */
+  --pine-verde-claro: #5B9E78; /* o acento sobre fundo escuro */
+
+  /* Apoio (derivados da paleta) */
+  --pine-tinta-60: rgb(27 20 16 / 0.6);  /* texto secundário no claro */
+  --pine-tinta-15: rgb(27 20 16 / 0.15); /* linhas e divisões no claro */
+  --pine-creme-60: rgb(243 235 221 / 0.6);
+  --pine-creme-15: rgb(243 235 221 / 0.15);
+
+  /* Tipografia (Google Fonts) */
+  --pine-fonte-titulo: "Fraunces", Georgia, serif;
+  --pine-fonte-texto: "Inter", system-ui, sans-serif;
+  --pine-fonte-etiqueta: "JetBrains Mono", ui-monospace, monospace;
+}

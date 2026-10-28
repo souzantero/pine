@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Logo } from "@/components/logo";
+import { Logo } from "@/components/brand/logo";
 import { cn } from "@/lib/utils";
 import { LeadFormProvider, useLeadForm } from "@/components/landing/lead-form";
 import { TimeBars } from "@/components/landing/time-bars";
@@ -87,7 +87,7 @@ function Header() {
   return (
     <header className="border-b border-foreground/10">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <Logo size="md" />
+        <Logo versao="cor" className="h-6 w-auto" />
         <button
           type="button"
           onClick={openLeadForm}
