@@ -4,20 +4,8 @@ import Link from "next/link";
 import { Logo } from "@/components/brand/logo";
 import { cn } from "@/lib/utils";
 import { LeadFormProvider, useLeadForm } from "@/components/landing/lead-form";
-import { TimeBars } from "@/components/landing/time-bars";
-
-function Cta({ children }: { children: React.ReactNode }) {
-  const { openLeadForm } = useLeadForm();
-  return (
-    <button
-      type="button"
-      onClick={openLeadForm}
-      className="inline-block bg-primary text-primary-foreground text-sm font-semibold uppercase tracking-widest px-8 py-4 transition-opacity hover:opacity-70"
-    >
-      {children}
-    </button>
-  );
-}
+import { Cta } from "@/components/landing/cta";
+import { Hero } from "@/components/landing/hero";
 
 function Section({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
@@ -85,15 +73,15 @@ function Steps({ items }: { items: string[] }) {
 function Header() {
   const { openLeadForm } = useLeadForm();
   return (
-    <header className="border-b border-foreground/10">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <Logo versao="cor" className="h-6 w-auto" />
+    <header className="bg-tinta text-creme">
+      <div className="mx-auto flex h-[72px] max-w-[1200px] items-center justify-between border-b border-creme/15 px-6">
+        <Logo versao="cor" className="h-[26px] w-auto" />
         <button
           type="button"
           onClick={openLeadForm}
-          className="text-sm font-semibold uppercase tracking-widest hover:opacity-60 transition-opacity"
+          className="etiqueta text-creme/60 transition-colors hover:text-creme"
         >
-          Vamos Conversar
+          Vamos conversar
         </button>
       </div>
     </header>
@@ -106,25 +94,7 @@ export function LandingPage() {
       <div className="min-h-screen bg-background text-foreground">
         <Header />
 
-        {/* Hero */}
-        <section className="py-28 md:py-40">
-          <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto text-center space-y-8">
-              <h1 className="text-5xl md:text-7xl font-extrabold uppercase tracking-tight leading-[0.95]">
-                Você pede.
-                <br />
-                Acontece.
-              </h1>
-              <p className="text-lg md:text-xl text-foreground/60 max-w-2xl mx-auto leading-relaxed">
-                Landing page em 24 horas. Site em 3 dias. App em 2 semanas.
-              </p>
-              <Cta>Me conta o que você precisa</Cta>
-            </div>
-            <div className="mt-20 md:mt-28">
-              <TimeBars />
-            </div>
-          </div>
-        </section>
+        <Hero />
 
         {/* Dor */}
         <Section>
