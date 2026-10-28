@@ -49,7 +49,6 @@ export default async function OpengraphImage() {
             {SUBTITULO}
           </div>
         </div>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={`data:image/svg+xml;base64,${pinha.toString("base64")}`}
           width={430}
