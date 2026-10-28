@@ -68,7 +68,7 @@ export function Servicos() {
 
         <Reveal className="space-y-8 border-t border-creme/15 py-20 md:py-28">
           <p data-anima className="max-w-2xl font-titulo text-[clamp(28px,4vw,44px)] leading-[1.15]">
-            Tem uma ideia que não está aqui? Conta. Se for software, acontece.
+            Tem uma ideia que não está aqui? Conta. Se for digital, acontece.
           </p>
           <div data-anima style={{ "--ordem": 1 } as React.CSSProperties}>
             <Cta tom="escuro">Me conta o que você precisa</Cta>
