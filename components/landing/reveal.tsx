@@ -17,6 +17,8 @@ export function Reveal({ as: Tag = "div", className, children }: RevealProps) {
   const [visivel, setVisivel] = useState(false);
 
   useEffect(() => {
+    // Avisa o script do <head> que o app carregou e as revelações vão funcionar
+    document.documentElement.dataset.hidratado = "1";
     const el = ref.current;
     if (!el) return;
     const observer = new IntersectionObserver(

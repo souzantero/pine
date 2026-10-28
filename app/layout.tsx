@@ -19,6 +19,10 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
 });
 
+const SCRIPT_JS =
+  "var h=document.documentElement;h.classList.add('js');" +
+  "setTimeout(function(){if(!h.dataset.hidratado)h.classList.remove('js')},4000)";
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://pine.net.br"),
   title: "PINE",
@@ -33,8 +37,9 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <head>
-        {/* Marca que há JS: só assim as revelações na rolagem escondem o conteúdo antes de animar */}
-        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
+        {/* Marca que há JS: só assim as revelações na rolagem escondem o conteúdo antes de animar.
+            Se o app não carregar em 4s (script bloqueado, rede caiu), tira a marca e mostra tudo. */}
+        <script dangerouslySetInnerHTML={{ __html: SCRIPT_JS }} />
       </head>
       <body
         className={`${fraunces.variable} ${inter.variable} ${jetbrainsMono.variable} antialiased`}
