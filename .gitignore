@@ -47,3 +47,6 @@ next-env.d.ts
 
 # Fonte baixada pelo gerador do brandkit
 brand/_gerador/*.ttf
+
+# Cache do Python do gerador
+__pycache__/
