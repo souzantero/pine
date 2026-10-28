@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { Logo } from "@/components/brand/logo";
 
 export const metadata: Metadata = {
   title: "Termos de Uso | PINE",
@@ -11,10 +12,13 @@ export default function TermsPage() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b">
-        <div className="container mx-auto px-4 h-16 flex items-center">
+        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+          <Link href="/" aria-label="PINE">
+            <Logo versao="negativo" className="h-6 w-auto" />
+          </Link>
           <Link
             href="/"
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+            className="etiqueta flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
             Voltar
@@ -24,7 +28,7 @@ export default function TermsPage() {
 
       {/* Content */}
       <main className="container mx-auto px-4 py-12 max-w-3xl">
-        <h1 className="text-3xl font-bold mb-8">Termos de Uso</h1>
+        <h1 className="font-titulo text-4xl md:text-5xl mb-8">Termos de Uso</h1>
 
         <div className="prose prose-neutral dark:prose-invert max-w-none space-y-6">
           <p className="text-muted-foreground">

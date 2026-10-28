@@ -10,6 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Pinhao } from "@/components/brand/pinha";
 
 const WHATSAPP_NUMBER = "5541992413811";
 
@@ -64,9 +65,9 @@ export function LeadFormProvider({ children }: { children: React.ReactNode }) {
     <LeadFormContext.Provider value={{ openLeadForm }}>
       {children}
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="right" className="w-full sm:max-w-md px-6 pt-14 pb-8 overflow-y-auto">
+        <SheetContent side="right" className="w-full sm:max-w-md px-6 pt-14 pb-8 overflow-y-auto bg-creme text-tinta">
           <div className="space-y-2">
-            <SheetTitle className="text-2xl font-bold uppercase tracking-tight">
+            <SheetTitle className="font-titulo text-4xl font-normal">
               Me conta.
             </SheetTitle>
             <SheetDescription className="text-foreground/60">
@@ -76,25 +77,26 @@ export function LeadFormProvider({ children }: { children: React.ReactNode }) {
 
           <form onSubmit={handleSubmit} className="space-y-5 mt-4">
             <div className="space-y-2">
-              <Label htmlFor="lead-nome">Nome</Label>
+              <Label htmlFor="lead-nome" className="etiqueta font-normal text-tinta/60">Nome</Label>
               <Input id="lead-nome" name="nome" required autoComplete="name" className="rounded-none" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="lead-empresa">Empresa</Label>
+              <Label htmlFor="lead-empresa" className="etiqueta font-normal text-tinta/60">Empresa</Label>
               <Input id="lead-empresa" name="empresa" autoComplete="organization" className="rounded-none" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="lead-contato">WhatsApp ou email</Label>
+              <Label htmlFor="lead-contato" className="etiqueta font-normal text-tinta/60">WhatsApp ou email</Label>
               <Input id="lead-contato" name="contato" required className="rounded-none" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="lead-necessidade">O que você precisa?</Label>
+              <Label htmlFor="lead-necessidade" className="etiqueta font-normal text-tinta/60">O que você precisa?</Label>
               <Textarea id="lead-necessidade" name="necessidade" required rows={4} className="min-h-24 rounded-none" />
             </div>
             <button
               type="submit"
-              className="w-full bg-primary text-primary-foreground text-sm font-semibold uppercase tracking-widest px-8 py-4 hover:opacity-80 transition-opacity"
+              className="group w-full inline-flex items-center justify-center gap-3 bg-tinta text-creme text-[13px] font-semibold uppercase tracking-[0.12em] px-8 py-[18px] hover:bg-black transition-colors"
             >
+              <Pinhao className="h-3.5 w-auto text-verde-claro transition-transform duration-300 group-hover:-translate-y-1 group-hover:-rotate-12" />
               Enviar pelo WhatsApp
             </button>
           </form>
