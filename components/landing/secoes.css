@@ -1,0 +1,69 @@
+/* Revelação na rolagem. Só esconde quando há JS (html.js) e o usuário aceita movimento. */
+@media (prefers-reduced-motion: no-preference) {
+  html.js .reveal [data-anima] {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 0.7s cubic-bezier(0.2, 0.7, 0.2, 1),
+      transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+    transition-delay: calc(var(--ordem, 0) * var(--passo, 120ms));
+  }
+
+  html.js .reveal.visivel [data-anima] {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Como funciona: a linha se desenha ligando os passos; o pinhão verde chega no fim */
+  html.js .passos .passos-linha {
+    transform: scaleY(0);
+    transition: transform 1.2s cubic-bezier(0.6, 0, 0.2, 1) 0.3s;
+  }
+  html.js .passos.visivel .passos-linha {
+    transform: none;
+  }
+  html.js .passos .passo-acontece {
+    opacity: 0;
+    transform: scale(0.3) rotate(-90deg);
+    transition:
+      opacity 0.4s ease-out 1.4s,
+      transform 0.55s cubic-bezier(0.2, 0.9, 0.3, 1.3) 1.4s;
+  }
+  html.js .passos.visivel .passo-acontece {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* A pinha do fechamento só começa a girar quando aparece */
+  .reveal:not(.visivel) .pinha-girando {
+    animation-play-state: paused;
+  }
+}
+
+.passos-linha {
+  transform-origin: top;
+}
+
+/* Virada: palavra por palavra */
+.palavras [data-anima] {
+  display: inline-block;
+  --passo: 60ms;
+}
+
+/* Fechamento: pinha grande cortada pela borda direita; no celular, atrás do texto */
+.fechamento-pinha {
+  position: absolute;
+  top: 50%;
+  right: -12vw;
+  width: min(54vw, 760px);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+@media (max-width: 767px) {
+  .fechamento-pinha {
+    right: -45vw;
+    width: 140vw;
+    opacity: 0.35;
+  }
+}
