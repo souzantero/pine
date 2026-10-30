@@ -91,8 +91,9 @@ brand/
 ├── logo/svg/             # pine-{formato}-{versao}.svg (fundo transparente, texto em curvas)
 ├── logo/png/             # os mesmos em PNG
 ├── favicon/              # favicon.svg, favicon.ico, apple-touch-icon, icon-192, icon-512
-├── social/               # avatares 1080x1080 (claro e escuro)
-└── _gerador/gerar.py     # gera todos os arquivos acima
+├── social/               # avatares 1080x1080, peças de Instagram e LinkedIn, textos.md
+├── _gerador/gerar.py     # gera logo, favicon e avatares
+└── _gerador/redes.py     # gera as peças de redes (precisa também de uharfbuzz)
 ```
 
 Para regenerar (requer `rsvg-convert`, via `brew install librsvg`):

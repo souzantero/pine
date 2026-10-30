@@ -60,8 +60,8 @@ function Rodape() {
           <a href="mailto:ai@pine.net.br" className={cn(link, "normal-case")}>
             ai@pine.net.br
           </a>
-          <a href="https://instagram.com/pine.ia" target="_blank" rel="noopener noreferrer" className={cn(link, "normal-case")}>
-            @pine.ia
+          <a href="https://instagram.com/pine.digital" target="_blank" rel="noopener noreferrer" className={cn(link, "normal-case")}>
+            @pine.digital
           </a>
           <a href="https://linkedin.com/company/pine-ia" target="_blank" rel="noopener noreferrer" className={link}>
             LinkedIn
